@@ -53,7 +53,6 @@ basic_stacked_path = 'D:/data_split_stacked/'
 
 
 print("Paso 0")    
-
 #tunning | puede ser sobre varios tipos de barras y varias acciones
 getting_ray_and_saving(
     ray_object_list = [standard_bar_tunning.remote(
@@ -70,6 +69,7 @@ getting_ray_and_saving(
     #### Optional Params ####
     list_element_types = None
     )
+
 
 print("Paso 1")
 
