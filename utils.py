@@ -459,7 +459,7 @@ def iterativeVwap(list_arrayPrice, list_arrayVol):
     result = []
         
     for idx in range(len(list_arrayPrice)):
-        
+
         if np.sum(list_arrayVol[idx]) == 0:
             vwap_ = np.sum(
                 list_arrayPrice[idx]*list_arrayVol[idx]
@@ -1858,6 +1858,9 @@ def infoBarGenerator(grp_time,
     string 'bartype', compute OHLC Bars (inc. 'VOLATILITY' + 'BARVOLUME')
     and VWAP.
     """
+    
+    grp_prices = List(grp_prices)
+    grp_vols = List(grp_vols)
     
     if bartype == 'tick':
         #compute vwap from Price and Vol by bar

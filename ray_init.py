@@ -5,7 +5,5 @@ Created on Sat Feb  6 20:23:04 2021
 @author: FRANK
 """
 import ray
-#import sys
-#print(dir(ray))
-#general right initialization
+
 ray.init(include_dashboard=(False),ignore_reinit_error=(True))

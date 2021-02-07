@@ -52,7 +52,6 @@ basic_stacked_path = 'D:/data_split_stacked/'
 
 
 
-
 print("Paso 0")    
 
 #tunning | puede ser sobre varios tipos de barras y varias acciones
@@ -105,24 +104,24 @@ getting_ray_and_saving(
 print("Paso 2")
 
 #entropy | puede ser sobre varias acciones, pero solo sobre un tipo de barra 
-getting_ray_and_saving(
-        ray_object_list = [entropyCalculationParallel.remote(
-                        zarr_dir = data_dir,
-                        pandas_dir = basic_stacked_path,
-                        stock = stock, 
-                        bartype = 'VOLUME',
-                        #### Optional Params ####
-                        beta = 0.02, 
-                        entropy_window = 100, 
-                        cumsum_sampling = True                        
-                        ) for stock in list_stocks],
-        path_save = basic_stacked_path, 
-        list_stocks = list_stocks, 
-        naming = "ENTROPY",
-        saving_type = 'entropy',
-        #### Optional Params ####
-        list_element_types = 'VOLUME', #aqui iteracion    
-    )
+#getting_ray_and_saving(
+#        ray_object_list = [entropyCalculationParallel.remote(
+#                        zarr_dir = data_dir,
+#                        pandas_dir = basic_stacked_path,
+#                        stock = stock, 
+#                        bartype = 'VOLUME',
+#                        #### Optional Params ####
+#                        beta = 0.02, 
+#                        entropy_window = 100, 
+#                        cumsum_sampling = True                        
+#                        ) for stock in list_stocks],
+#        path_save = basic_stacked_path, 
+#        list_stocks = list_stocks, 
+#        naming = "ENTROPY",
+#        saving_type = 'entropy',
+#        #### Optional Params ####
+#        list_element_types = 'VOLUME', #aqui iteracion    
+#    )
 
 print("Paso 3")
 
