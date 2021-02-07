@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 from numba import njit
 from datetime import datetime
-from enigmx.sampling_features import getTEventsCumSum
 from enigmx.utils import (
     get_arrs, bar_para, softmax, sel_days, 
     simpleFracdiff, open_bar_files
@@ -17,8 +16,7 @@ from enigmx.utils import (
 
 # El presente file 'alternative_methods.py' posee las func. relevantes
 # del primer apartado del workflow (ver ppt "17-01" del 2021).
-# Fue dividido para comodidad en posibles modificaciones futuras.
-#
+# Fue dividido para comidad en posibles modificaciones futuras.
         
 ##############################################################################        
 #1. Bar tunning #-------------------------------------------------------------
@@ -94,12 +92,32 @@ def standard_bar_tunning(url,ticker,num_bar, date_tuple_range):
 ##############################################################################
 #2. Entropy Calculation #-----------------------------------------------------
 ##############################################################################
+def getTEventsCumSum(gRaw,h):
+    """
+    Function for CUMSUM Filter resampling by 'h'.
+    
+    Higher 'h' means less tEvents values in term of prices diff.
+    
+    0 < h < 1
+    """
+    
+    tEvents,sPos,sNeg=[],0,0
+    #diff = np.diff(g)
+    diff=np.diff(gRaw) #differential | eq. returns
+    for i in range(1,diff.shape[0]):
+        sPos,sNeg=max(0,sPos+diff[i]),min(0,sNeg+diff[i])
+        #print(sPos,sNeg)
+        if sNeg<-h:
+            sNeg=0;tEvents.append(i)
+        elif sPos>h:
+            sPos=0;tEvents.append(i)
+    return tEvents#pd.DatetimeIndex(tEvents)
 
-@njit
+#@njit
 def matchLength(msg,i,n):
     # Maximum matched length+1, with overlap.
     # i>=n & len(msg)>=i+n
-    subS=0
+    subS=''
     #if 'n' is not a fixed window, it will be acumulated
     #print("info antes de match length")
     #print(range(n))
@@ -330,7 +348,6 @@ def optPort(cov,mu=None):
     w/=np.dot(ones.T,w)
     return w
 
-@ray.remote
 def etfTrick(bar_dir, 
              stock_list, 
              bartype, 
@@ -348,12 +365,13 @@ def etfTrick(bar_dir,
         - 'stock_list': lst of strings by stock of 'bar' .csv information.
         - 'bartype': str referring type of bars 'bar' .csv is based on.
         - 'k': initial K (AUM) int to compute ETF Trick.
-        - 'lowerb_ound_index': N-int 1st values taken to compute 1st covmatrix.
+        - 'lowerb_ound_index': N-int first values taken to 1st covmatrix.
         - 'allocation_approach': str referring weight method computation.
                 * 'inv': inverting covariance matrix method.
                 * otherwise: PCA decomposition.
-        - 'output_type': statement  referring to output format.
-                * "dict" statement: returns full dict of info 
+        - 'output_type': 'dict' statement or anything else referring 
+                         to output format.
+                * "dict" statement: returns full dictionary of info 
                                     (ETF value series not included).
                 * anything else: returns full ETF Trick series.
     Output:
@@ -367,7 +385,7 @@ def etfTrick(bar_dir,
     list_stocks = [
         open_bar_files(bar_dir, stock, bartype) for stock in stock_list
     ]
-    
+
     #get idx-time reformed df close dates of each stock-bar dataframe
     list_reformed_df_close_dates = [
         settingTimePandasFormat(stock_frame, "close_date") 
@@ -454,12 +472,13 @@ def etfTrick(bar_dir,
         
         #save information of weights
         info_weights.append(weigths)
-
+    
     #final prices segmentation | useful to final computation
     join_array_open_prices = join_dataframe_open_prices.values[
         lower_bound_index:
     ]
-
+    join_array_dates = join_array_dates[lower_bound_index:]
+    
     #find when a bar has a 't' index ocurrency | iterate by each 't'
     for stockIdx in range(len(info_weights)-1):
 
@@ -469,53 +488,65 @@ def etfTrick(bar_dir,
 
         #if there is bar at 't', we define a new 'h'
         else:
+
             #find allocation weight vector at 't' by stock index
             allocation_weight_t = info_weights[stockIdx]
-            
+
             #get open prices by stock idx in the next 't'
             precio_open_tsig = join_array_open_prices[stockIdx+1]
-            
+
             #find USD value change of 1 point (1%)
             USDValT = precio_open_tsig * 0.01
-            
+
             #compute delta difference
             delta = \
             temp_matrix_prices.iloc[stockIdx]-join_array_open_prices[stockIdx]
-            
+
             #if it is the first event
             if stockIdx == 0:
+
                 pass
             
             #otherwise
             else:
-                #find the new K at 't' | no problem h_ti error | defined iter.
-                k = k + sum(hi_t*USDValT*delta)
-            
+                #find the new K at 't'
+                k = k + sum(hi_t*USDValT*delta.fillna(0))
+
             #finally, compute 'h' holding securities at 't'
             hi_t = (
                 (allocation_weight_t * k)/(precio_open_tsig*USDValT * sum(
                     abs(allocation_weight_t))
                                           )
             )
-            
+
             #save 'h' to adress historical holdings
             _.append(hi_t)
             
-        info_dates.append(join_array_dates[stockIdx])  
-    
+        info_dates.append(join_array_dates[stockIdx])
+
     #if output_type is 'dict' return complete info dict report
     if output_type == dict:
         return {
             "info_weights":np.array(info_weights), 
-            "info_dates":np.array(info_dates), 
+            "info_dates":np.array(info_dates),
             "prices_allocation":np.array(join_array_open_prices)[:-1], 
             "holdings":np.array(_)
         }
     
-    #otherwise, returns only historical vector of asset holdings
-    #this dataframe use the 'time' info of largest equity info
     else:
-        return pd.DataFrame(
-            {"time": np.array(info_dates)[:,0], 
-             "value":np.sum(np.array(_) * np.array(join_array_open_prices)[:-1], axis=1)}
+        #generate final dataframe with ETF Trick
+        final_frame = pd.DataFrame(
+            {"value": np.sum(
+                np.array(_) * np.array(join_array_open_prices
+                                       )[:-1], axis=1)
+                }
         )
+
+        #add date-info per stocks to select after the next sampling process
+        final_frame[stock_list] = np.array(info_dates)
+        
+        final_frame[stock_list] = final_frame[stock_list].apply(pd.to_datetime)
+        final_frame.to_csv(
+            bar_dir + "SERIES_" + bartype + "_ETFTRICK.csv", index=False
+            )
+        return "ETFTrick Saved"

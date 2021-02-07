@@ -105,6 +105,7 @@ def get_allsadf(close,minSL,constant,lags):
             y_,x_=np.ascontiguousarray(y[start:]),np.ascontiguousarray(
                 x[start:, ]
                 )
+            
             try:
                 #x transpuesta * y
                 xy=np.ascontiguousarray(np.dot(x_.T,y_)) 
@@ -159,14 +160,20 @@ def generalSADFMethod(original_frame, main_column_name, lags = None):
     
     return original_frame
 
-@ray.remote
 def gettingSADF(path_etf_frame, 
                 bartype, 
                 lags = None, 
                 main_value_name = 'value'):
     
     etfDf = pd.read_csv(
-        path_etf_frame+"SERIES_"+bartype.upper()+"_"+"ETFTRICK.csv"
+        path_etf_frame+"SERIES_"+bartype.upper()+"_ETFTRICK.csv"
         )
     
-    return generalSADFMethod(etfDf, main_value_name, lags = lags)
+    sadf_frame = generalSADFMethod(etfDf, main_value_name, lags = lags)
+    
+    sadf_frame.to_csv(
+        path_etf_frame + "SERIES_" + bartype.upper() + "_SADF.csv",
+        index=False
+        )
+    
+    return "SADF saved in ETF Location. New column defined."

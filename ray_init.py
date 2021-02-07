@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
 """
-@author: Quantmoon Technologies
-webpage: https://www.quantmoon.tech//
-"""
+Created on Sat Feb  6 20:23:04 2021
 
+@author: FRANK
+"""
 import ray
 #import sys
 #print(dir(ray))

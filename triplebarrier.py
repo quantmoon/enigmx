@@ -6,7 +6,9 @@ webpage: https://www.quantmoon.tech//
 import ray
 import numpy as np
 import pandas as pd
-from enigmx.utils import get_horizons, getBarrierCoords
+from enigmx.utils import (
+    get_horizons, getBarrierCoords, LabelTripleBarrierComputation
+    )
 
 #Multilabel Computation | Sigma value as frontier
 def multilabel_computation(priceAchieved, upper, lower, sigma):
@@ -34,18 +36,25 @@ def trilabel_computation(priceAchieved, upper, lower):
             return 0
 
 #TripleBarrier Generation    
-@ray.remote
+#@ray.remote
 def generateTripleBarrier(data_dir,
                           stock,
-                          path_save,
+                          bartype,
                           alpha = 2.5,
                           window_volatility=1, 
                           window_horizon=1,
                           sigma = 0.3):
     
     df_ = pd.read_csv(
-        data_dir + stock + '_INTERMEDIATE_STACKED' + '.csv'
+        data_dir + stock + "_" + bartype.upper() + '_BAR.csv',
+        parse_dates= [
+            "open_date",
+            "high_date",
+            "low_date",
+            "close_date",
+            "horizon"]
         )
+    
     df_['datetime'] = pd.to_datetime(
                                 df_['datetime']
                                 )
@@ -140,6 +149,7 @@ def generateTripleBarrier(data_dir,
 def getting_ray_triple_barrier(ray_object_list, data_dir_last, list_stocks):
     
     list_datasets =  ray.get(ray_object_list)
+    #list_datasets = ray_object_list
     
     for idx, dataset in enumerate(list_datasets):
         
@@ -152,3 +162,19 @@ def getting_ray_triple_barrier(ray_object_list, data_dir_last, list_stocks):
         
     print("Saving Porcess Ended")
     return None
+
+@ray.remote
+def new_triple_barrier_computation(data_dir, stock, bartype, zarr_path, 
+                                   method = 'SADF'):
+    
+    df_ = pd.read_csv(
+        data_dir + stock + "_" + bartype.upper() + 
+        '_' + method + '_SAMPLED.csv',
+        parse_dates= [
+            "open_date",
+            "high_date",
+            "low_date",
+            "close_date",
+            "horizon"]
+        )
+    return LabelTripleBarrierComputation(df_, stock, zarr_path)

@@ -711,97 +711,6 @@ def get_prod(arr1,arr2):
 #######----------------------------------------------------------------####### 
 ####### Main IMBALANCE BARS Function #######
 
-#Hypertunning Variables per stock for Imbalance Bars Construction
-def comparative_df(
-        list_stocks, 
-        dates, 
-        alpha_1_interval, 
-        alpha_2_interval, 
-        bars_interval,
-        path, hyperp_path, 
-        tipo = 'DIB',
-        drop_dup = False, plot = False):
-    
-    """
-    Main Function to define Imbalance Bars parameters.
-    
-    It saves paratmers for each stock like:
-                            A            AA      ...
-        alpha_1      9.00E-05      9.00E-05      ...
-        alpha_2      1.00E-05      5.00E-05      ...    
-        num_bars           12            14      ...    
-        ET_init   1215.147727   1578.525974      ...    
-        Eb_init  -0.013919436  -0.010053447      ...    
-        Ebv_init -221.2989616  -88.02652877      ...    
-        
-    This function returns a .csv in certain path to use during Imbalance 
-    construction.
-    """
-    
-    df = pd.DataFrame(
-        columns=[
-            'symbol', 'num_bars','alpha1',
-            'alpha2','len_Ts','max_threshold',
-            'min_threshold'
-            ]
-        )
-    
-    hyperp = {}
-    
-    for symbol in list_stocks:
-        print(symbol)
-        ts_ref = 1
-        val=[0.0001,0.0001,5,1,1,1]
-        df_init = load_data(
-            symbol, path, dates, drop_dup = True
-            )
-        
-        for num_bars in bars_interval:
-            X, ET_init, Eb_init, Ebv_init = init_values(
-                df_init, 
-                tipo=tipo, 
-                num_bars=num_bars
-                )
-            X = np.array(X.bv,dtype=np.float64)
-            
-            for alpha_1 in alpha_1_interval:
-                
-                for alpha_2 in alpha_2_interval:
-                    Ts, thres = compute_Ts_DIB(
-                            X, 
-                            ET_init, 
-                            Ebv_init, 
-                            alpha_1, 
-                            alpha_2, 
-                            50, 
-                            len(dates)
-                        )
-                    
-                    if len(Ts)>ts_ref:
-                        
-                        if thres[-1]<thres[-2]*10:
-                            val[0] = alpha_1
-                            val[1] = alpha_2
-                            val[2] = num_bars
-                            val[3] = ET_init
-                            val[4] = Eb_init
-                            val[5] = Ebv_init
-                            ts_ref = len(Ts)
-                            
-        hyperp[symbol] = val
-        
-    df = pd.DataFrame(
-        hyperp,index = [
-            'alpha_1','alpha_2',
-            'num_bars',
-            'ET_init',
-            'Eb_init','Ebv_init'
-            ]
-        )
-    df.to_csv(hyperp_path+"hyperp.csv")
-                
-    return "Imbalance Hyperparameters Tunned"
-    
 def input_(df, init_b ,tipo):
     '''
     init_b: valor inicial del tick direction, puede ser 1 o -1, no deberia tener gran impacto
@@ -2167,7 +2076,8 @@ def ErrorIndexIdxFirstTrue(param):
         #only 1st value from tuple of single array
         return param[0][0]
 
-def vectorizedTripleBarrier(path, init, init_ts, last, last_ts, upper_bound, lower_bound):
+def vectorizedTripleBarrier(path, init, init_ts, last, last_ts, upper_bound, 
+                            lower_bound):
     
     #days range to search tripleBarrier | timeframe values
     daysList = sel_days(init, last) 
@@ -2334,13 +2244,10 @@ def saving_basic_bars(path_save, list_datasets, naming,
 
             saving_path = path_save + list_stocks[idx] + "_" + \
                 list_bar_names[idx_bartype].upper() + "_" + naming + '.csv'
-            
-            #save date as string to preserve mili/microsecond information
+
             dataframe.loc[:, 'open_date':'close_date'] = \
-                dataframe.loc[:, 'open_date':'close_date'].apply(
-                    lambda x: x.dt.strftime("%y-%m-%d %H:%M:%S.%f"),
-                    axis=1
-                    )
+                dataframe.loc[:, 'open_date':'close_date'].astype(str)
+
         
             dataframe.to_csv(
                 saving_path, 
@@ -2386,17 +2293,9 @@ def saving_etf_trick_or_sadf(path_save, list_datasets, naming,
 
         saving_path = path_save + "SERIES_" + \
                 bar_name.upper() + "_" + naming + '.csv'
-        
-        #save date as string to preserve mili/microsecond information
-        #dataset['time'] = \
-        #        dataset['time'].apply(
-        #            lambda x: x.dt.strftime("%y-%m-%d %H:%M:%S.%f"),
-        #            axis=1
-        #            )              
-               
+                
         dataset.to_csv(
                 saving_path, 
-                date_format="%y-%m-%d %H:%M:%S.%f", 
                 index=False
                 )    
         
@@ -2449,4 +2348,6 @@ def open_bar_files(base_path, stock, bartype):
     pandasBar = pd.read_csv(pandas_path, parse_dates=[
         "open_date","high_date","low_date","close_date", "horizon"]
                            )
+    #pandasBar = pd.read_csv(pandas_path)
+
     return pandasBar

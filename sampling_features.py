@@ -3,24 +3,14 @@
 webpage: https://www.quantmoon.tech//
 """
 
-import numpy as np
 import pandas as pd
 
-def getTEventsCumSum(gRaw,h):
-    """
-    Function for CUMSUM Filter resampling by 'h'.
-    
-    Higher 'h' means less tEvents values in term of prices diff.
-    
-    0 < h < 1
-    """
-    
+def getTEvents(gRaw,h):
     tEvents,sPos,sNeg=[],0,0
-    #diff = np.diff(g)
-    diff=np.diff(gRaw) #differential | eq. returns
+    diff = gRaw #np.diff(gRaw)
     for i in range(1,diff.shape[0]):
         sPos,sNeg=max(0,sPos+diff[i]),min(0,sNeg+diff[i])
-        #print(sPos,sNeg)
+        
         if sNeg<-h:
             sNeg=0;tEvents.append(i)
         elif sPos>h:
@@ -67,7 +57,7 @@ def getSamplingFeatures(
             )
     
     base_df = pd.read_csv(direction)
-
+    
     final_selected_object = samplingFilter(
                                         base_df, 
                                         main_column_name, 
@@ -80,9 +70,51 @@ def getSamplingFeatures(
         final_selected_object.to_csv(
             path_entropy_or_sadf_allocated+"FEATURES_"+
             bartype.upper() +"_"+ main_column_name.upper() +"_SAMPLING.csv", 
-            date_format="%y-%m-%d %H:%M:%S.%f", 
             index=False
             )    
+        return "Data Events Sampled."
     else: 
         return final_selected_object
-                        
+
+
+# Function for sampled selection based on structural breaks/entropy | base bars 
+def crossSectionalDataSelection(path_bars, list_stocks, bartype, save = True):
+    
+    base_sample_type = 'SADF'
+    
+    #open selected dataframe of sampled values in SADF
+    sampling_events_from_etf_and_method = pd.read_csv(
+        path_bars + "FEATURES_" + bartype + "_" + 
+        base_sample_type + "_SAMPLING.csv"
+    )
+    
+    #open base bar dataframe by stock 
+    list_stocks_bars = [
+        pd.read_csv(
+            path_bars + stock + "_" + bartype + "_BAR.csv"
+        ) for stock in list_stocks
+    ]
+    
+    #select sample of information in base bar df using sampled values in SADF
+    selection_samples = [
+        list_stocks_bars[idx].loc[
+            list_stocks_bars[idx]["close_date"].isin(
+                sampling_events_from_etf_and_method[stock]
+            )
+        ] for idx, stock in enumerate(list_stocks)
+    ]
+    
+    #save in same path
+    if save:
+        for idx, frame in enumerate(selection_samples):
+            frame = frame.reset_index(drop=True)
+            frame.to_csv(
+                path_bars + list_stocks[idx] + "_" 
+                + bartype + "_" + base_sample_type + "_SAMPLED.csv",
+                index=False
+            )
+            
+        return ("Sampled dataframes selected")
+    else: 
+        #return list of pandas sampled
+        return selection_samples
