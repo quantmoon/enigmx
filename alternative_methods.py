@@ -12,7 +12,8 @@ from enigmx.utils import (
     get_arrs, bar_para, softmax, sel_days, 
     simpleFracdiff, open_bar_files
     )
-
+import scipy.cluster.hierarchy as sch
+import random
 
 # El presente file 'alternative_methods.py' posee las func. relevantes
 # del primer apartado del workflow (ver ppt "17-01" del 2021).
@@ -289,7 +290,7 @@ def entropyCalculationParallel(zarr_dir,
     return pandasBar
 
 ##############################################################################
-#3. SADF & ETF Trick #--------------------------------------------------------
+#3. SADF & ETF Trick & HRP #--------------------------------------------------------
 ##############################################################################
 def pcaWeights(cov, 
                riskDist =  None, 
@@ -347,6 +348,85 @@ def optPort(cov,mu=None):
     w=np.dot(inv,mu)
     w/=np.dot(ones.T,w)
     return w
+
+
+#Implementación del Hierarchical Risk Parity del libro de MLDP(2018, C. 16)
+class HRP():
+    
+    def __init__(self, cov,corr):
+        self.cov = cov
+        self.corr = corr
+        self.weights = self.HRP(self.cov, self.corr)
+        
+
+    def HRP(self, cov,corr):
+        ''' PASO 1 (Tree Clustering) 
+            Se agrupan los elementos de la matrix de correlacion en base a su
+            distancia
+
+            Plantear utilizar otros procedimientos en la medición 
+            de distancias, ejm: scipy.spatial.distance.pdist
+        '''
+
+        # distance matrix
+        dist=((1-corr)/2.)**.5 
+        # linkage matrix object
+        link=sch.linkage(dist,'single') ### EVALUAR INCLUIR UN HYPERPARAMETRO
+        ''' PASO 2 (Cuasi Diagonalización)
+
+            Se determina el orden de las filas de la matriz de correlación 
+            en función de los clusters obtenidos en el paso 1.
+        '''
+        link=link.astype(int)
+        sortIx=pd.Series([link[-1,0],link[-1,1]])
+        # número de elementos por grupo (cuarta columna)
+        numItems=int(link[-1,3])
+        while sortIx.max()>=numItems:
+            sortIx.index=range(0,sortIx.shape[0]*2,2) # make space
+            df0=sortIx[sortIx>=numItems] # find clusters
+            i=df0.index;j=df0.values-numItems
+            sortIx[i]=link[j,0] # item 1
+            df0=pd.Series(link[j,1],index=i+1)
+            sortIx=sortIx.append(df0) # item 2
+            sortIx=sortIx.sort_index() # re-sort
+            sortIx.index=range(sortIx.shape[0]) # re-index
+        sortIx = sortIx.astype(int).tolist()
+        ''' PASO 3 (Recursive Bisection)
+
+            Se determinan los pesos asignados a cada acción iterativamente 
+            por pares. En consecuencia, el número de acciones
+            mínimo debe ser 4. 
+        '''
+        # generamos un vector para los pesos del portafolio
+        w=pd.Series(1,index=sortIx)
+        # initialize all items in one cluster
+        cItems=[sortIx] 
+        while len(cItems)>0:
+            cItems=[i[j:k] for i in cItems for j,k in ((0,int(len(i)/2)),(int(len(i)/2),len(i))) if len(i)>1] # bi-section
+            for i in range(0,len(cItems),2): # parse in pairs
+                cItems0=cItems[i] # cluster 1
+                cItems1=cItems[i+1] # cluster 2
+                cVar0=self.getClusterVar(cov,cItems0)
+                cVar1=self.getClusterVar(cov,cItems1)
+                alpha=1-cVar0/(cVar0+cVar1)
+                w[cItems0]*=alpha # weight 1
+                w[cItems1]*=1-alpha # weight 2
+        return w
+
+    #———————————————————————————————————————
+    def getIVP(self, cov,**kargs):
+    # Compute the inverse-variance portfolio
+        ivp=1./np.diag(cov)
+        ivp/=ivp.sum()
+        return ivp
+    #———————————————————————————————————————
+    def getClusterVar(self, cov,cItems):
+    # Compute variance per cluster
+        cov_=cov.iloc[cItems,cItems] # matrix slice
+        w_=self.getIVP(cov_).reshape(-1,1)
+        cVar=np.dot(np.dot(w_.T,cov_),w_)[0,0]
+        return cVar
+    #———————————————————————————————————————
 
 def etfTrick(bar_dir, 
              stock_list, 
@@ -434,11 +514,15 @@ def etfTrick(bar_dir,
     #if 'covariance inverse matrix' is selected
     if allocation_approach.lower() == 'inv':
         weights_method = optPort
-        
+
+    #se aplica el hierarchical risk parity del C. 16 de MLDP(2018)
+    elif allocation_approach.lower() == 'hrp':
+        weights_method = HRP
+
     #otherwise, apply simple PCA decomposition | Warning: this doesn't sum 1
     else:
         weights_method = pcaWeights
-    
+
     #-----------------ETF ITERATIVE CONSTRUCTION-----------------# 
     
     #historical empty weights
@@ -461,14 +545,34 @@ def etfTrick(bar_dir,
             join_array_close_prices[0:idx]
         )
         
+        temp_returns_matrix = temp_matrix_prices.pct_change()
+        
+        
         #temporal covariance matrix
         temp_covariance_matrix = temp_matrix_prices.cov()
         
         #save covariance matrix information
         covs.append(temp_covariance_matrix)
         
-        #weight vector computation
-        weigths = weights_method(temp_covariance_matrix).T[0]
+        
+        #Se añade condicional sobre hierarchical risk parity
+        #Necesario porque el HRP necesita la correlación y la covarianza
+        if weights_method == HRP:
+            
+            #for the HRP method, the correlation matrix is calculated
+            #temporal correlation matrix
+            temp_correlation_matrix = temp_returns_matrix.corr()
+            
+            #temporal covariance matrix
+            temp_covariance_matrix = temp_returns_matrix.cov()
+            
+            #weight vector computation (pd.Series)
+            weigths = weights_method(temp_correlation_matrix, temp_covariance_matrix).weights.sort_index()
+            
+        else:
+            
+            #weight vector computation
+            weigths = weights_method(temp_covariance_matrix).T[0]
         
         #save information of weights
         info_weights.append(weigths)

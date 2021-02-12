@@ -41,15 +41,14 @@ from enigmx.alternative_methods import (standard_bar_tunning,
 
 
 #basic params for generate basic dataset
-data_dir = 'D:/data_repository/'
+data_dir = 'C:/Users/sony/Downloads/QUANTMOON/Chapter 2/' 
 list_stocks = ['MSFT', 'NFLX', 'A', 'ADBE', 'AMZN'] #iterar stock x stock
 start_date = "2020-09-02" 
 end_date = "2020-12-14" 
 #list_stocks = global_list_stocks(data_dir)[275:310]
 list_of_bartypes = ['volume']
 alpha_calibration = 3692637
-basic_stacked_path = 'D:/data_split_stacked/' 
-
+basic_stacked_path = 'C:/Users/sony/Downloads/QUANTMOON/Chapter 2/' 
 
 
 print("Paso 0")    
