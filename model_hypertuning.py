@@ -37,8 +37,8 @@ def clfHyperFit(feat, lbl, t1, param_grid,
         -rndSearchIter: en caso haya una lista muy grande de valores para 
                         tunear, estos se escogerán aleatoriamente
     """
-
-    if set(lbl.values[:,0]) == {0, 1}:
+        
+    if set(lbl.values) == {0, 1}:
         scoring = make_scorer(
             f1_score, 
             average='macro'

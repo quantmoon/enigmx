@@ -128,7 +128,7 @@ def generate_datasets(stock,
                                         stock = stock
                                 )
 
-        #iteración por tipo de barra
+        #iteración por tipo de barra | result_value: numpy.array
         result_value = [
             QMREPOSITORY.geneticIterativeFunction(
                 freq = bar_grp_freq,
@@ -192,12 +192,12 @@ def generate_datasets(stock,
                 )
             
         #upper barrier definition    
-        barDataframe["upper_barrier"] =barDataframe.close * (
+        barDataframe["upper_barrier"] =barDataframe.close_price * (
             1 + barDataframe.volatility
             )
         
         #lower barrier definition
-        barDataframe["lower_barrier"] =barDataframe.close * (
+        barDataframe["lower_barrier"] =barDataframe.close_price* (
             1 - barDataframe.volatility
             )
         
@@ -215,7 +215,12 @@ def generate_datasets(stock,
             
             #segmentation over horizon based on limit day (last rows/events)
             barDataframe = barDataframe.query("horizon < @limit_data_date")
-               
+        
+        #accumulative volumen as int to allow easy saving in SQL Table
+        barDataframe = barDataframe.astype(
+            {'bar_cum_volume':int}
+            ) 
+        
         datasets_to_save.append(barDataframe)
     
     return datasets_to_save

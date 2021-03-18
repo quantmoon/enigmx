@@ -38,23 +38,21 @@ from enigmx.utils import (
 class QuantmoonSQLManager(object):
     
     def __init__(self, server, database_name, 
-                 base_database='TSQL', 
-                 vwap=False, globalRange=False, 
-                 remote=False, loggin='', access=''):
+                 base_database='TSQL', globalRange=False,
+                 loggin='', access=''):
         
         self.server = server
         self.base_database = base_database
-        self.vwap = vwap
+        #self.vwap = vwap
         self.globalRange = globalRange
-        self.remote = remote
-        
+
         self.loggin = ('Driver={SQL Server};Server='+server+
                        ';Trusted_Connection=yes;')
         
-        if self.vwap:
-            self.database_name = database_name.upper() + '_VWAP'
-        else:
-            self.database_name = database_name.upper() + '_NOVWAP'
+        #if self.vwap:
+        #    self.database_name = database_name.upper() + '_VWAP'
+        #else:
+        self.database_name = database_name.upper() #+ '_NOVWAP'
             
         if self.globalRange:
             self.global_ = '_GLOBAL'
@@ -113,7 +111,7 @@ class QuantmoonSQLManager(object):
         searchColumnsName = (
             "SELECT COLUMN_NAME FROM {}.INFORMATION_SCHEMA.COLUMNS " 
             "WHERE TABLE_NAME = N'{}'").format(
-                            self.database_name, self.tableName
+                            database_name, self.tableName
                             )
 
                 
@@ -218,7 +216,9 @@ class QuantmoonSQLManager(object):
     
     def get_write_statement(self, database_name, 
                             table_name, cursor_):
-        
+        """
+        Genera el statement (str) de escritura para tabla SQL.
+        """
         return self.__configurateWrittingInfo__(
                                         database_name, 
                                         table_name, 
@@ -227,37 +227,145 @@ class QuantmoonSQLManager(object):
         
     def write_table_info(self, statement_, 
                          dbconn_, cursor_, 
-                         data_, bartype_,
-                         vwap_):
-        
+                         data_, bartype_):
+      
         for idx, row in data_.iterrows():
+
+            if bartype_.upper() == 'TUNNING':
+                cursor_.execute( 
+                    statement_, 
+                    row.tick_t, 
+                    row.volume_t, 
+                    row.dollar_t, 
+                    row.stock
+                    )
+              
+            elif bartype_.upper()=='BARS' or  bartype_.upper()=='BARS_SAMPLED':
+                cursor_.execute(
+                    statement_, 
+                    row.open_price, 
+                    row.high_price, 
+                    row.low_price, 
+                    row.close_price, 
+                    row.open_date, 
+                    row.high_date, 
+                    row.low_date, 
+                    row.close_date, 
+                    row.basic_volatility, 
+                    row.bar_cum_volume, 
+                    row.vwap, 
+                    row.fracdiff,
+                    row.volatility, 
+                    row.horizon,
+                    row.upper_barrier,
+                    row.lower_barrier                    
+                    )
             
-            if bartype_=='time' and vwap_:
+            elif bartype_.upper() == 'ENTROPY':
                 cursor_.execute(
-                    statement_, row.datetime, row.price
+                    statement_, 
+                    row.open_price, 
+                    row.high_price, 
+                    row.low_price, 
+                    row.close_price, 
+                    row.open_date, 
+                    row.high_date, 
+                    row.low_date, 
+                    row.close_date, 
+                    row.basic_volatility, 
+                    row.bar_cum_volume, 
+                    row.vwap, 
+                    row.fracdiff,
+                    row.volatility, 
+                    row.horizon,
+                    row.upper_barrier,
+                    row.lower_barrier,
+                    row.entropy                    
+                    )            
+                
+            elif bartype_.upper() == 'ETFTRICXCK':
+                cursor_.execute(
+                    statement_, 
+                    row.value, 
+                    row.high_price, 
+                    row.low_price, 
+                    row.close_price, 
+                    row.open_date, 
+                    row.high_date, 
+                    row.low_date, 
+                    row.close_date, 
+                    row.basic_volatility, 
+                    row.bar_cum_volume, 
+                    row.vwap, 
+                    row.fracdiff,
+                    row.volatility, 
+                    row.horizon,
+                    row.upper_barrier,
+                    row.lower_barrier,
+                    row.entropy                    
+                    )               
+                
+            elif bartype_.upper() == 'BARS_COMPLETED':
+                cursor_.execute(
+                    statement_, 
+                    row.open_price, 
+                    row.high_price, 
+                    row.low_price, 
+                    row.close_price, 
+                    row.open_date, 
+                    row.high_date, 
+                    row.low_date, 
+                    row.close_date, 
+                    row.basic_volatility, 
+                    row.bar_cum_volume, 
+                    row.vwap, 
+                    row.fracdiff,
+                    row.volatility, 
+                    row.horizon,
+                    row.upper_barrier,
+                    row.lower_barrier,
+                    row.barrierPrice,
+                    row.barrierLabel,
+                    row.barrierTime
+                    )            
+                
+            elif bartype_.upper() == 'BARS_WEIGHTED':
+                cursor_.execute(
+                    statement_, 
+                    row.open_price, 
+                    row.high_price, 
+                    row.low_price, 
+                    row.close_price, 
+                    row.open_date, 
+                    row.high_date, 
+                    row.low_date, 
+                    row.close_date, 
+                    row.basic_volatility, 
+                    row.bar_cum_volume, 
+                    row.vwap, 
+                    row.fracdiff,
+                    row.volatility, 
+                    row.horizon,
+                    row.upper_barrier,
+                    row.lower_barrier,
+                    row.barrierPrice,
+                    row.barrierLabel,
+                    row.barrierTime,
+                    row.overlap,
+                    row.weight,
+                    row.weightTime
+                    )                         
+            
+                
+            else: 
+                raise ValueError(
+                    "Not recognized database name. \
+                        Normally bartype's name or 'TUNNING'. Please check."
                     )
-            elif bartype_=='time' and vwap_==False:
-                cursor_.execute(
-                    statement_, row.datetime, row.price, row.vol
-                    )     
-            elif bartype_=='tick' and vwap_:
-                cursor_.execute(
-                    statement_, row.grpId, row.datetime, row.price
-                    )
-            elif bartype_=='tick' and vwap_==False:
-                cursor_.execute(
-                    statement_, row.datetime, row.price
-                    )                
-            elif bartype_=='fracdiff':
-                cursor_.execute(
-                    statement_, row.datetime, row.fracdiff
-                    )
+                    
         dbconn_.commit()
         #cursor_.close()
-        print("Information '{}' was written".format(
-                                        self.database_name
-                                        )
-                                    )
+        print("---Information was written---")
         
     def globalSimpleInsert(self, statement_, infoTuple, dbconn_, cursor_):
         

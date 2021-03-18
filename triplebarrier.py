@@ -6,6 +6,7 @@ webpage: https://www.quantmoon.tech//
 import ray
 import numpy as np
 import pandas as pd
+from datetime import datetime
 from enigmx.utils import (
     get_horizons, getBarrierCoords, LabelTripleBarrierComputation
     )
@@ -164,17 +165,15 @@ def getting_ray_triple_barrier(ray_object_list, data_dir_last, list_stocks):
     return None
 
 @ray.remote
-def new_triple_barrier_computation(data_dir, stock, bartype, zarr_path, 
-                                   method = 'SADF'):
+def new_triple_barrier_computation(sampled_df, stock, zarr_path):
+    """
+    Esta función ingesta la computación de la triple barrera usando 'Ray'.
+    """
+    #computación triplebarrera
+    dataset = LabelTripleBarrierComputation(sampled_df, stock, zarr_path)
     
-    df_ = pd.read_csv(
-        data_dir + stock + "_" + bartype.upper() + 
-        '_' + method + '_SAMPLED.csv',
-        parse_dates= [
-            "open_date",
-            "high_date",
-            "low_date",
-            "close_date",
-            "horizon"]
+    #transformación de serie numérica timestamp a datetimeObj
+    dataset["barrierTime"] = dataset.barrierTime.transform(
+        lambda x: datetime.fromtimestamp(x/1e3)
         )
-    return LabelTripleBarrierComputation(df_, stock, zarr_path)
+    return dataset

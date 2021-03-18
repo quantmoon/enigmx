@@ -1298,23 +1298,35 @@ def global_list_stocks(data_dir,
             list_stocks.append(os.path.basename(file)[:-drop_extension])
     return list_stocks
 
-#Data Tunning Preparation
+EquitiesEnigmxUniverse = global_list_stocks('D:/data_repository/')
+
+#Data Tunning Preparation| CAMBIARLO POR SQL 
 def dataPreparation_forTuning(csv_path,
-                              list_features_names, 
-                              label_name,
+                              label_name = "barrierLabel",
+                              features_sufix = "feature",
+                              timeIndexName = "close_date",
                               set_datetime_as_index = True):
+    
     if not set_datetime_as_index:
         raise ValueError(
             "Only True available for datatime as index until now."
             )
-        
-    df = pd.read_csv(
-        csv_path, index_col='datetime'
+    
+    dfStacked = pd.read_csv(
+        csv_path, 
         ).dropna()
     
-    X = df[list_features_names]
+    dfStacked[timeIndexName] = dfStacked[timeIndexName].astype('datetime64[ns]')
     
-    y = df[label_name]
+    dfStacked = dfStacked.set_index(timeIndexName)
+    
+    featureColumnsName = dfStacked.filter(
+                like= features_sufix
+                ).columns.values   
+    
+    X = dfStacked[featureColumnsName]
+
+    y = dfStacked[label_name]
     
     t1 = pd.Series(data=y.index, index=y.index)    
     
@@ -1336,7 +1348,36 @@ keep_same = {
     'timeAchieved', 'time','special_time'
 }
 
-def dataPreparation(data, 
+def dataPreparation(data_csv, 
+                    feature_sufix = 'feature',
+                    label_name='barrierLabel', 
+                    timeIndexName = "close_date",
+                    timeLabelName = "horizon"):
+    
+    dfStacked = pd.read_csv(
+        data_csv, 
+        ).dropna()
+    
+    dfStacked[timeIndexName] = dfStacked[timeIndexName].astype('datetime64[ns]')
+    dfStacked[timeLabelName] = dfStacked[timeLabelName].astype('datetime64[ns]')
+    
+    dfStacked = dfStacked.set_index(timeIndexName)
+    
+    featureColumnsName = list(dfStacked.filter(
+                like= feature_sufix
+                ).columns.values)       
+    
+    featureColumnsName.append(timeLabelName)
+    
+    X = dfStacked[featureColumnsName]
+
+    y = dfStacked[label_name]
+    
+    X[label_name] = y
+     
+    return X
+
+def dataPreparationOld(data, 
                     label_name='tripleBarrier', 
                     add_suffix = True, 
                     no_suffix = keep_same):
@@ -1454,7 +1495,7 @@ def purge_embargo(X,train_indices,test_indices,embargo):
     train_2 = train[train.index > (end + np.timedelta64(embargo,'D'))]
     
     new_train = pd.concat([train_1,train_2])
-    train['new_index'] = train_indices.copy()
+    train.loc[:, 'new_index'] = train_indices.copy()
     train = pd.merge(train,new_train,
                      how='left',
                      left_index  = True, 
@@ -2056,10 +2097,10 @@ def barsNameDefinition(bartype,
     """
     return [bartype +  "_" + colName for colName in columnBaseNames]
     
-dataset_column_names = ["open", "high", "low", "close", "open_date", 
-                        "high_date", "low_date", "close_date", 
-                        "basic_volatility", "bar_cum_volume", 
-                        "vwap", "fracdiff"]
+dataset_column_names = ["open_price", "high_price", "low_price", "close_price", 
+                        "open_date", "high_date", "low_date", "close_date", 
+                        "basic_volatility", "bar_cum_volume", "vwap", 
+                        "fracdiff"]
 
 ##############################################################################
 ##############################################################################
@@ -2196,8 +2237,9 @@ def LabelTripleBarrierComputation(barDataframe, stock, data_dir):
             , 
             axis=1
             )
+
     #barrier columns information generation
-    barDataframe[['barrierPrice', 'barrierLabel', 'barrierTimestamp']] = \
+    barDataframe[['barrierPrice', 'barrierLabel', 'barrierTime']] = \
         pd.DataFrame(
             tripleBarrierInfo.tolist(), 
             index=tripleBarrierInfo.index
@@ -2354,3 +2396,32 @@ def open_bar_files(base_path, stock, bartype):
     #pandasBar = pd.read_csv(pandas_path)
 
     return pandasBar
+
+
+def construct_pandas_tunning(list_datasets, list_stocks):
+    
+    list_frames = []
+    
+    for idx, dataset in enumerate(list_datasets):
+
+        dataset["stock"] = list_stocks[idx]
+        
+        equity_tuning_frame_bar = pd.DataFrame(
+            dataset, 
+            index=[0]
+            )
+
+        list_frames.append(equity_tuning_frame_bar)
+    
+    return pd.concat(list_frames)
+
+
+##############################################################################
+
+def enigmxSplit(df, pct_average):
+    
+    msk = np.random.rand(len(df)) < pct_average
+    
+    train, test = df[msk], df[~msk]
+    
+    return train, test

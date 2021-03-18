@@ -12,6 +12,7 @@ from enigmx.utils import (
     get_arrs, bar_para, softmax, sel_days, 
     simpleFracdiff, open_bar_files
     )
+import scipy.cluster.hierarchy as sch
 
 
 # El presente file 'alternative_methods.py' posee las func. relevantes
@@ -39,6 +40,7 @@ def standard_bar_tunning(url,ticker,num_bar, date_tuple_range):
     * diccionario con hyperparametros para las tres barras estandar
     ## {'tick_para': a, 'vol_para': b, 'dol_para': c}
     '''
+
     #obtener el url para aperturar el Zarr
     url = url+ticker+'.zarr'
     
@@ -46,7 +48,6 @@ def standard_bar_tunning(url,ticker,num_bar, date_tuple_range):
     zarrds = zarr.open_group(url)
 
     #si la tupla de fechas tiene un valor distinto a None (str fecha x 2)
-        
     #abre todas las fechas
     zarr_dates = zarrds.date.get_basic_selection()
 
@@ -167,11 +168,15 @@ def konto(msg,window=None):
     out = 1-(sum_ / num_)/np.log2(len(msg)) # redundancy, 0<=r<=1
     return out
 
-def entropyFeature(path, 
-                   init, init_ts, 
-                   last, last_ts, 
+def entropyFeature(row, 
+                   path, 
                    entropy_window = None,
-                   beta=0.025, cumsum_sampling = True):
+                   beta=0.025, 
+                   cumsum_sampling = True):
+    
+    init, last = row[4], row[7]
+    init_ts = datetime.timestamp(init.to_pydatetime()) * 1e3
+    last_ts = datetime.timestamp(last.to_pydatetime()) * 1e3
     
     #days range to search tripleBarrier | timeframe values
     daysList = sel_days(init, last)
@@ -218,7 +223,10 @@ def entropyFeature(path,
     
     #--------------------Entropy calculation--------------------#
     
+    #check if there are prices in the interval
     if vector_prices.shape[0] == 0:
+        
+        #set entropy as zero
         entropy = 0
         
     else: 
@@ -238,55 +246,68 @@ def entropyFeature(path,
 
         #log prices calculation from resampled prices vector
         vector_log_prices = np.log(vector_prices)
-
-        #computation of fracdiff from log prices of resampled prices vector
-        vector_fracdiff_log_prices = simpleFracdiff(vector_log_prices)
-
-        #encoding of fracdiff prices
-        binarized_vector_fracdiff_log_prices = np.where(
-                vector_fracdiff_log_prices>np.mean(vector_fracdiff_log_prices), 
-                1, 0
-            )
-
-        #redundancy as entropy
-        entropy = konto(
-                msg= binarized_vector_fracdiff_log_prices, 
-                window= entropy_window
-            )
-
+        
+        #check in case log transformation gets small dataset size
+        if vector_log_prices.shape[0] < 10:
+            
+            #set entropy as zero
+            entropy = 0
+            
+        else:
+            #computation of fracdiff from log prices of resampled prices vector
+            vector_fracdiff_log_prices = simpleFracdiff(vector_log_prices)
+    
+            #encoding of fracdiff prices
+            binarized_vector_fracdiff_log_prices = np.where(
+                    vector_fracdiff_log_prices>np.mean(
+                        vector_fracdiff_log_prices
+                        ), 
+                    1, 0
+                )
+    
+            #redundancy as entropy
+            entropy = konto(
+                    msg= binarized_vector_fracdiff_log_prices, 
+                    window= entropy_window
+                )
     return entropy
 
 @ray.remote
 def entropyCalculationParallel(zarr_dir, 
-                               pandas_dir, 
-                               stock, bartype, 
+                               pandas_bar, 
+                               stock,
                                beta = 0.01, 
                                entropy_window = 100, 
-                               cumsum_sampling = True,
-                               base_path = "D:/data_split_stacked/"):
-    
-    pandasBar = open_bar_files(base_path, stock, bartype)
-    
+                               cumsum_sampling = True):
+        
     zarr_path = zarr_dir + stock + ".zarr"
     
-    pandasBar["entropy"] = pandasBar.apply(lambda row:
-                           entropyFeature(
-                               path = zarr_path,
-                               init = row["open_date"],
-                               init_ts = datetime.timestamp(
-                                           row["open_date"].to_pydatetime()
-                                           ) * 1e3,
-                               last = row["close_date"],
-                               last_ts= datetime.timestamp(
-                                           row["close_date"].to_pydatetime()
-                                           ) * 1e3, 
-                               #### Optional Params ####
-                               beta = beta, 
-                               entropy_window = entropy_window, 
-                               cumsum_sampling = cumsum_sampling)
-                           ,axis=1
-                          )    
-    return pandasBar
+    #pandas_bar["entropy"] = 
+    pandas_bar["entropy"] = np.apply_along_axis(
+        entropyFeature, 1, pandas_bar.values, 
+        zarr_path, entropy_window, beta, cumsum_sampling 
+        )
+    #print(pandas_bar)
+    #ga = pandas_bar.apply(lambda row:
+    #                       entropyFeature(
+    #                           path = zarr_path,
+    #                           init = row["open_date"],
+    #                           init_ts = datetime.timestamp(
+    #                                       row["open_date"].to_pydatetime()
+    #                                       ) * 1e3,
+    #                           last = row["close_date"],
+    #                           last_ts= datetime.timestamp(
+    #                                       row["close_date"].to_pydatetime()
+    #                                       ) * 1e3, 
+    #                           #### Optional Params ####
+    #                           beta = beta, 
+    #                           entropy_window = entropy_window, 
+    #                           cumsum_sampling = cumsum_sampling)
+    #                       ,axis=1
+    #                      )    
+    #print(ga)
+    #pandas_bar["entropy"] = ga   
+    return pandas_bar
 
 ##############################################################################
 #3. SADF & ETF Trick #--------------------------------------------------------
@@ -348,9 +369,94 @@ def optPort(cov,mu=None):
     w/=np.dot(ones.T,w)
     return w
 
-def etfTrick(bar_dir, 
+##############################################################################
+######################### THEOTHERICAL RISK ##################################
+##############################################################################
+
+class HRP():
+    
+    def __init__(self, cov,corr):
+        self.cov = cov
+        self.corr = corr
+        self.weights = self.HRP(self.cov, self.corr)
+        
+
+    def HRP(self, cov,corr):
+        ''' PASO 1 (Tree Clustering) 
+            Se agrupan los elementos de la matrix de correlacion en base a su
+            distancia
+            Plantear utilizar otros procedimientos en la medición 
+            de distancias, ejm: scipy.spatial.distance.pdist
+        '''
+
+        # distance matrix
+        dist=((1-corr)/2.)**.5 
+        # linkage matrix object
+        link=sch.linkage(dist,'single') ### EVALUAR INCLUIR UN HYPERPARAMETRO
+        ''' PASO 2 (Cuasi Diagonalización)
+            Se determina el orden de las filas de la matriz de correlación 
+            en función de los clusters obtenidos en el paso 1.
+        '''
+        link=link.astype(int)
+        sortIx=pd.Series([link[-1,0],link[-1,1]])
+        # número de elementos por grupo (cuarta columna)
+        numItems=int(link[-1,3])
+        while sortIx.max()>=numItems:
+            sortIx.index=range(0,sortIx.shape[0]*2,2) # make space
+            df0=sortIx[sortIx>=numItems] # find clusters
+            i=df0.index;j=df0.values-numItems
+            sortIx[i]=link[j,0] # item 1
+            df0=pd.Series(link[j,1],index=i+1)
+            sortIx=sortIx.append(df0) # item 2
+            sortIx=sortIx.sort_index() # re-sort
+            sortIx.index=range(sortIx.shape[0]) # re-index
+        sortIx = sortIx.astype(int).tolist()
+        ''' PASO 3 (Recursive Bisection)
+            Se determinan los pesos asignados a cada acción iterativamente 
+            por pares. En consecuencia, el número de acciones
+            mínimo debe ser 4. 
+        '''
+        # generamos un vector para los pesos del portafolio
+        w=pd.Series(1,index=sortIx)
+        # initialize all items in one cluster
+        cItems=[sortIx] 
+        while len(cItems)>0:
+            cItems=[
+                i[j:k] for i in cItems for j,k in (
+                    (0,int(len(i)/2)), 
+                    (int(len(i)/2),len(i))) if len(i)>1
+                ] # bi-section
+            for i in range(0,len(cItems),2): # parse in pairs
+                cItems0=cItems[i] # cluster 1
+                cItems1=cItems[i+1] # cluster 2
+                cVar0=self.getClusterVar(cov,cItems0)
+                cVar1=self.getClusterVar(cov,cItems1)
+                alpha=1-cVar0/(cVar0+cVar1)
+                w[cItems0]*=alpha # weight 1
+                w[cItems1]*=1-alpha # weight 2
+        return w
+
+    #———————————————————————————————————————
+    def getIVP(self, cov,**kargs):
+    # Compute the inverse-variance portfolio
+        ivp=1./np.diag(cov)
+        ivp/=ivp.sum()
+        return ivp
+    #———————————————————————————————————————
+    def getClusterVar(self, cov,cItems):
+    # Compute variance per cluster
+        cov_=cov.iloc[cItems,cItems] # matrix slice
+        w_=self.getIVP(cov_).reshape(-1,1)
+        cVar=np.dot(np.dot(w_.T,cov_),w_)[0,0]
+        return cVar
+    #———————————————————————————————————————
+
+##############################################################################
+##############################################################################
+##############################################################################
+
+def etfTrick(list_bars_stocks, 
              stock_list, 
-             bartype, 
              k=10000, 
              lower_bound_index = 50, 
              allocation_approach = 'inv',
@@ -361,13 +467,14 @@ def etfTrick(bar_dir,
         Cap 2 - AFML of Marcos Lopez de Prado (Section 2.4.1).
     
     Parameters:
-        - 'bar_dir': str path where 'bar' .csv by stock is allocated.
+        - 'list_bars_stocks': dataframes list with bar pandas by equity.
         - 'stock_list': lst of strings by stock of 'bar' .csv information.
         - 'bartype': str referring type of bars 'bar' .csv is based on.
         - 'k': initial K (AUM) int to compute ETF Trick.
         - 'lowerb_ound_index': N-int first values taken to 1st covmatrix.
         - 'allocation_approach': str referring weight method computation.
                 * 'inv': inverting covariance matrix method.
+                * 'hrp': hierarchical risk.
                 * otherwise: PCA decomposition.
         - 'output_type': 'dict' statement or anything else referring 
                          to output format.
@@ -382,29 +489,30 @@ def etfTrick(bar_dir,
             * anything else: returns full ETF Trick series.        
     """
     #get list stock-bar information dataframe
-    list_stocks = [
-        open_bar_files(bar_dir, stock, bartype) for stock in stock_list
-    ]
+    #list_stocks = [
+    #    open_bar_files(bar_dir, stock, bartype) for stock in stock_list
+    #]
 
     #get idx-time reformed df close dates of each stock-bar dataframe
     list_reformed_df_close_dates = [
         settingTimePandasFormat(stock_frame, "close_date") 
-        for stock_frame in list_stocks
+        for stock_frame in list_bars_stocks
     ]
     
     #get idx-time reformed df open prices of each stock-bar dataframe
     list_reformed_df_open_prices = [
-        settingTimePandasFormat(stock_frame, "open")
-        for stock_frame in list_stocks        
+        settingTimePandasFormat(stock_frame, "open_price")
+        for stock_frame in list_bars_stocks
     ]
     
     #get idx-time reformed df close prices of each stock-bar dataframe
     list_reformed_df_close_prices = [
-        settingTimePandasFormat(stock_frame, "close")
-        for stock_frame in list_stocks        
+        settingTimePandasFormat(stock_frame, "close_price")
+        for stock_frame in list_bars_stocks   
     ]    
     
     #compute joinned dataframe of dates from all stocks
+    #ERROR LINE
     join_dataframe_dates = pd.concat(
         list_reformed_df_close_dates, axis=1
     ).fillna(method='ffill')[1:]
@@ -435,6 +543,10 @@ def etfTrick(bar_dir,
     if allocation_approach.lower() == 'inv':
         weights_method = optPort
         
+    #se aplica el hierarchical risk parity del C. 16 de MLDP(2018)
+    elif allocation_approach.lower() == 'hrp':
+        weights_method = HRP         
+        
     #otherwise, apply simple PCA decomposition | Warning: this doesn't sum 1
     else:
         weights_method = pcaWeights
@@ -461,14 +573,31 @@ def etfTrick(bar_dir,
             join_array_close_prices[0:idx]
         )
         
+        #temporal returns matrix
+        temp_returns_matrix = temp_matrix_prices.pct_change()
+        
         #temporal covariance matrix
         temp_covariance_matrix = temp_matrix_prices.cov()
         
         #save covariance matrix information
         covs.append(temp_covariance_matrix)
         
-        #weight vector computation
-        weigths = weights_method(temp_covariance_matrix).T[0]
+        if weights_method == HRP:
+            #for the HRP method, the correlation matrix is calculated
+            #temporal correlation matrix
+            temp_correlation_matrix = temp_returns_matrix.corr()
+            
+            #temporal covariance matrix
+            temp_covariance_matrix = temp_returns_matrix.cov()
+            
+            #weight vector computation (pd.Series)
+            weigths = weights_method(
+                temp_correlation_matrix, temp_covariance_matrix
+                ).weights.sort_index()            
+        
+        else:
+            #weight vector computation
+            weigths = weights_method(temp_covariance_matrix).T[0]
         
         #save information of weights
         info_weights.append(weigths)
@@ -504,7 +633,6 @@ def etfTrick(bar_dir,
 
             #if it is the first event
             if stockIdx == 0:
-
                 pass
             
             #otherwise
@@ -546,7 +674,7 @@ def etfTrick(bar_dir,
         final_frame[stock_list] = np.array(info_dates)
         
         final_frame[stock_list] = final_frame[stock_list].apply(pd.to_datetime)
-        final_frame.to_csv(
-            bar_dir + "SERIES_" + bartype + "_ETFTRICK.csv", index=False
-            )
-        return "ETFTrick Saved"
+        #final_frame.to_csv(
+        #    bar_dir + "SERIES_" + bartype + "_ETFTRICK.csv", index=False
+        #    )
+        return final_frame #"ETFTrick Saved"

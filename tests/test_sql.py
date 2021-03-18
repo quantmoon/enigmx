@@ -10,6 +10,9 @@ from enigmx.databundle import DataRespositoryInitialization
 from dbgenerator import (table_params_time_NOVWAP_SIMPLE,
                          databundle_instance)
 
+print(table_params_time_NOVWAP_SIMPLE)
+print(caca)
+
 list_stocks = ['MSFT']
 
 # general paramters
@@ -32,7 +35,6 @@ SQLFRAME, dbconn, cursor = databundle_instance(
                                         server, 
                                         bartype,  
                                         create_database = creation_database, 
-                                        vwap=vwap, 
                                         global_range=global_range
                                     )
 

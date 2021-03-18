@@ -4,10 +4,12 @@ webpage: https://www.quantmoon.tech//
 """
 
 import warnings
+from pandas.core.common import SettingWithCopyWarning
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
+warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
 #from enigmx.backtester.core import Backtest
 #from enigmx.extractor import Extractor

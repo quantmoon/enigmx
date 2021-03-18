@@ -160,20 +160,11 @@ def generalSADFMethod(original_frame, main_column_name, lags = None):
     
     return original_frame
 
-def gettingSADF(path_etf_frame, 
-                bartype, 
+def gettingSADF(etf_df, 
                 lags = None, 
                 main_value_name = 'value'):
     
-    etfDf = pd.read_csv(
-        path_etf_frame+"SERIES_"+bartype.upper()+"_ETFTRICK.csv"
-        )
+    sadf_frame = generalSADFMethod(etf_df, main_value_name, lags = lags)
     
-    sadf_frame = generalSADFMethod(etfDf, main_value_name, lags = lags)
     
-    sadf_frame.to_csv(
-        path_etf_frame + "SERIES_" + bartype.upper() + "_SADF.csv",
-        index=False
-        )
-    
-    return "SADF saved in ETF Location. New column defined."
+    return sadf_frame

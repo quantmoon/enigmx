@@ -7,18 +7,23 @@ import pandas as pd
 from enigmx.betsize import *
 from enigmx.utils import dataPreparation_forTuning
 
-#0) path to save the endogenous betsize metalabelling model
-path_endogenous_model = "D:/data_split_stacked/"
 
-#i) path where tunning data is allocated
-csv_path = "D:/data_split_stacked/DATA_TUNING_ENDOMODEL.csv"
 
-#ii) path where exogenous model is allocated (pickle file)
 model_path = "D:/data_split_stacked/exogenous_model.pkl"
 
-#iii) features & label name (optinal)
-features_names = ["tick", "imbalance", "volume", "volatility", "fracdiff"]
-label_name = ['tripleBarrier']
+exogenous_model = pickle.load(open(model_path, 'rb'))
+
+print(exogenous_model )
+print(temp)
+#0) path to save the endogenous betsize metalabelling model
+path_endogenous_model = "D:/feature_importance/"
+
+#i) path where tunning data is allocated
+csv_path = "D:/feature_importance/STACKED_ENDO_VOLUME_MDA.csv"
+
+#ii) path where exogenous model is allocated (pickle file)
+model_path = "D:/feature_importance/exogenous_model.pkl"
+
 
 #iv) data preparation for tuning | 't1' is not useful
 X, y, t1 = dataPreparation_forTuning(
@@ -29,7 +34,6 @@ y = y.values
 
 
 ###STEPS
-
 
 # 1) Open Exogenous Model
 exogenous_model = pickle.load(open(model_path, 'rb'))
