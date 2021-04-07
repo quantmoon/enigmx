@@ -75,14 +75,35 @@ table_weighted_bar_structure = {
 
 #############################################################################
 #Definition of Main DataBundle Instance Function
-def databundle_instance(server, bartype_database, 
+def databundle_instance(server, 
+                        bartype_database, 
+                        driver, 
+                        uid,
+                        pwd,
                         create_database,
-                        global_range):
+                        global_range, 
+                        referential_base_database):
+    """
+    Función canalizadora de la interfaz de SQL. 
+    
+    Inputs:
+        - server (str): nombre del servidor SQL
+        - bartype_database (str): nombre de la base de datos
+        - create_database (bool): booleano para ver si se crea una base de datos.
+        - global_range (bool): booleano para catalogar a los datos como globales o parciales.
+        
+    Output:
+        - Tupla: instancia de SQl, conexión a base de datos y puntero
+    """
     
     #Define general parameters to initialize SQL
     SQLFRAME = QSQL(server=server, 
+                    driver = driver, 
+                    uid = uid, 
+                    pwd = pwd,
                     database_name=bartype_database, 
-                    globalRange=global_range) 
+                    globalRange=global_range, 
+                    base_database=referential_base_database) 
     
     # OPTIONAL: create database if it wasn't created
     if create_database:
@@ -92,51 +113,3 @@ def databundle_instance(server, bartype_database,
     dbconn, cursor = SQLFRAME.select_database() 
     
     return SQLFRAME, dbconn, cursor
-
-
-def sqlManagement(**kwargs):
-    """
-    La siguiente función resume todo el proceso de manejo de SQLServer.
-    
-    Los argumentos ingestados deben ser:
-        
-        - "initialize" (boolean): 
-            
-            * True si desea inicializar SQL
-            
-              En caso sea 'True', debe ingestar algunos parámetros más:
-                  
-                  OBLIGATORIOS:
-                      
-                  ** "server"       (str): nombre del servidor local o VPN.
-                  
-                  ** "databasename" (str): nombre de base de datos del puntero.
-                                           Esta es la base de datos principal
-                                           sobre la que trabajará. 
-                  OPTATIVOS:
-                      
-                  ** "create_database" (bool): boleano para crear database.
-                  
-                  ** "base_database"(str): nombre de la base de datos matriz.
-            
-                  ** "global_range" (boolean): añade un str 'GLOBAL' 
-                                               a c/nombre de tabla. Diferencia
-                                               entre las tablas de info 
-                                               completa y de info parcial.
-                          
-            * False en caso SQL ya se encuentre inicializado
-            
-        
-    """
-    if kwargs["initialize"]:
-        return databundle_instance(
-            server = kwargs["server"], 
-            bartype_database = kwargs["databasename"],
-            create_database = kwargs["create_database"],
-            global_range = kwargs["global_range"]
-            )        
-        
-    
-    print(kwargs)
-    return "yes"
-

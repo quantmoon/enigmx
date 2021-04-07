@@ -6,11 +6,12 @@ webpage: https://www.quantmoon.tech//
 import ray
 import numpy as np
 import pandas as pd
+from datetime import datetime
 from enigmx.utils import (
     get_horizons, getBarrierCoords, LabelTripleBarrierComputation
     )
 
-#Multilabel Computation | Sigma value as frontier
+#Multilabel Computation | Sigma value as frontier | deprecated
 def multilabel_computation(priceAchieved, upper, lower, sigma):
     difference = upper - lower
     
@@ -25,6 +26,7 @@ def multilabel_computation(priceAchieved, upper, lower, sigma):
     else:
         return 0.5
     
+#Segmented triple barrier computation | deprecated    
 def trilabel_computation(priceAchieved, upper, lower):
 
     if priceAchieved > upper:
@@ -45,6 +47,15 @@ def generateTripleBarrier(data_dir,
                           window_horizon=1,
                           sigma = 0.3):
     
+    """
+    Función general que permite la computación de la triple barrera.
+    
+    Utiliza aún csv para computación de triple barrera.
+    
+    Depreciado.
+    """
+    
+    # lectura de dataframe
     df_ = pd.read_csv(
         data_dir + stock + "_" + bartype.upper() + '_BAR.csv',
         parse_dates= [
@@ -55,13 +66,18 @@ def generateTripleBarrier(data_dir,
             "horizon"]
         )
     
+    # asignación de columna datetime
     df_['datetime'] = pd.to_datetime(
                                 df_['datetime']
                                 )
+    
+    # redefinición de dataframe con index datetime
     df_ = df_.set_index('datetime')
     
+    # eliminación del primer evento
     df_ = df_[1:]
     
+    # extracción de variables add
     special_time = df_[['special_time']]
     volatilities = df_[['volatility']]
     
@@ -94,7 +110,6 @@ def generateTripleBarrier(data_dir,
         ).dropna()
     
     #redefining time types
-    
     df_.index = np.datetime_as_string(
                             df_.index, unit='D'
                             )    
@@ -148,9 +163,19 @@ def generateTripleBarrier(data_dir,
 #Generate triple barrier using RAY
 def getting_ray_triple_barrier(ray_object_list, data_dir_last, list_stocks):
     
-    list_datasets =  ray.get(ray_object_list)
-    #list_datasets = ray_object_list
+    """
+    Función para computar la triple barrera (formato antiguo).
     
+    Utiliza aún csv para computación de triple barrera.
+    
+    Depreciado
+    """
+    
+    # obtener lista de datasets
+    
+    list_datasets =  ray.get(ray_object_list)
+    
+    # iteración para guardado
     for idx, dataset in enumerate(list_datasets):
         
         print("Saving", list_stocks[idx], "...")
@@ -163,18 +188,33 @@ def getting_ray_triple_barrier(ray_object_list, data_dir_last, list_stocks):
     print("Saving Porcess Ended")
     return None
 
+##############################################################################
+###################### USEFUL TRIPLE BARRIER COMPUTATION #####################
+##############################################################################
+
 @ray.remote
-def new_triple_barrier_computation(data_dir, stock, bartype, zarr_path, 
-                                   method = 'SADF'):
+def new_triple_barrier_computation(sampled_df, stock, zarr_path):
+    """
+    Función ingesta la computación de la triple barrera usando 'Ray'.
     
-    df_ = pd.read_csv(
-        data_dir + stock + "_" + bartype.upper() + 
-        '_' + method + '_SAMPLED.csv',
-        parse_dates= [
-            "open_date",
-            "high_date",
-            "low_date",
-            "close_date",
-            "horizon"]
+    Inputs:
+        - sampled_df (pd.DataFrame): dataframe utilizado para computar la triple barrera.
+        - stock (str): nombre de la acción sobre la que se computara triple barrera.
+        - zarr_path (str): dirección path donde se encuentra alojado los archivos .zarr.
+    
+    Output:
+        - dataset (pd.DataFrame): actualizado con las columnas 
+            * barrierLabel
+            * barrierTime
+            * barrierPrice
+    """
+    # computación triplebarrera
+    dataset = LabelTripleBarrierComputation(sampled_df, stock, zarr_path)
+    
+    # transformación de serie numérica timestamp a datetimeObj
+    dataset["barrierTime"] = dataset.barrierTime.transform(
+        lambda x: datetime.fromtimestamp(x/1e3)
         )
-    return LabelTripleBarrierComputation(df_, stock, zarr_path)
+    
+    # retorno final del dataset
+    return dataset

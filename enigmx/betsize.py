@@ -165,13 +165,14 @@ class BetSize(object):
       raise ValueError(
           "BROKEN CODE: 'endogenous_model' only 'rf' or 'svm'."
       )
-
-    if len(self.array_labels.shape) == 1:
-      self.array_labels = self.array_labels.reshape(
-          self.array_labels.reshape(
-              self.array_labels.shape[0], 1
-              )
-          )
+    
+    
+    #if len(self.array_labels.shape) == 1:
+    #  self.array_labels = self.array_labels.reshape(
+    #      self.array_labels.reshape(
+    #          self.array_labels.shape[0], 1
+    #          )
+    #      )
     
   def __dataManagement__(self):
     self.__warningStatements__()
@@ -436,7 +437,7 @@ class BetSize(object):
     
 def betsize_livetrading(features_matrix, prediction_vector, 
                         betsize_model, scaling = False, 
-                        stepSize=0.2, weighting = True):
+                        stepSize=0.2, weighting = False):
   """
   Posibilita la aplicación del betsize para livetrading.
   Utiliza para ello el modelo 'meta-labeling' entrenado en la clase 'BetSize'.
@@ -461,6 +462,9 @@ def betsize_livetrading(features_matrix, prediction_vector,
   Importante:
     'M': cantidad total de acciones
     'N': cantidad total de features 
+    
+    
+    AGREGAR APALANCAMIENTO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
   """
 
   #revisar data type de algunos inputs

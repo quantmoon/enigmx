@@ -9,27 +9,38 @@ from enigmx.betsize import betsize_livetrading
 from enigmx.utils import (
     nCk, 
     paths,
-    keep_same, 
-    consecutive,
     master_sets,
-    purge_embargo, 
-    split_map_CPCV, 
-    dataPreparation,  
-    groups_from_test,
-    list_for_train_test
+    split_map_CPCV,  
     )
 
-def check_data(idxs, base_dataset):
-    base_dataset = base_dataset.reset_index(drop=True).values
-    featuresMatrix, labelsVector = (
-            base_dataset[idxs,:-1].astype(np.float32), 
-            base_dataset[idxs,-1:]
-        )
-    
-    return featuresMatrix, labelsVector
-
 class GeneralModel(object):
+    """
+    Clase general para utilizado de Modelo Macro.
     
+    Modelo Macro: modelo exógeno (side) + modelo endógeno (size)
+    
+    Recrea la estructura de modelo sklearn (fit y predict).
+    
+    Clase GeneralModel:
+        Inputs obligatorios:
+            - 'MA' (sklearn, keras, pytorch o pers.): modelo exógeno.
+            - 'MB' (RandomForestClassifier o SVC): modelo endógenos.
+            
+    Métodos centrales:
+        - 'fit': recrea el aprendizaje del modelo sobre el modelo exógeno.
+            * 'idxs': indices lst para distinción entre features matrix y label vector
+            * 'basedata': dataframe o numpy array conteniendo la data para el modelo
+        - 'predict': ejecuta la predicción doble (m. exógeno y m. endógeno)
+            * 'idxs': indices lst para distinción entre features matrix y label vector 
+            * 'basedata': dataframe o numpy array conteniendo la data para el modelo
+            * 'y_true': bool para retornar o no el vector del yLabel verdadero
+                        útil para calcular métricas de performance.
+                        
+    Métodos accesitarios:
+        - '__dataPreparation__': permite dividir un dataset en featuresMatrix y labelsVector
+            * 'idxs': indices lst para distinción entre features matrix y label vector
+            * 'basedata': dataframe o numpy array conteniendo la data para el modelo
+    """
     def __init__(self, MA, MB):
         
         self.MA = MA 
@@ -37,7 +48,7 @@ class GeneralModel(object):
     
     def __dataPreparation__(self, idxs, basedata):
         """
-        Contraint:
+        Constraint:
         If 'base_dataset': pd.DataFrame:
             'label':= idx[-1]
         If 'base_dataset': np.ndarray:
@@ -57,55 +68,39 @@ class GeneralModel(object):
                 basedata[idxs,:-1].astype(np.float32), 
                 basedata[idxs,-1:]
             )        
-        
+
         return featuresMatrix, labelsVector
     
     def fit(self, idxs, basedata):
+        """
+        Método de entrenamiento para Modelo Macro. 
+        
+        Trabaja solo sobre MA (modelo exógeno)
+        """
         #split division to define X and Y (training set)
         X, y = self.__dataPreparation__(idxs, basedata)
-        
-        
-        #print("DATA QUE SE OBTIENE EN  FIT")
-        #print(X)
-        #print(np.unique(y))
-        #print(" ")
-        
+
         #fitting/update training process in exogenous model (side)
         self.MA = self.MA.fit(X,y)
     
     def predict(self, idxs, basedata, y_true=False):
-        
+        """
+        Método de predicción para modelo Macro.
+        """
         #split division to define X and Y (testing set)
         X, y_real = self.__dataPreparation__(idxs, basedata)
         
-        
-        #print("DATA 'X' QUE SE OBTIENE EN  PREDICT")
-        #print(X.shape)
-        #print(" ")
-        
         #prediction process in exogenous model (side)
         predictionA = self.MA.predict(X)
-        
-    
-        
-        #print("PREDICCIONES 'A' EN PREDICT")
-        #print(predictionA)
-        #print(" ")
         
         #prediction process in endogenous model (size | metalabelling)
         predictionB = betsize_livetrading(
             X, predictionA.reshape(-1,1), self.MB
             )
         
-        
-        
-        #for PA, PB in zip(predictionA, predictionB):
-        #if np.unique(predictionA).shape[0]>1: 
-        print(np.unique(predictionA, return_counts=True), np.unique(predictionB))
-        
         #if 'y_true', returns Y' (predictions) and Y(real label events)
         if y_true: #useful to calculate the performance metric
-            return predictionB, y_real
+            return predictionA, predictionB, y_real 
         else:
             return predictionB
         
@@ -133,18 +128,25 @@ class CPKFCV(object):
                 Get the predictions for each path based on 
                 '__IndexStructureGeneration__' method results.
                 
+                Returns tuple of information:
+                    * side predictions by path (N-1) in array format
+                    * size predictions by path (N-1) in array format
+                    * true label index by path (N-1) in array format
+                    * event idx by path (N-1) in array format
+                
             Aditional input:
                 * 'exogenous_model': base Machine Learning model | side pred.
                 * 'endogenous_model': complementary ML model | size pred.
                 * 'nonfeature': useless var list to drop from feature matrix.
                 
     """
-    def __init__(self, data, N, k):
+    def __init__(self, data, N, k, embargo_level = 5):
         self.data = data
         self.N = N
         self.k = k
+        self.embargo_level = embargo_level
         
-    def __IndexStructureGeneration__(self, embargo_level=10):
+    def __IndexStructureGeneration__(self):
         
         #kFold using N  
         kf = KFold(n_splits = self.N, shuffle = False)
@@ -165,15 +167,16 @@ class CPKFCV(object):
         
         #item 2 | idxs to construct 
         masterSets = master_sets(
-            self.N, self.k, split_map, pieces, self.data, embargo_level
+            self.N, self.k, split_map, pieces, self.data, self.embargo_level
         )
         return masterSets, split_map, n_paths
     
     def getResults(self, exogenous_model, endogenous_model, 
                    nonfeature=['horizon'], y_true = True):
         
+
         #get useful dataset
-        featuresLabelData = self.data.drop(nonfeature,axis=1)
+        featuresLabelData = self.data.drop(nonfeature, axis=1)
         
         #items: [0] masterSets, [1] split_map, [2] n_paths        
         items = self.__IndexStructureGeneration__()
@@ -181,12 +184,13 @@ class CPKFCV(object):
         #predictions and y_real | elements to compute performance
         updatedPreds = []
         y_reals = []
-        #temp = []
+        predCat = []
+        indexPredEvent = []
         
-        #predicciones_sin_split = []
-
+        
         #Updating Models Process using 'train' subset (idx[0])         
         for idxs_arrays_in_tuple in items[0]:
+            
             
             #definition of general model: side model + size model
             model = GeneralModel(
@@ -199,60 +203,53 @@ class CPKFCV(object):
             )
             
             #fitting general model with subset of test | predictions + y_real
-            predictions, y_real = model.predict(
+            predictionCat, predictions, y_real = model.predict(
                 idxs_arrays_in_tuple[1], featuresLabelData, y_true
             )
             
-            #predicciones_sin_split.append(predictions)
-            
             #split side_size_predictions & y_real 
+            splitted_predCat = np.array_split(predictionCat, self.k)
             splitted_predictions = np.array_split(predictions, self.k)
             splitted_y_reals = np.array_split(y_real, self.k)
+            splitted_index_y = np.array_split(idxs_arrays_in_tuple[1], self.k)
             
             #include splitted information to each base lists
+            predCat.append(splitted_predCat)
             updatedPreds.append(splitted_predictions)
             y_reals.append(splitted_y_reals)
-            
-            #print("CHECK DATA")
-            #temp.append(check_data(
-            #    idxs_arrays_in_tuple[0], featuresLabelData,
-            #) )
-        
-        #print("CHECKING FETURES DATA EQUALITY") 
-        #for idx in range(1,len(temp)):
-        #    print("Checking Features & Labels Equality")
-            
-        #    print( np.unique(temp[idx-1][0] ==  temp[idx][0]))
-        #    print( np.unique(temp[idx-1][1] ==  temp[idx][1]))
-        #print(" ")
-            
-        #print("Imprimiendo Split Maps")
-        #for mapeo in items[1]:
-        #    print(mapeo)
-            
-        #print("Checking Predictions base model equality")
-        #for idx in range(1,len(predicciones_sin_split)):
-            
-        #    print("Prediccion")
-        #    print(predicciones_sin_split[idx])
-        #    print(predicciones_sin_split[idx-1])
-           
-        #    print( predicciones_sin_split[idx-1] == predicciones_sin_split[idx] )
-        
-        #print("*******************")
-            
+            indexPredEvent.append(splitted_index_y)
     
             
-        #constuction of final paths (N elements) | predictions
+        #constuction of final paths (N elements) | simple categorical pred.
+        final_prediction_catpath = [
+            np.concatenate(path) for path in paths(
+                predCat, items[1], items[2])
+        ]        
+        
+        #constuction of final paths (N elements) | betsize predictions
         final_prediction_paths = [
             np.concatenate(path) for path in paths(
                 updatedPreds, items[1], items[2])
         ]
         
-        #constuction of final paths (N elements) | y_real 
-        final_y_reals_paths = [
+        #constuction of final paths (N elements) | true label (y)
+        #values in each path are the same
+        final_y_real_paths = [
             np.concatenate(path) for path in paths(
                 y_reals, items[1], items[2])
         ]
         
-        return final_prediction_paths, final_y_reals_paths
+        #constuction of final paths (N elements) | true index label (y-idx)
+        #values in each path are the same
+        final_index_y_paths = [
+            np.concatenate(path) for path in paths(
+                indexPredEvent, items[1], items[2])
+        ]
+        
+        
+        return (
+            final_prediction_catpath, 
+            final_prediction_paths, 
+            final_y_real_paths, 
+            final_index_y_paths
+            )

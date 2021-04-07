@@ -10,10 +10,10 @@ from numba import njit
 from datetime import datetime
 from enigmx.utils import (
     get_arrs, bar_para, softmax, sel_days, 
-    simpleFracdiff, open_bar_files
+    simpleFracdiff
     )
 import scipy.cluster.hierarchy as sch
-import random
+
 
 # El presente file 'alternative_methods.py' posee las func. relevantes
 # del primer apartado del workflow (ver ppt "17-01" del 2021).
@@ -40,23 +40,23 @@ def standard_bar_tunning(url,ticker,num_bar, date_tuple_range):
     * diccionario con hyperparametros para las tres barras estandar
     ## {'tick_para': a, 'vol_para': b, 'dol_para': c}
     '''
+    
     #obtener el url para aperturar el Zarr
     url = url+ticker+'.zarr'
-    
+
     #apertura remota de zarr
     zarrds = zarr.open_group(url)
 
     #si la tupla de fechas tiene un valor distinto a None (str fecha x 2)
-        
     #abre todas las fechas
     zarr_dates = zarrds.date.get_basic_selection()
 
     #encuentra los idxs de la fecha min y fecha max dada en la tupla
     dateIdxs = np.searchsorted(zarr_dates, date_tuple_range)
-        
+
     #guarda número de días del zarr| dif. de indexes
     num_days = dateIdxs[1]-dateIdxs[0]
-    
+
     #guarda número prom diario de ticks, volumen o dollar | init: 0 all
     average_ticks_day, average_volume_day, average_dollar_day = 0, 0, 0
 
@@ -103,16 +103,17 @@ def getTEventsCumSum(gRaw,h):
     """
     
     tEvents,sPos,sNeg=[],0,0
-    #diff = np.diff(g)
+
     diff=np.diff(gRaw) #differential | eq. returns
     for i in range(1,diff.shape[0]):
         sPos,sNeg=max(0,sPos+diff[i]),min(0,sNeg+diff[i])
-        #print(sPos,sNeg)
+
         if sNeg<-h:
             sNeg=0;tEvents.append(i)
         elif sPos>h:
             sPos=0;tEvents.append(i)
-    return tEvents#pd.DatetimeIndex(tEvents)
+    return tEvents
+
 
 #@njit
 def matchLength(msg,i,n):
@@ -120,11 +121,6 @@ def matchLength(msg,i,n):
     # i>=n & len(msg)>=i+n
     subS=''
     #if 'n' is not a fixed window, it will be acumulated
-    #print("info antes de match length")
-    #print(range(n))
-    
-    #print(len(msg))
-    #print(" ")
     for l in range(n):
         msg1=msg[i:i+l+1]
         for j in range(i-n,i):
@@ -168,11 +164,32 @@ def konto(msg,window=None):
     out = 1-(sum_ / num_)/np.log2(len(msg)) # redundancy, 0<=r<=1
     return out
 
-def entropyFeature(path, 
-                   init, init_ts, 
-                   last, last_ts, 
+def entropyFeature(row, 
+                   path, 
                    entropy_window = None,
-                   beta=0.025, cumsum_sampling = True):
+                   beta=0.025, 
+                   cumsum_sampling = True):
+    
+    """
+    Función principal que calcula la entropía.
+    
+    Es ingestada por la función 'entropyCalculationParallel' para su
+    cómputo paralelizado.
+    
+    Inputs:
+        - row: vector de información extraído de cada evento (cada barra)
+        - path: dirección local específica donde se encuentra .zarr de una acción dada
+        - entropy window: None cambiable a int para definir ventana de entropía
+        - beta: float para valor de cálculo de la entropía min req.
+        - cumsum_sampling: aplicar el proceso de sampleo (aligera el proceso)
+        
+    Outputs:
+        - valor float 'entropy'
+    """
+
+    init, last = row[4], row[7]
+    init_ts = datetime.timestamp(init.to_pydatetime()) * 1e3
+    last_ts = datetime.timestamp(last.to_pydatetime()) * 1e3
     
     #days range to search tripleBarrier | timeframe values
     daysList = sel_days(init, last)
@@ -219,7 +236,10 @@ def entropyFeature(path,
     
     #--------------------Entropy calculation--------------------#
     
+    #check if there are prices in the interval
     if vector_prices.shape[0] == 0:
+        
+        #set entropy as zero
         entropy = 0
         
     else: 
@@ -239,58 +259,67 @@ def entropyFeature(path,
 
         #log prices calculation from resampled prices vector
         vector_log_prices = np.log(vector_prices)
-
-        #computation of fracdiff from log prices of resampled prices vector
-        vector_fracdiff_log_prices = simpleFracdiff(vector_log_prices)
-
-        #encoding of fracdiff prices
-        binarized_vector_fracdiff_log_prices = np.where(
-                vector_fracdiff_log_prices>np.mean(vector_fracdiff_log_prices), 
-                1, 0
-            )
-
-        #redundancy as entropy
-        entropy = konto(
-                msg= binarized_vector_fracdiff_log_prices, 
-                window= entropy_window
-            )
-
+        
+        #check in case log transformation gets small dataset size
+        if vector_log_prices.shape[0] < 10:
+            
+            #set entropy as zero
+            entropy = 0
+            
+        else:
+            #computation of fracdiff from log prices of resampled prices vector
+            vector_fracdiff_log_prices = simpleFracdiff(vector_log_prices)
+    
+            #encoding of fracdiff prices
+            binarized_vector_fracdiff_log_prices = np.where(
+                    vector_fracdiff_log_prices>np.mean(
+                        vector_fracdiff_log_prices
+                        ), 
+                    1, 0
+                )
+    
+            #redundancy as entropy
+            entropy = konto(
+                    msg= binarized_vector_fracdiff_log_prices, 
+                    window= entropy_window
+                )
     return entropy
 
 @ray.remote
 def entropyCalculationParallel(zarr_dir, 
-                               pandas_dir, 
-                               stock, bartype, 
+                               pandas_bar, 
+                               stock,
                                beta = 0.01, 
                                entropy_window = 100, 
-                               cumsum_sampling = True,
-                               base_path = "D:/data_split_stacked/"):
+                               cumsum_sampling = True):
+    """
+    Función que permite calcular la entropía utilizando paralelización Ray.
     
-    pandasBar = open_bar_files(base_path, stock, bartype)
+    Inputs:
+        - zarr_dir: str local path donde se encuentran los archivo zarr 
+        - pandas_bar: dataframe con la barra de la acción 
+        - stock: string name de la acción
+        - beta: float para valor de cálculo de la entropía min req.
+        - entropy_window: ventana de la entropía
+        - cumsum_sampling: aplicar el proceso de sampleo (aligera el proceso)
+        
+    Outputs:
+        - pandas_bar actualizado con columna "entropy" (float vector)
+    """
     
+    # reconstrucción de zarr para ubicar archivo de la acción
     zarr_path = zarr_dir + stock + ".zarr"
     
-    pandasBar["entropy"] = pandasBar.apply(lambda row:
-                           entropyFeature(
-                               path = zarr_path,
-                               init = row["open_date"],
-                               init_ts = datetime.timestamp(
-                                           row["open_date"].to_pydatetime()
-                                           ) * 1e3,
-                               last = row["close_date"],
-                               last_ts= datetime.timestamp(
-                                           row["close_date"].to_pydatetime()
-                                           ) * 1e3, 
-                               #### Optional Params ####
-                               beta = beta, 
-                               entropy_window = entropy_window, 
-                               cumsum_sampling = cumsum_sampling)
-                           ,axis=1
-                          )    
-    return pandasBar
+    # agregado de columna entropy
+    pandas_bar["entropy"] = np.apply_along_axis(
+        entropyFeature, 1, pandas_bar.values, 
+        zarr_path, entropy_window, beta, cumsum_sampling 
+        )
+    
+    return pandas_bar
 
 ##############################################################################
-#3. SADF & ETF Trick & HRP #--------------------------------------------------------
+#3. SADF & ETF Trick #--------------------------------------------------------
 ##############################################################################
 def pcaWeights(cov, 
                riskDist =  None, 
@@ -349,10 +378,23 @@ def optPort(cov,mu=None):
     w/=np.dot(ones.T,w)
     return w
 
+##############################################################################
+######################### THEOTHERICAL RISK ##################################
+##############################################################################
 
-#Implementación del Hierarchical Risk Parity del libro de MLDP(2018, C. 16)
 class HRP():
+    """
+    Clase principal para el cómputo de Theotherical Risk.
     
+    Útil para definición de pesos de cada evento en el ETF TRICK.
+    
+    Clase HRP
+    
+    Métodos Principales:
+        - HRP: Three Clustering
+        - getI: computa la inversa de la matriz de varianza del portafolio.
+        - getClusterVar: computa la varianza por cluster.
+    """
     def __init__(self, cov,corr):
         self.cov = cov
         self.corr = corr
@@ -363,7 +405,6 @@ class HRP():
         ''' PASO 1 (Tree Clustering) 
             Se agrupan los elementos de la matrix de correlacion en base a su
             distancia
-
             Plantear utilizar otros procedimientos en la medición 
             de distancias, ejm: scipy.spatial.distance.pdist
         '''
@@ -373,7 +414,6 @@ class HRP():
         # linkage matrix object
         link=sch.linkage(dist,'single') ### EVALUAR INCLUIR UN HYPERPARAMETRO
         ''' PASO 2 (Cuasi Diagonalización)
-
             Se determina el orden de las filas de la matriz de correlación 
             en función de los clusters obtenidos en el paso 1.
         '''
@@ -392,7 +432,6 @@ class HRP():
             sortIx.index=range(sortIx.shape[0]) # re-index
         sortIx = sortIx.astype(int).tolist()
         ''' PASO 3 (Recursive Bisection)
-
             Se determinan los pesos asignados a cada acción iterativamente 
             por pares. En consecuencia, el número de acciones
             mínimo debe ser 4. 
@@ -402,7 +441,11 @@ class HRP():
         # initialize all items in one cluster
         cItems=[sortIx] 
         while len(cItems)>0:
-            cItems=[i[j:k] for i in cItems for j,k in ((0,int(len(i)/2)),(int(len(i)/2),len(i))) if len(i)>1] # bi-section
+            cItems=[
+                i[j:k] for i in cItems for j,k in (
+                    (0,int(len(i)/2)), 
+                    (int(len(i)/2),len(i))) if len(i)>1
+                ] # bi-section
             for i in range(0,len(cItems),2): # parse in pairs
                 cItems0=cItems[i] # cluster 1
                 cItems1=cItems[i+1] # cluster 2
@@ -428,11 +471,14 @@ class HRP():
         return cVar
     #———————————————————————————————————————
 
-def etfTrick(bar_dir, 
+##############################################################################
+##############################################################################
+##############################################################################
+
+def etfTrick(list_bars_stocks, 
              stock_list, 
-             bartype, 
              k=10000, 
-             lower_bound_index = 50, 
+             lower_bound_index = 25, 
              allocation_approach = 'inv',
              output_type = dict):
     """
@@ -441,13 +487,14 @@ def etfTrick(bar_dir,
         Cap 2 - AFML of Marcos Lopez de Prado (Section 2.4.1).
     
     Parameters:
-        - 'bar_dir': str path where 'bar' .csv by stock is allocated.
+        - 'list_bars_stocks': dataframes list with bar pandas by equity.
         - 'stock_list': lst of strings by stock of 'bar' .csv information.
         - 'bartype': str referring type of bars 'bar' .csv is based on.
         - 'k': initial K (AUM) int to compute ETF Trick.
         - 'lowerb_ound_index': N-int first values taken to 1st covmatrix.
         - 'allocation_approach': str referring weight method computation.
                 * 'inv': inverting covariance matrix method.
+                * 'hrp': hierarchical risk.
                 * otherwise: PCA decomposition.
         - 'output_type': 'dict' statement or anything else referring 
                          to output format.
@@ -461,30 +508,27 @@ def etfTrick(bar_dir,
                                 (ETF value series not included).
             * anything else: returns full ETF Trick series.        
     """
-    #get list stock-bar information dataframe
-    list_stocks = [
-        open_bar_files(bar_dir, stock, bartype) for stock in stock_list
-    ]
 
     #get idx-time reformed df close dates of each stock-bar dataframe
     list_reformed_df_close_dates = [
         settingTimePandasFormat(stock_frame, "close_date") 
-        for stock_frame in list_stocks
+        for stock_frame in list_bars_stocks
     ]
     
     #get idx-time reformed df open prices of each stock-bar dataframe
     list_reformed_df_open_prices = [
-        settingTimePandasFormat(stock_frame, "open")
-        for stock_frame in list_stocks        
+        settingTimePandasFormat(stock_frame, "open_price")
+        for stock_frame in list_bars_stocks
     ]
     
     #get idx-time reformed df close prices of each stock-bar dataframe
     list_reformed_df_close_prices = [
-        settingTimePandasFormat(stock_frame, "close")
-        for stock_frame in list_stocks        
+        settingTimePandasFormat(stock_frame, "close_price")
+        for stock_frame in list_bars_stocks   
     ]    
     
     #compute joinned dataframe of dates from all stocks
+    #ERROR LINE
     join_dataframe_dates = pd.concat(
         list_reformed_df_close_dates, axis=1
     ).fillna(method='ffill')[1:]
@@ -514,15 +558,15 @@ def etfTrick(bar_dir,
     #if 'covariance inverse matrix' is selected
     if allocation_approach.lower() == 'inv':
         weights_method = optPort
-
+        
     #se aplica el hierarchical risk parity del C. 16 de MLDP(2018)
     elif allocation_approach.lower() == 'hrp':
-        weights_method = HRP
-
+        weights_method = HRP         
+        
     #otherwise, apply simple PCA decomposition | Warning: this doesn't sum 1
     else:
         weights_method = pcaWeights
-
+    
     #-----------------ETF ITERATIVE CONSTRUCTION-----------------# 
     
     #historical empty weights
@@ -545,8 +589,8 @@ def etfTrick(bar_dir,
             join_array_close_prices[0:idx]
         )
         
+        #temporal returns matrix
         temp_returns_matrix = temp_matrix_prices.pct_change()
-        
         
         #temporal covariance matrix
         temp_covariance_matrix = temp_matrix_prices.cov()
@@ -554,11 +598,7 @@ def etfTrick(bar_dir,
         #save covariance matrix information
         covs.append(temp_covariance_matrix)
         
-        
-        #Se añade condicional sobre hierarchical risk parity
-        #Necesario porque el HRP necesita la correlación y la covarianza
         if weights_method == HRP:
-            
             #for the HRP method, the correlation matrix is calculated
             #temporal correlation matrix
             temp_correlation_matrix = temp_returns_matrix.corr()
@@ -567,10 +607,11 @@ def etfTrick(bar_dir,
             temp_covariance_matrix = temp_returns_matrix.cov()
             
             #weight vector computation (pd.Series)
-            weigths = weights_method(temp_correlation_matrix, temp_covariance_matrix).weights.sort_index()
-            
+            weigths = weights_method(
+                temp_correlation_matrix, temp_covariance_matrix
+                ).weights.sort_index()            
+        
         else:
-            
             #weight vector computation
             weigths = weights_method(temp_covariance_matrix).T[0]
         
@@ -608,7 +649,6 @@ def etfTrick(bar_dir,
 
             #if it is the first event
             if stockIdx == 0:
-
                 pass
             
             #otherwise
@@ -650,7 +690,7 @@ def etfTrick(bar_dir,
         final_frame[stock_list] = np.array(info_dates)
         
         final_frame[stock_list] = final_frame[stock_list].apply(pd.to_datetime)
-        final_frame.to_csv(
-            bar_dir + "SERIES_" + bartype + "_ETFTRICK.csv", index=False
-            )
-        return "ETFTrick Saved"
+        #final_frame.to_csv(
+        #    bar_dir + "SERIES_" + bartype + "_ETFTRICK.csv", index=False
+        #    )
+        return final_frame #"ETFTrick Saved"

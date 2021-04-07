@@ -15,6 +15,7 @@ from enigmx.utils import (
     doubleReformedVolatility,
     simpleFracdiff, 
     dataset_column_names,
+    # for deprecated second function
     saving_basic_bars,
     saving_tunning_bars,
     saving_unique_entropy_bar,
@@ -25,7 +26,7 @@ from enigmx.utils import (
 @ray.remote
 def generate_datasets(stock, 
                       bartypesList,  
-        		      data_dir, 
+                      data_dir, 
                       range_dates,                   
                       imbalance_dict,
                       bar_grp_freq= 1,
@@ -113,10 +114,8 @@ def generate_datasets(stock,
         raise ValueError(
             "Only 'close'&'open' for fracdiff estimation. Check args. params."
             )
-    
-    list_of_list = []
-            
-    
+        
+    list_of_list = []            
     #iteración simple día x día para cálculo de barras
     for date in range_dates:            
 
@@ -128,15 +127,15 @@ def generate_datasets(stock,
                                         stock = stock
                                 )
 
-        #iteración por tipo de barra
+        #iteración por tipo de barra | result_value: numpy.array
+        
         result_value = [
             QMREPOSITORY.geneticIterativeFunction(
                 freq = bar_grp_freq,
                 time = bar_grp_horizon,
                 bartype = bartype,
                 imbalance_list = imbalance_dict[stock], 
-                daily_time_bars_organization=\
-                    alpha_calibration[bartype+'_t'].item()
+                daily_time_bars_organization=alpha_calibration[bartype+'_t'].item()
                 )
             for bartype in bartypesList]
 
@@ -192,12 +191,12 @@ def generate_datasets(stock,
                 )
             
         #upper barrier definition    
-        barDataframe["upper_barrier"] =barDataframe.close * (
+        barDataframe["upper_barrier"] =barDataframe.close_price * (
             1 + barDataframe.volatility
             )
         
         #lower barrier definition
-        barDataframe["lower_barrier"] =barDataframe.close * (
+        barDataframe["lower_barrier"] =barDataframe.close_price* (
             1 - barDataframe.volatility
             )
         
@@ -215,7 +214,12 @@ def generate_datasets(stock,
             
             #segmentation over horizon based on limit day (last rows/events)
             barDataframe = barDataframe.query("horizon < @limit_data_date")
-               
+        
+        #accumulative volumen as int to allow easy saving in SQL Table
+        barDataframe = barDataframe.astype(
+            {'bar_cum_volume':int}
+            ) 
+        
         datasets_to_save.append(barDataframe)
     
     return datasets_to_save
@@ -227,6 +231,8 @@ def getting_ray_and_saving(ray_object_list,
                            saving_type,
                            list_element_types = None):
     """
+    DEPRECATED (NO USADA EN ENIGMX)
+    
     Nombre: 'getting_ray_and_saving'
     Consideración: Python Function.
     Funcionalidad: Función que permite el almacenaje de información.
@@ -279,7 +285,7 @@ def getting_ray_and_saving(ray_object_list,
             "Paramter 'saving_type' should be defined as:\
                 'bar_tunning', 'bar_frame' only. Other values not allowed."
             )
-        
+    
     print("Saving Porcess Ended")
     return None
 

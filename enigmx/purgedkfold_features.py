@@ -47,6 +47,9 @@ class PurgedKFold(_BaseKFold):
         self.pctEmbargo=pctEmbargo
 
     def split(self,X,y=None,groups=None):
+        
+        self.t1 = self.t1.sort_index()
+        
         if (X.index==self.t1.index).sum()!=len(self.t1):
             raise ValueError('X and ThruDateValues must have the same index')
 
@@ -81,6 +84,8 @@ def cvScore(clf,X,y,sample_weight=None,scoring='neg_log_loss',
     if scoring not in ['neg_log_loss','accuracy']:
         raise Exception('wrong scoring method.')
     
+    X = X.sort_index()
+    
     idx = pd.IndexSlice
     if cvGen is None:
         #Purging Process
@@ -112,10 +117,15 @@ def featImpMDA(clf,X,y,cv,sample_weight,t1,pctEmbargo,scoring='neg_log_loss'):
     cvGen=PurgedKFold(n_splits=cv,t1=t1,pctEmbargo=pctEmbargo) # purged cv
     scr0,scr1=pd.Series(), pd.DataFrame(columns=X.columns)
 
+    X = X.sort_index()
+    
     for i,(train,test) in enumerate(cvGen.split(X=X)):
+        
         X0,y0,w0=X.iloc[train,:],y.iloc[train],sample_weight.iloc[train]
         X1,y1,w1=X.iloc[test,:],y.iloc[test],sample_weight.iloc[test]
+        
         fit=clf.fit(X=X0,y=y0,sample_weight=w0.values)
+        
         if scoring=='neg_log_loss':
             prob=fit.predict_proba(X1)
             scr0.loc[i]=-log_loss(y1,prob,sample_weight=w1.values,

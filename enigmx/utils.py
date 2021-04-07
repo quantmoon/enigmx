@@ -166,6 +166,7 @@ def getTickPrices(path, date_):
 #OPEN ZARR | Version 2.0: vectorized version (use range of dates)
 def open_zarr_general(zarrDates, range_dates, zarrObject):    
     #resultado de la función mini nueva        
+    
     idxs_ = [np.where(zarrDates == range_dates[0])[0][0],
              np.where(zarrDates == range_dates[-1])[0][0]+1]
     
@@ -624,6 +625,7 @@ def simpleFracdiff(priceArray,
                     window=window_fracdiff,
                     pvalue=0.01
                     )
+    
 
     #fracdiff calculation
     fracdiff_results = fracdiff_.fit_transform(X_)
@@ -957,9 +959,6 @@ def imb_feat(prices,
                  ewmas y el número de barras esperado
     tipo: imbalance de ticks, dollar, volume (Actualmente solo para dollar)
     """
-    #print(hyperp_dict)
-        
-    #init_vals = init_df[symbol]
     
     alpha_1 = init_vals[0]
     alpha_2 = init_vals[1]
@@ -1292,30 +1291,88 @@ def simpleBarTick(arrayTime,
 def global_list_stocks(data_dir, 
                        common_path = '.zarr', 
                        drop_extension = 5):
+    
+    """
+    Función para obtener todas la lista de acciones de un repositorio local.
+    
+    Lee los nombres de los archivos existentes que tienen un 
+    string en común (prefijo, infijo, sufijo).
+    
+    Elimina los strings innecesarios y se queda con el nombre de las acciones.
+    
+    Inputs:
+        - data_dir (str): local path para buscar.
+        - common_path (str): tipo de su-pre-in fijo para buscar.
+        - drop_extension (int): # de eliminación de los últimos #
+        
+    outputs:
+        - lista de acciones (lista de strings)
+    """
+    
     list_stocks = []
     for i,file in enumerate(os.listdir(data_dir)):
         if file.endswith(common_path):
             list_stocks.append(os.path.basename(file)[:-drop_extension])
     return list_stocks
 
-#Data Tunning Preparation
+# nominación de lista de acciones para ingesta directa de path 
+#EquitiesEnigmxUniverse = global_list_stocks('D:/data_repository/')
+
+#Data Tunning Preparation| CAMBIARLO POR SQL 
 def dataPreparation_forTuning(csv_path,
-                              list_features_names, 
-                              label_name,
+                              label_name = "barrierLabel",
+                              features_sufix = "feature",
+                              timeIndexName = "close_date",
                               set_datetime_as_index = True):
+    """
+    Función para preparar un csv para la utilización con los modelos.
+    
+    Inputs:
+        - csv_path (str): dirección local donde se encuentra el csv
+        - label_name (str): nombre del label en dicho pandas extraído del csv-path.
+        - features_sufix (str): sufijo de las columnas de features en el df.
+        - timeIndexName (str): nombre de la columna temporal a usarse como Idx de evento.
+        - set_datetime_as_index (bool): setear el idx de evento como idx del dataframe.
+        
+    Output:
+        - Tuple:
+            * X : matriz de features
+            * y : vector de label
+            * t1: vector de timeIndex 
+    """
+    
     if not set_datetime_as_index:
         raise ValueError(
             "Only True available for datatime as index until now."
             )
-        
-    df = pd.read_csv(
-        csv_path, index_col='datetime'
+    
+    # obtención del df stacked desde path
+    dfStacked = pd.read_csv(
+        csv_path, 
         ).dropna()
     
-    X = df[list_features_names]
+    # seteo de la columna timeIndexName como un datetime (no como string)
+    dfStacked[timeIndexName] = dfStacked[timeIndexName].astype('datetime64[ns]')
     
-    y = df[label_name]
+    # definir cono index a la columna asignada a timeIndexName
+    dfStacked = dfStacked.set_index(timeIndexName)
     
+    # array conteniendo los nombres de features según sufijo definido
+    featureColumnsName = dfStacked.filter(
+                like= features_sufix
+                ).columns.values   
+    
+    # selección únicamente de features
+    X = dfStacked[featureColumnsName]
+    
+    # selección únicamente de label
+    y = dfStacked[label_name]
+    
+    # ordenamiento serie-temporal según timeIndexName
+    X = X.sort_index()
+    y = y.sort_index()
+    
+    # obtención de vector de timeIndex
     t1 = pd.Series(data=y.index, index=y.index)    
     
     return X, y, t1
@@ -1336,7 +1393,53 @@ keep_same = {
     'timeAchieved', 'time','special_time'
 }
 
-def dataPreparation(data, 
+def dataPreparation(data_csv, 
+                    feature_sufix = 'feature',
+                    label_name='barrierLabel', 
+                    timeIndexName = "close_date",
+                    timeLabelName = "horizon"): 
+    
+    """
+    Función para preparar un csv para la utilización con los modelos.
+    
+    Inputs:
+        - csv_path (str): dirección local donde se encuentra el csv
+        - label_name (str): nombre del label en dicho pandas extraído del csv-path.
+        - features_sufix (str): sufijo de las columnas de features en el df.
+        - timeIndexName (str): nombre de la columna temporal a usarse como Idx de evento.
+        - set_datetime_as_index (bool): setear el idx de evento como idx del dataframe.
+        
+    Output:
+        - Tuple:
+            * X : matriz de features
+            * y : vector de label
+            * t1: vector de timeIndex 
+    """    
+    
+    dfStacked = pd.read_csv(
+        data_csv, 
+        ).dropna()
+    
+    dfStacked[timeIndexName] = dfStacked[timeIndexName].astype('datetime64[ns]')
+    dfStacked[timeLabelName] = dfStacked[timeLabelName].astype('datetime64[ns]')
+    
+    dfStacked = dfStacked.set_index(timeIndexName)
+    
+    featureColumnsName = list(dfStacked.filter(
+                like= feature_sufix
+                ).columns.values)       
+    
+    featureColumnsName.append(timeLabelName)
+    
+    X = dfStacked[featureColumnsName]
+
+    y = dfStacked[label_name]
+    
+    X[label_name] = y
+     
+    return X
+
+def dataPreparationOld(data, 
                     label_name='tripleBarrier', 
                     add_suffix = True, 
                     no_suffix = keep_same):
@@ -1454,7 +1557,7 @@ def purge_embargo(X,train_indices,test_indices,embargo):
     train_2 = train[train.index > (end + np.timedelta64(embargo,'D'))]
     
     new_train = pd.concat([train_1,train_2])
-    train['new_index'] = train_indices.copy()
+    train.loc[:, 'new_index'] = train_indices.copy()
     train = pd.merge(train,new_train,
                      how='left',
                      left_index  = True, 
@@ -1490,17 +1593,14 @@ def master_sets(N,k,split_map,pieces,X,embargo):
 
     for split in range(model_split):
         non_zero = np.nonzero(split_map[:,split])
-        #print('Split Set: ' + str(split))
         
         train = []
         test = []
     
         for piece in range(len(pieces)):
             if np.isin(piece,non_zero):
-                #print('Test: ' + str(piece))
                 test.append(pieces[piece])
             else:
-                #print('Train: ' + str(piece))
                 train.append(pieces[piece])
     
         model_index_splits.append((train,test))
@@ -1672,6 +1772,7 @@ def __newTickBarConstruction__(arrayTime,
      
     return groupTime, groupPrice, groupVol
 
+#New Volume Bar Construction Function | No Vectorized
 def __newVolumeBarConstruction__(arrayTime, 
                                  arrayPrice, 
                                  arrayVol, 
@@ -1723,7 +1824,11 @@ def __newDollarBarConstruction__(arrayTime,
                                  arrayPrice, 
                                  arrayVol, 
                                  alpha_calibration=1e3):
-
+    """
+    New dollar bar construction vectorized base version.
+    
+    Deprecated
+    """
     #volume cumsum
     cumsumDol = np.cumsum(arrayPrice * arrayVol)
     
@@ -1774,6 +1879,7 @@ def OHLC_BAR(list_arrayPrice, list_arraytime, list_arrayVol):
     OHLC + VOLATILITY + VOLUME computation.
     
     Includes arrayTime values for OHLC prices.
+
     """
     barOHLC_plus_time_info = []
     
@@ -1903,9 +2009,27 @@ def infoBarGenerator(grp_time,
     
     else:
         raise ValueError("Not recognized bartype string input")
+
+##############################################################################
+##############################################################################
+############### PRE-ELEMENTS FOR TRIPLE BARRIER COMPUTATION ##################
+##############################################################################
+##############################################################################
         
 def getTripleBarrierOHLC(df):
+    """
+    Función que permite computar los elementos básicos previos de una Triple Barrera.
     
+    Inputs:
+        - df (pd.DataFrame): pandas dataframe con valores OHLC de la barra.
+        
+    Output:
+        - dataframe con las sig. columnas nuevas:
+            * uppber_barrier
+            * lower_barrier
+            * barrier_price
+            * barrier_date
+    """
     #upper and loser barriers column definition
     df["upper_barrier"] = df.close * (1 + df.volatility)
     df["lower_barrier"] = df.close * (1 - df.volatility)
@@ -2056,10 +2180,10 @@ def barsNameDefinition(bartype,
     """
     return [bartype +  "_" + colName for colName in columnBaseNames]
     
-dataset_column_names = ["open", "high", "low", "close", "open_date", 
-                        "high_date", "low_date", "close_date", 
-                        "basic_volatility", "bar_cum_volume", 
-                        "vwap", "fracdiff"]
+dataset_column_names = ["open_price", "high_price", "low_price", "close_price", 
+                        "open_date", "high_date", "low_date", "close_date", 
+                        "basic_volatility", "bar_cum_volume", "vwap", 
+                        "fracdiff"]
 
 ##############################################################################
 ##############################################################################
@@ -2081,6 +2205,29 @@ def ErrorIndexIdxFirstTrue(param):
 
 def vectorizedTripleBarrier(path, init, init_ts, last, last_ts, upper_bound, 
                             lower_bound):
+    """
+    Función Principal para el cómputo de la Triple Barrera.
+    
+    Función ingestada en 'LabelTripleBarrierComputation'.
+    
+    Esta a su vez es ingestada en 'new_triple_barrier_computation'
+    de tripleBarrier.py a través del multiprocesador 'ray'.
+    
+    Inputs:
+        - path (str): dirección local donde se encuentran el .zarr de una acción det.
+        - init (datetime series): pd.Series conteniendo las fechas de c/ bar-event (close_date)
+        - init_ts (timestamp series): pd.Series conteniendo las fechas de c/ bar-event en formato timestamp
+        - last (datetime series): pd.Series conteniendo las fechas máx. de c/ label (horizon).
+        - last_ts (timestamp series): pd.Series conteniendo las fechas máx. de c/ label (horizon) en formato timestamp.
+        - upper_bound (float series): pd.Series conteniendo el valor float-price máximo de la barrera horizontal.
+        - lower_bound (float series): pd.Series conteniendo el valor float-price mínimo de la barrera horizontal.
+        
+    Output:
+        - Tupla conteniendo tres valores:
+            * finalPrice (float)
+            * finalLabel (int: -1, 0 ó 1)
+            * finalTimestamp (float)
+    """
     
     #days range to search tripleBarrier | timeframe values
     daysList = sel_days(init, last) 
@@ -2177,9 +2324,24 @@ def vectorizedTripleBarrier(path, init, init_ts, last, last_ts, upper_bound,
 
 
 def LabelTripleBarrierComputation(barDataframe, stock, data_dir):
-
+    """
+    Función de ingesta e inicialización de la triple barrera.
+    
+    Ingesta la función "vectorizedTripleBarrier" para obtener resultados.
+    
+    Inputs:
+        - barDataframe (pd.DataFrame): dataframe central sobre el que computar la triple barrera.
+        - stock (str): nombre de la acción.
+        - data_dir (str): path donde se encuentra los archivos .zarr con data x tick.
+        
+    Output:
+        - barDataframe reformado inc. las siguientes columnas de la triple barrera:
+            * 'barrierPrice'
+            * 'barrierLabel'
+            * 'barrierTime'
+    """
     #tripleBarrier vectorized computation version
-    tripleBarrierInfo = barDataframe.apply( #para ENTROPY, aplicar lambda también como org. global
+    tripleBarrierInfo = barDataframe.apply( 
         lambda row: 
             vectorizedTripleBarrier(
                 path = data_dir + stock + ".zarr", 
@@ -2196,8 +2358,9 @@ def LabelTripleBarrierComputation(barDataframe, stock, data_dir):
             , 
             axis=1
             )
+
     #barrier columns information generation
-    barDataframe[['barrierPrice', 'barrierLabel', 'barrierTimestamp']] = \
+    barDataframe[['barrierPrice', 'barrierLabel', 'barrierTime']] = \
         pd.DataFrame(
             tripleBarrierInfo.tolist(), 
             index=tripleBarrierInfo.index
@@ -2354,3 +2517,71 @@ def open_bar_files(base_path, stock, bartype):
     #pandasBar = pd.read_csv(pandas_path)
 
     return pandasBar
+
+
+def construct_pandas_tunning(list_datasets, list_stocks):
+    """
+    Función que permite construir el pandas resumen del bars-tunning.
+    
+    Inputs:
+        - list_datasets (lst - df): lista de df conteniendo info tunning de cada acción
+        - list_stocks (lst - str): lista de strings con los nombres de las acciones
+    
+    Outputs:
+        - pandas Tunning conteniendo las sig. columnas
+            * [volume_t]
+            * [dollar_t]
+            * [stock]    
+    """
+    # lista de frames almacenable para concadenar
+    list_frames = []
+    
+    # iteración por idex y dataset
+    for idx, dataset in enumerate(list_datasets):
+        
+        # añade columna stock al dataset principal
+        dataset["stock"] = list_stocks[idx]
+        
+        # convierte al dataset en un pandas 
+        equity_tuning_frame_bar = pd.DataFrame(
+            dataset, 
+            index=[0]
+            )
+        
+        # añade a la lista final
+        list_frames.append(equity_tuning_frame_bar)
+    
+    # retorna tunning bars dataframe
+    return pd.concat(list_frames)
+
+
+##############################################################################
+
+def enigmxSplit(df, pct_average, backtest_comb = 0.5):
+    """
+    Función que permite el split aleatorio de un dataset según un % de partición.
+    
+    Es usado principalmente para dividir el stackedDf en tres elementos:
+        - stacked para FeatImportance
+        - stacked para ModelTunning
+        - stacked para Combinatorial backtest.
+    
+    Inputs:
+        - 'df' (pd.DataFrame)  : dataframe a particionar.
+        - 'pct_average' (float): valor ]0;1[ como % de primera partición.
+        - 'backtest_comb' (float): valor ]0;1[ como % de segunda partición.
+    """
+    # primera partición: obtener train y pre-test (div. según pct_average)
+    msk1 = np.random.rand(len(df)) < pct_average
+    
+    # obtención de primer train, y test
+    train, __test__ = df[msk1], df[~msk1]
+    
+    # segunda partición: obtener test y combinatorial data (div. 50% del resto)
+    msk2 = np.random.rand(len(__test__)) < backtest_comb 
+    
+    # obtención de test final y combinatorial dataset
+    test, combinatorial = __test__[msk2], __test__[~msk2]
+    
+    return train, test, combinatorial
+

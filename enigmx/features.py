@@ -1,3 +1,7 @@
+"""
+@author: Quantmoon Technologies
+webpage: https://www.quantmoon.tech//
+"""
 import pandas as pd
 import inspect as ins
 import talib
@@ -59,9 +63,10 @@ def alpha20_(o,h,c,l):
 
 def alpha23_(h,window=20):
     alpha23_ = [np.nan]*window
+
     for i in range(len(h))[window:]:
         if sum(h)/len(h) > h.iloc[-1]:
-            alpha23_.append(-1*h.diff(2)[-1])
+            alpha23_.append(-1*h.diff(2).iloc[-1])
         else:
             alpha23_.append(0)
     return alpha23_
@@ -92,15 +97,14 @@ class FeaturesClass():
             - percentil
             - normalización min/max
         - features: este método aplica los 4 métodos anteriores para unificar todos los features computables por esta clase
-
-
-    """
+    """    
+    
     def __init__(self,df):
         self.df = df
-        self.o = df['open']
-        self.h = df['high']
-        self.l = df['low']
-        self.c = df['close']
+        self.o = df['open_price']
+        self.h = df['high_price']
+        self.l = df['low_price']
+        self.c = df['close_price']
         self.v = df['bar_cum_volume']
         
         self.functions =  [f.absolute_sum_of_changes, f.abs_energy, f.benford_correlation, f.count_above_mean, f.count_below_mean, 
@@ -163,14 +167,27 @@ class FeaturesClass():
         return self.dfothers 
     
     def features(self):
+        
+        nonFeatures = list(self.df.columns.values)
+        
         alphas = self.alphas()
         technicals = self.technicals()
         tsfresh = self.tsfresh()
         others = self.others()
         df = pd.concat([self.df,technicals,tsfresh,others,alphas],axis=1).dropna()
-        names = []
+        
+        #names = []
+        
         for i in df.columns:
-            name = 'feature_'+i
-            names.append(name)
-        df.columns = names
+            
+            if i not in nonFeatures:
+                name = 'feature_'+i
+                nonFeatures.append(name)
+        
+        df.columns = nonFeatures #names
         return df
+
+
+#dataframe = pd.read_csv("D:/feature_importance/STACKED_EXO_VOLUME_MDA.csv")
+#print(dataframe.columns)
+#print(FeaturesClass(dataframe).features())

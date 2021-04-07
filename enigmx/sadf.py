@@ -9,7 +9,6 @@ from numba.typed import List
 from statsmodels.regression.linear_model import OLS
 from numba import njit,float64,jit,float32,int64,typeof,char
 
-
 # FUNCION 1: Recibe de insumo un DataFrame en tiempo (Yt) 
 # y devuelve sus retornos (Yt, Yt-1,... Yt-n) para n lags
 def lagDF(df0,lags): #Obtiene los n lags y los anida a la derecha del series
@@ -135,45 +134,50 @@ def get_allsadf(close,minSL,constant,lags):
 
 def generalSADFMethod(original_frame, main_column_name, lags = None):
     """
-    Add column to base original_frame with "SADF" data.
+    Main  function of the SADF Process.
+    
+    Adds column to base original_frame with "SADF" data.
+    
+    Inputs:
+        - original_frame (dataframe)
+        - main_column_name (str): column to apply the SADF
+        - lags (None | int): number of lags to apply the SADF
     """
     
     assert(
         type(original_frame) == pd.DataFrame
         ), "'original_frame' param is not a pandas."
-        
+    
+    # get the array price series
     price_array_series = np.log(
         original_frame[main_column_name].values
     ).reshape(-1,1)
     
+    # if there is no lags, work time series as datapoints goes by
     if lags is None:
         lags = find_nlags(price_array_series, constant="nc", lags = 1)
     
+    # list with points of super augmented dickey fuller 
     bsadfs = get_allsadf(price_array_series, 1 ,'nc', lags)
     
+    # find differences in legnth of original df and SADF list
     if original_frame.shape[0]!= len(bsadfs):
         difference = abs(original_frame.shape[0] - len(bsadfs))
         _ = [-1]*difference
         _.extend(bsadfs)
-        
+    
+    # add new SADF column to original frame containing list points
     original_frame["SADF"] = _
     
+    # return reformed original frame
     return original_frame
 
-def gettingSADF(path_etf_frame, 
-                bartype, 
+def gettingSADF(etf_df, 
                 lags = None, 
                 main_value_name = 'value'):
     
-    etfDf = pd.read_csv(
-        path_etf_frame+"SERIES_"+bartype.upper()+"_ETFTRICK.csv"
-        )
+    # función canalizadora del método SADF general
     
-    sadf_frame = generalSADFMethod(etfDf, main_value_name, lags = lags)
-    
-    sadf_frame.to_csv(
-        path_etf_frame + "SERIES_" + bartype.upper() + "_SADF.csv",
-        index=False
-        )
-    
-    return "SADF saved in ETF Location. New column defined."
+    sadf_frame = generalSADFMethod(etf_df, main_value_name, lags = lags)
+
+    return sadf_frame

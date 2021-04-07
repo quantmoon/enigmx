@@ -17,7 +17,11 @@ import datetime as dt
 from urllib.parse import urlencode
 from dateutil import parser
 from pytz import timezone
+import pandas_market_calendars as mcal
+import finnhub
 warnings.filterwarnings("ignore")
+
+
 
 #Base Class for Data Extraction
 class BaseExtractor(object):
@@ -92,7 +96,7 @@ class BaseExtractor(object):
     def _check_dates(self, path, symbol,date_str):
         
         try:
-            values = xr.open_zarr(path+symbol+'.zarr').date.values
+            values = xr.open_zarr(path+"/"+symbol+'.zarr').date.values
         except:
             answer = 'continue'
         else:        
@@ -114,12 +118,16 @@ class Extractor(BaseExtractor):
 
     def __init__(self,list_stocks, start_date, end_date, 
                  path, limit = 25000, feature = 'tick',
-                 api_key = "bt4a2lv48v6ue5eg959g",
+                 api_key = "c04f66748v6u76cjieag",
                  length = 1000000,
                  chunk = 900000, 
                  stocks_file_info = "company_info_zarr.csv",
-                 threads = 1):
-    
+                 threads = 1, 
+                 tupleTimeZone = (4,5) #for Cloud | (9,10) for local
+                 ):
+        
+        self.finnhub_client = finnhub.Client(api_key=api_key)
+
         self.list_stocks = list_stocks #define list of stocks
         self.start_date = start_date #define start date as string
         self.end_date = end_date #define end date as string
@@ -129,9 +137,10 @@ class Extractor(BaseExtractor):
         self.url="https://finnhub.io/api/v1/stock/{}?".format(feature)
         self.final_dates = self._check_for_final_dates(self.start_date,
                                                        self.end_date)
+        self.tupleTimeZone = tupleTimeZone #hrs range to fit TimeZone
         self.length = length
         self.threads = threads
-
+        self.limit = limit
         self._parallelize_extraction(self.list_stocks)
         #self._extraction()
         
@@ -199,30 +208,34 @@ class Extractor(BaseExtractor):
                         ("format","csv")])
             print("    >>>> download... {}".format(symbol))  
             print("       > skip {} rows".format(skip))            
-            df_ = pd.read_csv(self.url+params)
+            
+            res = self.finnhub_client.stock_tick(symbol,date,self.limit,skip)
+            df_ = pd.DataFrame(res)
+
+            
             print("    >>>> download finished...{}".format(symbol))
             #Verifica si hay data en la última descarga (ya que la descarga
             #se hace cada 25 000 ticks).
 
-            if df_['timestamp'].shape[0] != 0:
+            if df_['t'].shape[0] != 0:
             #Si hay data, los valores de timestamp, precio y volumen, se 
             #añaden a las listas que van a ser las variables del dataset
                 
-                if init.astimezone(timezone('US/Eastern')).hour == 9:
-                    df_ = df_[df_['timestamp'] > ts_init]    
-                    df_ = df_[df_['timestamp'] < ts_last]
-                    timestamp.extend(df_['timestamp'].tolist())                
-                    value.extend(df_['price'].tolist())
-                    vol.extend(df_['volume'].tolist())
+                if init.astimezone(timezone('US/Eastern')).hour == self.tupleTimeZone[0]:
+                    df_ = df_[df_['t'] > ts_init]    
+                    df_ = df_[df_['t'] < ts_last]
+                    timestamp.extend(df_['t'].tolist())                
+                    value.extend(df_['p'].tolist())
+                    vol.extend(df_['v'].tolist())
                 
-                elif init.astimezone(timezone('US/Eastern')).hour == 10:
-                    df_ = df_[df_['timestamp'] > ts_init2]
-                    df_ = df_[df_['timestamp'] < ts_last2]
-                    timestamps = df_['timestamp'].tolist()
+                elif init.astimezone(timezone('US/Eastern')).hour == self.tupleTimeZone[1]:
+                    df_ = df_[df_['t'] > ts_init2]
+                    df_ = df_[df_['t'] < ts_last2]
+                    timestamps = df_['t'].tolist()
                     timestamps = [i + 3600000 for i in timestamps]
                     timestamp.extend(timestamps)                
-                    value.extend(df_['price'].tolist())
-                    vol.extend(df_['volume'].tolist())
+                    value.extend(df_['p'].tolist())
+                    vol.extend(df_['v'].tolist())
                 
                 
             else:
@@ -342,5 +355,4 @@ class Extractor(BaseExtractor):
         for i in procs:
             i.join()
         print("Extraction finished")
-        
         
