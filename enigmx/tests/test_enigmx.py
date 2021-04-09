@@ -11,7 +11,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 
 instance = EnigmX(bartype = 'VOLUME', 
                   method = 'MDA', 
-                  base_path = './results/',
+                  base_path = './',
                   cloud_framework = False
                   ) 
 
@@ -22,9 +22,9 @@ params_for_tuning = {
 
 instance.get_feature_importance(    
                    model = GradientBoostingClassifier(), 
-                   list_stocks = ['ACIW'], 
+                   list_stocks = ['AFL', 'AGCO', 'AGI', 'AGIO'], 
                    score_constraint = 0.3,
-                   server_name="34.123.8.243",
+                   server_name="35.223.72.148",
                    database="BARS_FEATURES",
                    uid = 'sqlserver',
                    pwd='quantmoon2019',

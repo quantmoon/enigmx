@@ -163,12 +163,20 @@ def getTickPrices(path, date_):
     return (infoArrays_[0][infoArrays_[0]!=0],
             infoArrays_[1][infoArrays_[1]!=0])
 
-#OPEN ZARR | Version 2.0: vectorized version (use range of dates)
+#OPEN ZARR | Version 2.0: vectorized version (use range of dates) | version oficial 
 def open_zarr_general(zarrDates, range_dates, zarrObject):    
-    #resultado de la función mini nueva        
-    
-    idxs_ = [np.where(zarrDates == range_dates[0])[0][0],
-             np.where(zarrDates == range_dates[-1])[0][0]+1]
+    #revisa la existencia de error | detiene proceso en caso ocurra
+    try: 
+        idxs_ = [np.where(zarrDates == range_dates[0])[0][0],
+                 np.where(zarrDates == range_dates[-1])[0][0]+1]
+    except Exception as error:
+        print("Process Stopped!")
+        print(f"Error Ocurred: '{error}'")
+        print(":::::::> Please, check 'ZarrDates':")
+        print(zarrDates)
+        print(":::::::> And compered the existance of 'range_dates' elements on it:")
+        print(range_dates)
+        print("System Error Exit")
     
     #these 3 process are the longest 
     prices = zarrObject.value[idxs_[0]:idxs_[-1]]    

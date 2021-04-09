@@ -8,12 +8,12 @@ ray.init(include_dashboard=(False),ignore_reinit_error=(True))
 #from enigmx.utils import EquitiesEnigmxUniverse
 from enigmx.databundle_interface import SQLEnigmXinterface
 
-server_name = "34.123.8.243" #"34.69.18.216"
+server_name = "35.223.72.148" 
 referential_base_database = 'TSQL'
-pathzarr = '/home/f1141167/.local/lib/python3.7/site-packages/enigmx/transform/'
-list_stocks = ['SLNO']
-start_date = "2021-01-15" 
-end_date = "2021-03-22" 
+pathzarr = '/home/dataquantmoon/.local/lib/python3.7/site-packages/enigmx/transform/'
+list_stocks = ['AFL', 'AGCO', 'AGI', 'AGIO']
+start_date = "2020-08-09" 
+end_date = "2020-09-09" 
 desired_bars = 10
 bartype = 'volume'
 driver = "{ODBC DRIVER 17 for SQL Server}"
@@ -41,9 +41,9 @@ enigmxsql.create_table_database(
     bars_entropy = False, 
     etfs_trick = True, 
     bars_sampled = True, 
-    bars_barrier = True,
+    bars_barrier =True,
     bars_weights = True,
-    bars_features = True,
+    bars_features =True,
     creation_database = True)
 
 print("subiendo info")
@@ -60,3 +60,4 @@ enigmxsql.compute_info_to_sql(
     )
 
 
+ 

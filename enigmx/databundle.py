@@ -524,16 +524,22 @@ class DataRespositoryInitialization(object):
             self.pathFullZarr = self.data_dir + self.stock + ".zarr"
         else:
             self.pathFullZarr = self.data_dir + '/' + self.stock + ".zarr"
-        
+
         #Get Zarr Base Object
         self.zarrObject = zarr.open(self.pathFullZarr)
+        
+        #Check error in zarr composition
+        try: 
+            self.zarrObject.date or len(self.zarrObject.date[0]) > 0
+        except Exception as error:
+            print("Process Stopped!")
+            print(f"Error message: ArrayObject for {pathFullZarr} 'date' is empty or 'date' att. doesn't exist.")
 
         #get dates from object
         self.zarrDates = np.array(
             self.zarrObject.date)
         
         #Get information from the base DataRepository Instance
-        
         #check if days are well-defined
         if check_days: 
                    

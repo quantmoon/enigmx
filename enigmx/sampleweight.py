@@ -2,6 +2,7 @@
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
+import sys
 import itertools
 import numpy as np
 import pandas as pd
@@ -47,11 +48,15 @@ def mpSampleW(df):
   ret = np.log(df.close_price).diff() # log-returns, so that they are additive
   # define un pd.Series vacío con index 'close_date' y valores flaot64
   wght = pd.Series(index=ret.index, dtype='float64') 
-
+  # revisa si existen o no valores TS en el dataframe de entrada
+  if df["barrierTime"].empty:
+    # detiene el proceso en caso no existan elementos en el dataframe
+    sys.exit("Error! 'barrierTime' column is empty! | file: sampleweight.py")
   # iteración para llenar el pd.Series con los sample-weights corrsp.
   for tIn,tOut in df["barrierTime"].iteritems():
     # tIn: fecha de término de la barra
     # tOut: fecha de materialización del evento objetivo (barrierTime)  
+    # ERROR DE SUPERPOSICIÓN!
     # Asignación del peso correspondiente según la fecha "tIn"
     wght.loc[tIn] = (ret.loc[tIn:tOut]/df.overlap.loc[tIn:tOut]).sum()
 

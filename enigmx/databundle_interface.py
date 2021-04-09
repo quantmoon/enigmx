@@ -183,9 +183,13 @@ class SQLEnigmXinterface(object):
         #obten la lista de información con los diccionarios
         list_datasets =  ray.get(ray_object_list)
         
-        print("LIST DATASET-----------------------------------------------")
-        print(list_datasets)
-        print(" ")
+        #revisando si el diccionario resultante de tunning tiene valores 0
+        for diccionario in list_datasets:
+              if 0 in diccionario.values():
+                  print("ERROR!")
+                  print(diccionario.values())
+                  sys.exit("Tunning Dict. Has a zero value. Please fix it.") 
+
         #transforma los diccionarios en un pandas con los params de tunning x bar
         tunning_pandas = construct_pandas_tunning(list_datasets, self.list_stocks)
         
