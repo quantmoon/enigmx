@@ -182,13 +182,6 @@ class SQLEnigmXinterface(object):
         
         #obten la lista de información con los diccionarios
         list_datasets =  ray.get(ray_object_list)
-        
-        #revisando si el diccionario resultante de tunning tiene valores 0
-        for diccionario in list_datasets:
-              if 0 in diccionario.values():
-                  print("ERROR!")
-                  print(diccionario.values())
-                  sys.exit("Tunning Dict. Has a zero value. Please fix it.") 
 
         #transforma los diccionarios en un pandas con los params de tunning x bar
         tunning_pandas = construct_pandas_tunning(list_datasets, self.list_stocks)
@@ -215,7 +208,8 @@ class SQLEnigmXinterface(object):
                                    barrierPrice,
                                    bar_group_factor,
                                    bar_grp_horizon):
-
+        
+        # aqui ocurre la apertura de los Zarr para la gen. de barras
         print(":::::::::: CONSTRUCTED BARS >>>>>>")
         #lee la tabla de bars tunning | insumo de creación de barras
         tunning_sql_frame = SQLFRAME.read_table_info(
@@ -252,11 +246,10 @@ class SQLEnigmXinterface(object):
             ]
         
         #extraemos los objetos ray con los dataframe para la escritura en SQL
-        list_datasets =  ray.get(ray_object_list)
+        list_datasets = ray.get(ray_object_list)
     
         #primer bloque iterativo: loop sobre tipo de barra (si lo hubiere)
         for idx, dataset in enumerate(list_datasets):
-            
             print("::::> RUNNING: Writting {} into SQL Table for BaseBars".format(
                     self.list_stocks[idx]
                     )
@@ -266,12 +259,16 @@ class SQLEnigmXinterface(object):
             for idx_bartype, dataframe in enumerate(dataset):    
                                 
                 statement = "INSERT INTO BARS.dbo.{}_{}_GLOBAL \
-                    {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
+                    {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
                     self.list_stocks[idx], self.bartype.upper(),
                     "(open_price,high_price,low_price,close_price,\
                         open_date,high_date,low_date,close_date,basic_volatility,\
-                            bar_cum_volume,vwap,fracdiff,volatility,\
-                                horizon,upper_barrier,lower_barrier)"
+                            bar_cum_volume,\
+                                feat_buyInitTotal, feat_sellInitTotal, feat_signVolSide,\
+                                feat_accumulativeVolBuyInit, feat_accumulativeVolSellInit,\
+                                    feat_accumulativeDollarValue, feat_hasbrouckSign,\
+                                        vwap,fracdiff,volatility,\
+                                            horizon,upper_barrier,lower_barrier)"
                     )    
                     
                 #writting info into its SQL table
@@ -329,12 +326,16 @@ class SQLEnigmXinterface(object):
             
             #sentencia SQL (statement) para gestionar el guardado de la info
             statement = "INSERT INTO ENTROPY.dbo.{}_{}_GLOBAL \
-                {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
+                {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
                 self.list_stocks[idx], self.bartype.upper(),
                 "(open_price,high_price,low_price,close_price,\
                     open_date,high_date,low_date,close_date,basic_volatility,\
-                        bar_cum_volume,vwap,fracdiff,volatility,\
-                            horizon,upper_barrier,lower_barrier, entropy)"
+                        bar_cum_volume,\
+                            feat_buyInitTotal, feat_sellInitTotal, feat_signVolSide,\
+                                feat_accumulativeVolBuyInit, feat_accumulativeVolSellInit,\
+                                    feat_accumulativeDollarValue, feat_hasbrouckSign,\
+                                        vwap,fracdiff,volatility,\
+                                            horizon,upper_barrier,lower_barrier,entropy)"
                 )     
                 
             #writting info into its SQL table
@@ -480,12 +481,16 @@ class SQLEnigmXinterface(object):
                 ) 
             
             statement = "INSERT INTO BARS_SAMPLED.dbo.{}_SAMPLED_{}_GLOBAL \
-                {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
+                {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
                 self.list_stocks[idx], self.bartype.upper(),
                 "(open_price,high_price,low_price,close_price,\
                     open_date,high_date,low_date,close_date,basic_volatility,\
-                        bar_cum_volume,vwap,fracdiff,volatility,\
-                            horizon,upper_barrier,lower_barrier)"
+                        bar_cum_volume,\
+                            feat_buyInitTotal, feat_sellInitTotal, feat_signVolSide,\
+                                feat_accumulativeVolBuyInit, feat_accumulativeVolSellInit,\
+                                    feat_accumulativeDollarValue, feat_hasbrouckSign,\
+                                        vwap,fracdiff,volatility,\
+                                            horizon,upper_barrier,lower_barrier)"
                 )
     
             #writting info into its SQL table
@@ -538,13 +543,17 @@ class SQLEnigmXinterface(object):
                     
             #SQL statement for write information
             statement = "INSERT INTO BARS_COMPLETED.dbo.{}_{}_GLOBAL \
-                {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
+                {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
                 self.list_stocks[idx], self.bartype.upper(),
                 "(open_price,high_price,low_price,close_price,\
                     open_date,high_date,low_date,close_date,basic_volatility,\
-                        bar_cum_volume,vwap,fracdiff,volatility,\
-                            horizon,upper_barrier,lower_barrier, \
-                                barrierPrice, barrierLabel, barrierTime)"
+                        bar_cum_volume,\
+                            feat_buyInitTotal, feat_sellInitTotal, feat_signVolSide,\
+                                feat_accumulativeVolBuyInit, feat_accumulativeVolSellInit,\
+                                    feat_accumulativeDollarValue, feat_hasbrouckSign,\
+                                        vwap,fracdiff,volatility,\
+                                            horizon,upper_barrier,lower_barrier,\
+                                                barrierPrice, barrierLabel, barrierTime)"
                 )        
     
             #writting info into its SQL table
@@ -577,9 +586,13 @@ class SQLEnigmXinterface(object):
                 
         for stock, dataframe in pandas_sampled_bars_from_sql.items():
             
+            # updated dataframe inc. weight values
             updatedDf = WeightsGeneration(dataframe).getWeights(
                 decay_factor= decayfactor
                 )
+            
+            # filling NaN's values with 0
+            updatedDf = updatedDf.fillna(0)
             
             print("::::> RUNNING: Writting {} Weighted Ver. into SQL Table".format(
                     stock
@@ -588,14 +601,18 @@ class SQLEnigmXinterface(object):
             
             #SQL statement for write information
             statement = "INSERT INTO BARS_WEIGHTED.dbo.{}_{}_GLOBAL \
-                {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
+                {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
                 stock, self.bartype.upper(),
                 "(open_price,high_price,low_price,close_price,\
                     open_date,high_date,low_date,close_date,basic_volatility,\
-                        bar_cum_volume,vwap,fracdiff,volatility,\
-                            horizon,upper_barrier,lower_barrier, \
-                                barrierPrice, barrierLabel, barrierTime,\
-                                    overlap, weight, weightTime)"
+                        bar_cum_volume,\
+                            feat_buyInitTotal, feat_sellInitTotal, feat_signVolSide,\
+                                feat_accumulativeVolBuyInit, feat_accumulativeVolSellInit,\
+                                    feat_accumulativeDollarValue, feat_hasbrouckSign,\
+                                        vwap,fracdiff,volatility,\
+                                            horizon,upper_barrier,lower_barrier,\
+                                                barrierPrice, barrierLabel, barrierTime,\
+                                                    overlap, weight, weightTime)"
                 )        
     
             #writting info into its SQL table
@@ -611,8 +628,16 @@ class SQLEnigmXinterface(object):
         
     def __featuresComputation__(self, SQLFRAME, dbconn, cursor):
         
-        #obtenemos el driver temporal en uso directamente de pyodbc
-        temporalDriver = [item for item in pyodbc.drivers()][-1]
+        print(":::::: >>> SQL Alchemy Initialization for 'features' final table...\n")
+        
+        #obtenemos la lista de drivers temporales en uso directamente de pyodbc
+        temporalDriver = [item for item in pyodbc.drivers()]
+                
+        #selecciona el temporal driver idx = 0 | en caso error, usar idx = -1
+        temporalDriver = temporalDriver[0]
+        
+        print(f">>> Temporal Driver Selected is '{temporalDriver}'...")
+        print("----> Warning! In case 'InterfaceError': please change 'temporalDriver' index selection in line 620 databundle_interface.py.\n")
 
         #construimos la sentencia de conexión a través de SQL ALchemy
         mainSQLAlchemySentence = f'DRIVER={temporalDriver};SERVER={self.server_name};DATABASE={self.database_features};UID={self.uid[0]};PWD={self.pwd[0]}'
@@ -652,7 +677,7 @@ class SQLEnigmXinterface(object):
                     )
                 )                  
             
-            #actualiza el dataframe final añandiéndole los features
+            #actualiza el dataframe final añandiéndole los features computados
             fullDataframe = FeaturesClass(dataframe).features()
             
             #elimina valores "inf" que posiblemente generen error al escribir tabla
@@ -746,8 +771,9 @@ class SQLEnigmXinterface(object):
             bartype_database = 'ENTROPY'
                 
             SQLFRAME, dbconn, cursor = databundle_instance(
-
-                    driver = self.driver, uid = self.uid, pwd = self.pwd,                    #nombre del servidor SQL Local
+                    #driver: nombre del driver local
+                    driver = self.driver, uid = self.uid, pwd = self.pwd,
+                    #server: nombre del servidor SQL Local
                     server = self.server_name, 
                     #nombre que se le asignará a la base de datos matriz
                     bartype_database = bartype_database,

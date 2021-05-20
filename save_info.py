@@ -128,7 +128,6 @@ def generate_datasets(stock,
                                 )
 
         #iteración por tipo de barra | result_value: numpy.array
-        
         result_value = [
             QMREPOSITORY.geneticIterativeFunction(
                 freq = bar_grp_freq,

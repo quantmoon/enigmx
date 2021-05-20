@@ -2,12 +2,16 @@
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
+
 import ray
 import zarr
 import numpy as np
 import pandas as pd
+pd.set_option('display.max_rows', 5000)
+#pd.set_option('expand_frame_repr', False)
+
 from numba import njit
-from datetime import datetime
+from datetime import datetime,timedelta
 from enigmx.utils import (
     get_arrs, bar_para, softmax, sel_days, 
     simpleFracdiff
@@ -367,6 +371,30 @@ def settingTimePandasFormat(dataframe, column_name):
     df.set_index(dataframe['close_date'], inplace=True)
     return df
 
+def checkBarsRepeated(dataframes_list,
+                        column = "close_date"):
+    """
+    Revisa si existen timestamps que se repitan, aumentando
+    1 milisegundo al timestamp si así ocurre
+    """
+    dates_list = []
+
+    for idx,stock in enumerate(dataframes_list):
+        dates = stock[column]
+        if idx == 0:
+            pass
+        else:
+            for index,date in enumerate(dates):
+                if date in dates_list:
+                    date = datetime.strptime(date,'%Y-%m-%d %H:%M:%S.%f')
+                    date = date + timedelta(microseconds=1000)
+                    date = date.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                    dataframes_list[idx][column][index] = date
+        dates_list.extend(dates)
+    return dataframes_list
+
+
+
 def optPort(cov,mu=None):
     """
     Weights calculation by inverting cov. matrix.
@@ -509,6 +537,9 @@ def etfTrick(list_bars_stocks,
             * anything else: returns full ETF Trick series.        
     """
 
+    list_bars_stocks = checkBarsRepeated(list_bars_stocks)
+
+        
     #get idx-time reformed df close dates of each stock-bar dataframe
     list_reformed_df_close_dates = [
         settingTimePandasFormat(stock_frame, "close_date") 
@@ -524,24 +555,27 @@ def etfTrick(list_bars_stocks,
     #get idx-time reformed df close prices of each stock-bar dataframe
     list_reformed_df_close_prices = [
         settingTimePandasFormat(stock_frame, "close_price")
-        for stock_frame in list_bars_stocks   
+        for stock_frame in list_bars_stocks
     ]    
     
     #compute joinned dataframe of dates from all stocks
     #ERROR LINE
-    join_dataframe_dates = pd.concat(
-        list_reformed_df_close_dates, axis=1
-    ).fillna(method='ffill')[1:]
+    join_dataframe_dates = list_reformed_df_close_dates[0].join(
+        list_reformed_df_close_dates[1:], how = 'outer'
+        ).fillna(method='ffill').dropna()
+    
     
     #compute joinned dataframe of open prices from all stocks
-    join_dataframe_open_prices = pd.concat(
-        list_reformed_df_open_prices, axis=1
-    ).fillna(method='ffill')[1:]
+    join_dataframe_open_prices = list_reformed_df_open_prices[0].join(
+        list_reformed_df_open_prices[1:], how = 'outer'
+        ).fillna(method='ffill').dropna()
+    
     
     #compute joinned dataframe of close prices from all stocks
-    join_dataframe_close_prices = pd.concat(
-        list_reformed_df_close_prices, axis=1
-    ).fillna(method='ffill')[1:]
+    join_dataframe_close_prices = list_reformed_df_close_prices[0].join(
+        list_reformed_df_close_prices[1:], how = 'outer'
+        ).fillna(method='ffill').dropna()
+    
     
     #transform dataframe as price array - multiple stocks
     join_array_close_prices = join_dataframe_close_prices.values
@@ -590,6 +624,8 @@ def etfTrick(list_bars_stocks,
         )
         
         #temporal returns matrix
+        #print(temp_matrix_prices)
+        
         temp_returns_matrix = temp_matrix_prices.pct_change()
         
         #temporal covariance matrix
@@ -687,9 +723,18 @@ def etfTrick(list_bars_stocks,
         )
 
         #add date-info per stocks to select after the next sampling process
-        final_frame[stock_list] = np.array(info_dates)
         
-        final_frame[stock_list] = final_frame[stock_list].apply(pd.to_datetime)
+        info_dates = list(zip(*info_dates))
+        
+        
+        for idx,stock in enumerate(stock_list):
+            final_frame[stock] = list(info_dates[idx])
+            final_frame[stock] = final_frame[stock].apply(pd.to_datetime)
+        
+        #final_frame[stock_list] = np.array(info_dates)
+        #final_frame[stock_list] = final_frame[stock_list].apply(pd.to_datetime)
+        
+
         #final_frame.to_csv(
         #    bar_dir + "SERIES_" + bartype + "_ETFTRICK.csv", index=False
         #    )

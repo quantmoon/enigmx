@@ -6,12 +6,40 @@ webpage: https://www.quantmoon.tech//
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
+from enigmx.utils import simpleFracdiff
+from statsmodels.tsa.stattools import adfuller
 from sklearn.preprocessing import StandardScaler
 from enigmx.dbgenerator import databundle_instance 
 from sklearn.model_selection import train_test_split
 from enigmx.purgedkfold_features import featImportances, plotFeatImportance
 
-#Main Feature Importance Class
+
+# PCA computation Snippet (8.5 page 119)
+def get_eVec(dot,varThres):
+    # compute eVec from dot prod matrix, reduce dimension
+    eVal,eVec=np.linalg.eigh(dot)
+    idx=eVal.argsort()[::-1] # arguments for sorting eVal desc
+    eVal,eVec=eVal[idx],eVec[:,idx]
+    #2) only positive eVals
+    eVal=pd.Series(eVal,index=['PC_'+str(i+1) for i in range(eVal.shape[0])])
+    eVec=pd.DataFrame(eVec,index=dot.index,columns=eVal.index)
+    eVec=eVec.loc[:,eVal.index]
+    #3) reduce dimension, form PCs
+    cumVar=eVal.cumsum()/eVal.sum()
+    dim=cumVar.values.searchsorted(varThres)
+    eVal,eVec=eVal.iloc[:dim+1],eVec.iloc[:,:dim+1]
+    return eVal,eVec
+#----------------------------------------------------------------------------#
+def orthoFeats(dfZ,varThres=.95):
+    # Given a dataframe dfX of features, compute orthofeatures dfP
+    dot=pd.DataFrame(np.dot(dfZ.T,dfZ),index=dfZ.columns,columns=dfZ.columns)
+    eVal,eVec=get_eVec(dot,varThres)
+    dfP=np.dot(dfZ,eVec)
+    return dfP, eVal
+#----------------------------------------------------------------------------#
+
+
+######################### Main Feature Importance Class #######################
 class FeatureImportance(object):
     """
     Clase hija computable Feature Importance.
@@ -72,7 +100,11 @@ class FeatureImportance(object):
                     #nombre del servidor SQL Local
                     server = self.server_name, 
                     #nombre que se le asignará a la base de datos matriz
-                    bartype_database = self.database_name,driver = self.driver, uid = self.uid, pwd = self.pwd,
+                    bartype_database = self.database_name,
+                    #nombre de driver, usuario y password
+                    driver = self.driver, 
+                    uid = self.uid, 
+                    pwd = self.pwd,
                     #boleano para crear la tabla
                     create_database = False, 
                     #nombre global para cada tabla | "GLOBAL" x defecto
@@ -102,7 +134,7 @@ class FeatureImportance(object):
                 like=self.features_sufix
                 ).columns.values)     
         
-            #hace rolling solo sobre las columnas de feature
+            #hace rolling solo sobre las columnas de feature de forma individual por accion
             list_df = [
                 pd.concat(
                     [   #extrae aquellas columnas que no haran rolling
@@ -112,7 +144,7 @@ class FeatureImportance(object):
                         #computa el rolling solo en columnas de features
                         dataframe[columns_for_rolling].rolling(
                             self.window, win_type=self.win_type
-                            ).sum(std=self.add_parameter)
+                            ).sum(std=self.add_parameter) #sum? #std?
                         ], axis=1
                                 ).dropna()  for dataframe in list_df
                         ]
@@ -124,11 +156,11 @@ class FeatureImportance(object):
         
         return df_, columns_for_rolling
     
-    def __splitStacked__(self): 
+    def __organizationDataProcess__(self): 
         """
-        Generate x_train, y_train, x_test & y_test for stacked df.
+        Inputs : matriz de features stackedada y nombres de features.
         
-        Se extraen el test y train, y se seleccionan los features.
+        Outputs : devuelve organizados el df de features y el df de labels
         """
         #obtener el dataframe de los valores stacked + columnas de features
         df_global_stacked, features_col_name = self.__getStacked__()
@@ -139,39 +171,110 @@ class FeatureImportance(object):
         else:
             df = df_global_stacked
         
-        #creación de la información de las etiquetas
+        #creación de la información de las etiquetas ('y' como df)
         y = df_global_stacked[self.col_label_type].to_frame('labels')
         
-        #definición de 't1': horizonte temporal máx. de c/ barra (barrera vert.)
+        #definición de 't1': horizonte temporal máx./barra (barrera vert.)
         y['t1'] = df_global_stacked[self.col_t1_type]
         
-        #definición de 'w': pesos para cada observación
+        #definición de 'w': pesos para cada observación en y como df
         y['w'] = df_global_stacked[self.col_weight_type]
         y.set_index(df_global_stacked['close_date'],inplace=True)
                 
-        #stacked segmentation
+        #segmentacion y definition del stacked
         x = df
         x.set_index(df_global_stacked['close_date'],inplace=True)
 
-        #data split
-        x_train, x_test, y_train, y_test = train_test_split(
-            x, y, random_state=42)
+        #retorna dataframe de features y dataframe de etiquetas
+        return x, y
+    
+    def __checkingStationary__(self, pval_adf = '5%'):
         
-        return x_train, x_test, y_train, y_test, df_global_stacked
+        # extrae matriz de features, y vector de labels del split stacked
+        df_base_matrix, yVectorArray = self.__organizationDataProcess__()
+        
+        # generamos copia del dataset
+        xMatrixDf = df_base_matrix.copy()
+        
+        # contador de features no estacionarios transformados
+        featuresTransformed = 0        
+        
+        for featuresName, featuresData in xMatrixDf.iteritems():
+            
+            # extrae el vector de la caracteristica sobre la que se itera
+            temporalFeatArray = featuresData.values
+
+            # calcula el Dickey-Fuller
+            critical_values_adf = adfuller(temporalFeatArray)
+            
+            # desagregando estadistico y valor critico del dickey-fuller
+            statVal, criticalVal = critical_values_adf[0], critical_values_adf[4][pval_adf]
+                        
+            # si el valor del estadistico no es menor al del valor critico 
+            if not (statVal < criticalVal): 
+                print("-----> Warning! '{}' is not stationary... ".format(
+                        featuresName
+                        )
+                    )
+                print(":::: Stationary Transformation Initialized >>>")
+                # aplica transformacion estacionaria con diferenciacion fraccional
+                newTemporalFeatArray = simpleFracdiff(
+                    temporalFeatArray
+                    )
+                
+                # reasigna la informacion estacionarizada al dataframe
+                xMatrixDf[featuresName] = newTemporalFeatArray
+                
+                # agrega un valor al contador de features modificacods
+                featuresTransformed+=1
+        
+        print(':::::::::::::'*5)
+        print(f'\n::: >>> Stationary Process Checked!\
+              Features Transformed {featuresTransformed} over {xMatrixDf.shape[1]}')
+        print(':::::::::::::'*5)            
+              
+        # estandarizacion Mean/Std de los valores de la matriz de features
+        dfStandarized = xMatrixDf.sub(
+            xMatrixDf.mean(), axis=1
+            ).div(xMatrixDf.std(),axis=1)   
+        
+        return dfStandarized, yVectorArray, df_base_matrix   
     
     def get_feature_importance(self, 
                                pathOut, 
                                method, 
-                               model_selected, 
+                               model_selected,
                                pctEmbargo = 0.01, 
                                cv=5, 
-                               oob=False):
+                               oob=False, 
+                               variance_explained = 0.95):
         """
         Método central para el proceso de feature importance.
         """
         
-        # extracción de data útil
-        x_train, x_test, y_train, y_test, dfStacked = self.__splitStacked__()
+        # extrae la matriz de features estacionaria y estandarizada, y el vector de labels
+        featStandarizedMatrix, labelsDataframe, dfStacked = self.__checkingStationary__() 
+        
+        # ejecuta el proceso de ortogonalizacion 
+        orthogonalized_features_matrix, pca_egienvalues = orthoFeats(
+            dfZ = featStandarizedMatrix,
+            varThres = variance_explained
+            )
+        
+        # convertimos la matriz ortogonalizada de array a dataframe
+        new_orthogonalized_feat_matrix = pd.DataFrame(
+            orthogonalized_features_matrix, 
+            index=labelsDataframe.index, 
+            columns=['PC_{}'.format(i) for i in range(
+                1, orthogonalized_features_matrix.shape[1]+1
+                )
+                ]
+            )         
+        
+        # extrae data de train/test desde la matriz ortogonalizada y el vector de etiquetas                
+        x_train, x_test, y_train, y_test = train_test_split(
+            new_orthogonalized_feat_matrix , labelsDataframe, random_state=42
+            )
         
         # si el método seleccionado es 'MDA'
         if method == 'MDA':
@@ -193,7 +296,7 @@ class FeatureImportance(object):
                         )
                     )
             
-        # importance rank, score con cpkf, y mean val (NaN)
+        # importance values, score con cpkf, y mean val (NaN)
         imp,oos,oob = featImportances(x_train, 
                                       y_train, 
                                       model_selected,
@@ -203,16 +306,23 @@ class FeatureImportance(object):
                                       cv=cv,
                                       oob=False)
         
+        # computamos el importance rank 
+        featureImportanceRank = imp['mean'].rank()
+        
+        # computamos el PCA rank utilizando los eigenvalues
+        pcaImportanceRank = pca_egienvalues.rank()
+
+        print("       >>>> Complementary research...")
         # fit del modelo seleccionado para el featImp
         model_selected.fit(x_train,y_train['labels'])
         
         # score sin combinatorial purged kfold (socre del modelo)
         score_sin_cpkf = model_selected.score(x_test, y_test['labels'])
         
-        print("Score sin el PurgedKFold:", score_sin_cpkf)
-        print("Score con el PurgedKFold:", oos)
+        print("FeatImportance Score without PurgedKFold:", score_sin_cpkf)
+        print("FeatImportance Score with PurgedKFold:", oos)
         
-        print("Saving picture...")
+        print("Saving featImportance picture...")
         # guardado imagen de feature importance como prueba de control
         plotFeatImportance(
                         pathOut,    
@@ -228,77 +338,7 @@ class FeatureImportance(object):
         print("Feature Importance picture Saved in {}".format(
             pathOut)
             )
-        
-        return imp, score_sin_cpkf, oos, dfStacked
-        
-#Main PCA Calculation for Feature Selection
-class PCA_QM(object):
-    """
-    This class is over PCA process over stacked file.
-    """
-    def __init__(self, 
-                 stacked_df):
-        
-        self.stacked_df = stacked_df.reset_index(drop=True)
 
-    # método principal para obtención del PCA
-    def get_pca(self,
-               number_features,
-               path_to_save_picture,
-               min_var_exp = 0.05,
-               feature_selection = True):
+        # retorna los rank de los feature, y del pca
+        return featureImportanceRank, pcaImportanceRank, score_sin_cpkf, oos
         
-        # transformación escalar
-        scaler = StandardScaler()
-        scaler.fit(self.stacked_df)
-        X = scaler.transform(self.stacked_df)
-        
-        # computación pca
-        pca = PCA(n_components=min(X.shape))
-        
-        # transformación de X dims.
-        X_new = pca.fit_transform(X)   
-
-        pc_s = []
-        
-        # si pca está por encima del ratio de varianza esperado
-        for i in pca.explained_variance_ratio_:
-
-            if i > min_var_exp:
-                pc_s.append(i)
-        
-        pc_s = np.array(pc_s)   
-
-        # selección de features con base a PCA
-        if feature_selection:
-            
-            # valor de features importance
-            Fea_imp = abs(pca.components_[:pc_s.shape[0],:])
-
-            pca_values_ = np.max(Fea_imp, 0)
-            features_ = self.stacked_df.columns.values
-            
-            # pandas dataframe de importance
-            imp = pd.DataFrame(
-                    {
-                        'mean': pca_values_, 
-                        'std': [np.nan]*len(pca_values_)
-                        }, 
-                    index=features_
-                    )
-                    
-            # plot and save picture
-            plotFeatImportance(
-                            path_to_save_picture,    
-                            imp,
-                            number_features,
-                            min_var_exp,
-                            method='PCA', 
-                            tag='First try',
-                            simNum='PCA')
-            print("PCA picture Saved in {}".format(path_to_save_picture))
-            return imp
-
-        else:
-            # reduced matrix
-            return X_new

@@ -5,8 +5,8 @@ webpage: https://www.quantmoon.tech//
 import sys
 import numpy as np
 import pandas as pd
-from enigmx.utils import enigmxSplit
-from enigmx.features_algorithms import FeatureImportance, PCA_QM
+from enigmx.utils import enigmxSplit, kendall_evaluation
+from enigmx.features_algorithms import FeatureImportance
 
 
 class featureImportance(object):
@@ -63,9 +63,12 @@ class featureImportance(object):
                  list_stocks,
                  pca_comparisson,
                  cloud_framework = True,
-                 top_features = 10,
+                 kendall_threshold = 0.5,
                  score_constraint = 0.6,
-                 server_name = "DESKTOP-N8JUB39", driver="{ODBC Driver 17 for SQL Server}",uid="sqlserver",pwd="J7JA4L0pwz0K56oa",
+                 server_name = "DESKTOP-N8JUB39", 
+                 driver="{ODBC Driver 17 for SQL Server}",
+                 uid="sqlserver",
+                 pwd="J7JA4L0pwz0K56oa",
                  database = 'BARS_FEATURES',
                  rolling_window = 10, 
                  rolling_type = 'gaussian', 
@@ -90,7 +93,7 @@ class featureImportance(object):
         self.uid = uid
         self.pwd = pwd
 
-        self.top_features = top_features
+        self.kendall_threshold = kendall_threshold
         self.pca_comparisson = pca_comparisson
         
         self.server_name = server_name
@@ -139,14 +142,10 @@ class featureImportance(object):
         print("----------Process {} started---------- \n".format(self.method))
         
         # feature importance DF, no-scored purged float, scored purged float y stacked DF
-        featImpDf, scoreNoPurged, scorePurged, stack = instance.get_feature_importance(
-            self.pictures_pathout, self.method, self.model,
+        featImpRank, featPcaRank, scoreNoPurged, scorePurged = instance.get_feature_importance(
+            self.pictures_pathout, self.method, self.model, #varsThre
             )
-        
-        # tupla: ( stacked df, lista de cols sobre las que ejecutar rolling)
-        stackedPackage = instance.__getStacked__()
-        pcaIng = stackedPackage[0][stackedPackage[1]]               
-        
+                
         # revisar si el score constraint no es mayor al score No Purged (Warning!)
         if self.score_constraint > scoreNoPurged: 
             print("Warning! NoPurgedScore < ScoreConstraint \n")
@@ -158,61 +157,14 @@ class featureImportance(object):
                 )             
             # detener proceso
             sys.exit("{}".format(message))
-            
-        else:
-            # si se activa la comparasión PCA para selec. de features
-            if self.pca_comparisson: 
-                
-                print("\n---------- PCA Comparisson activated----------\n")
-                
-                # obtención de DF con la info del PCA x feature
-                pcaDf = PCA_QM(pcaIng).get_pca(
-                        number_features = len(stackedPackage[1]), 
-                        path_to_save_picture = self.pictures_pathout,
-                        min_var_exp = self.pca_min_var_expected,
-                        feature_selection = True
-                        )
-                
-                # ordenar valores del pcaDF por columna 'mean' (importancia)
-                bestArr1 = pcaDf.sort_values(
-                    by=['mean'], ascending = False
-                    ).head(self.top_features).index.values
-                
-                # ordenar valores del featImpDf por columna'mean' (importancia)
-                bestArr2 = featImpDf.sort_values(
-                    by=['mean'], ascending = False
-                    ).head(self.top_features).index.values
-                
-                # obtener la intersección de ambos en los N primeros 
-                bestAllPcaFeatImp = np.intersect1d(bestArr1, bestArr2)
-                
-                # detener proceso si no hay features coincidentes
-                if bestAllPcaFeatImp.shape[0] == 0:
-                    print("RequirementError: \
-                          No features matches in PCA vs {} comparisson".format(
-                        self.method
-                        ))
-                    sys.exit("Process Interrupted")
         
-                else:
-                    
-                    # selección de columnas pertenecientes a la intersección
-                    bestPcaVal = pcaDf.loc[bestAllPcaFeatImp][['mean']]
-                    bestMETVal = featImpDf.loc[bestAllPcaFeatImp][['mean']]                
-    
-                    # reconstrucción de la matriz final
-                    dfMatrix = pd.concat([bestPcaVal, bestMETVal],axis=1)
-                    dfMatrix.columns = ['ePCA', 'e{}'.format(self.method)]
-                    
-                    return dfMatrix, stack, stackedPackage[1]
-                            
-            else:
-                # directamente obtiene el feature importance sin pca comparisson
-                dfMatrix = featImpDf.rename(
-                    columns={'mean':'e{}'.format(self.method)}
-                    )
-                
-                return dfMatrix, stack, stackedPackage[1]
+        ############################# Computar aqui el Kendall #################
+        # paquete: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kendalltau.html 
+ 
+        
+            
+        
+        return #retornar nada, por el momento.
         
     def get_relevant_features(self, 
                               filtering = True, 

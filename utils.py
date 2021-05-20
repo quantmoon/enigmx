@@ -9,12 +9,16 @@ import math
 import numpy as np
 import pandas as pd
 from numba import njit
+from scipy import stats
 from numba import float64
 from functools import reduce
 from numba.typed import List
 from datetime import datetime
+from keras.utils import np_utils
 import pandas_market_calendars as mcal
 from fracdiff import StationaryFracdiff
+from sklearn.preprocessing import LabelEncoder
+from enigmx.protofeatures import protoFeatures
 
 #general class to personalize ValueError Messages
 class UnAcceptedValueError(Exception):
@@ -163,21 +167,21 @@ def getTickPrices(path, date_):
     return (infoArrays_[0][infoArrays_[0]!=0],
             infoArrays_[1][infoArrays_[1]!=0])
 
-#OPEN ZARR | Version 2.0: vectorized version (use range of dates) | version oficial 
-def open_zarr_general(zarrDates, range_dates, zarrObject):    
-    #revisa la existencia de error | detiene proceso en caso ocurra
-    try: 
-        idxs_ = [np.where(zarrDates == range_dates[0])[0][0],
-                 np.where(zarrDates == range_dates[-1])[0][0]+1]
-    except Exception as error:
-        print("Process Stopped!")
-        print(f"Error Ocurred: '{error}'")
-        print(":::::::> Please, check 'ZarrDates':")
-        print(zarrDates)
-        print(":::::::> And compered the existance of 'range_dates' elements on it:")
-        print(range_dates)
-        print("System Error Exit")
+#OPEN ZARR | Version 2.0: vectorized version (use range of dates)
+def open_zarr_general(zarrDates, range_dates, zarrObject, ref_stock_name = None):    
+    #resultado de la función mini nueva    
     
+    if range_dates not in zarrDates:
+        print('Date selected is not in range_dates from zarr vector for {}'.format(
+            ref_stock_name)
+            )
+        print(':::::>>> IndexError will raise...')
+        
+    idxs_ = [
+            np.where(zarrDates == range_dates[0])[0][0],
+            np.where(zarrDates == range_dates[-1])[0][0]+1
+            ]
+
     #these 3 process are the longest 
     prices = zarrObject.value[idxs_[0]:idxs_[-1]]    
     volume = zarrObject.vol[idxs_[0]:idxs_[-1]]
@@ -1324,7 +1328,7 @@ def global_list_stocks(data_dir,
     return list_stocks
 
 # nominación de lista de acciones para ingesta directa de path 
-#EquitiesEnigmxUniverse = global_list_stocks('D:/data_repository/')
+EquitiesEnigmxUniverse = global_list_stocks
 
 #Data Tunning Preparation| CAMBIARLO POR SQL 
 def dataPreparation_forTuning(csv_path,
@@ -1385,6 +1389,19 @@ def dataPreparation_forTuning(csv_path,
     
     return X, y, t1
 
+
+def data_heuristic_preparation_for_tunning(csv_path,
+                                           list_heuristic_elements):
+    # obtención del df stacked desde path
+    dfStacked = pd.read_csv(
+        csv_path, 
+        ).dropna()
+    
+    # array conteniendo los elementos de la data según nombre de columna 
+    dataframe = dfStacked[list_heuristic_elements]
+
+    return dataframe
+    
 #############################################################################
 #############################################################################
 ###################FUNCTIONS FOR COMBINATORIAL PURGED K-FOLD################# 
@@ -1784,7 +1801,8 @@ def __newTickBarConstruction__(arrayTime,
 def __newVolumeBarConstruction__(arrayTime, 
                                  arrayPrice, 
                                  arrayVol, 
-                                 alpha_calibration=1e3):
+                                 arrayTickRule, 
+                                 alpha_calibration=1e3): #agregar parametro tickrule spliteado
 
     #volume cumsum
     cumsumVol = np.cumsum(arrayVol)
@@ -1825,8 +1843,15 @@ def __newVolumeBarConstruction__(arrayTime,
     groupVol = np.split(
                 arrayVol, idx
                 )        
-     
-    return groupTime, groupPrice, groupVol
+    
+    #split array tick with idx
+    groupTickRule = np.split(
+                arrayTickRule, idx
+                )
+    
+    ### groupTickRule
+    
+    return groupTime, groupPrice, groupVol, groupTickRule #, groupTickRule agrupado 
 
 def __newDollarBarConstruction__(arrayTime, 
                                  arrayPrice, 
@@ -1880,7 +1905,7 @@ def __newDollarBarConstruction__(arrayTime,
     return groupTime, groupPrice, groupDol 
 
 #@njit
-def OHLC_BAR(list_arrayPrice, list_arraytime, list_arrayVol):
+def OHLC_BAR(list_arrayPrice, list_arraytime, list_arrayVol, list_array_tick_rule):
     """
     No vectorized version.
     
@@ -1894,8 +1919,14 @@ def OHLC_BAR(list_arrayPrice, list_arraytime, list_arrayVol):
     #for each array of price (arrays in price same as in Time and Vol)
     for idx in range(len(list_arrayPrice)):
         
+        #array 1d of prices
         subset_info = list_arrayPrice[idx]
+        #array 1d of time
         subset_info_time = list_arraytime[idx]
+        #array 1d of tickRule
+        subset_array_tick_rule = list_array_tick_rule[idx]
+        #array 1d of volume
+        subset_info_volume = list_arrayVol[idx]
         
         open_ = subset_info[0]
         high_ = np.max(subset_info)
@@ -1907,7 +1938,14 @@ def OHLC_BAR(list_arrayPrice, list_arraytime, list_arrayVol):
         #basic volatility as simple standard deviation of bar prices
         basic_volatility = np.std(subset_info)
         
-        volume_in_bar = np.cumsum(list_arrayVol[idx])[-1]
+        volume_in_bar = np.cumsum(subset_info_volume)[-1]
+        
+        # calculamos los PROTO FEATURES (7 valores)
+        proto_features_elements = protoFeatures(
+            price_vector = subset_info, 
+            volume_vector = subset_info_volume, 
+            tick_rule_vector = subset_array_tick_rule 
+            ).get_proto_features()
         
         barOHLC_plus_time_info.append(
             [
@@ -1917,7 +1955,21 @@ def OHLC_BAR(list_arrayPrice, list_arraytime, list_arrayVol):
                 subset_info_time[low_index],
                 subset_info_time[-1], 
                 basic_volatility, 
-                volume_in_bar
+                volume_in_bar, 
+                # protofeature 'feat_buyInitTotal'
+                proto_features_elements[0],
+                # protofeature 'feat_sellInitTotal'
+                proto_features_elements[1],
+                # protofeature 'feat_signVolSide'
+                proto_features_elements[2],
+                # protofeature 'feat_accumulativeVolBuyInit'
+                proto_features_elements[3], 
+                # protofeature 'feat_accumulativeVolSellInit'
+                proto_features_elements[4],
+                # protofeature 'feat_accumulativeDollarValue'
+                proto_features_elements[5],
+                # protofeature 'feat_hasbrouckSign'
+                proto_features_elements[6]
                 ]
             )
 
@@ -1964,6 +2016,7 @@ OHLC_BAR_VEC = np.frompyfunc(
 def infoBarGenerator(grp_time, 
                      grp_prices,
                      grp_vols,
+                     grp_tick_rule,
                      bartype):
     
     """
@@ -1981,7 +2034,8 @@ def infoBarGenerator(grp_time,
         vwap = iterativeVwap(grp_prices, grp_vols)     
         
         #List of lists of values:
-        #[O, H, L, CL, O-Date, H-Date, L-Date, C-Date, volatility, bar volume] 
+        #[O, H, L, CL, O-Date, H-Date, L-Date, C-Date, volatility, bar volume]
+        # incluye tambien los 7 protofeatures ('feat_...')         
         OHLCBars = OHLC_BAR(
             grp_prices, grp_time, grp_vols
             ) #ad '_VEC' to func. name for vectorized version
@@ -1995,8 +2049,9 @@ def infoBarGenerator(grp_time,
         
         #List of lists of values:
         #[O, H, L, CL, O-Date, H-Date, L-Date, C-Date, volatility, bar volume] 
+        # incluye tambien los 7 protofeatures ('feat_...') 
         OHLCBars = OHLC_BAR(
-            grp_prices, grp_time, grp_vols
+            grp_prices, grp_time, grp_vols, grp_tick_rule #groupTickRule agrupado 
             ) #ad '_VEC' to func. name for vectorized version
         
         #returns object        
@@ -2008,6 +2063,7 @@ def infoBarGenerator(grp_time,
         
         #List of lists of values:
         #[O, H, L, CL, O-Date, H-Date, L-Date, C-Date, volatility, bar volume] 
+        # incluye tambien los 7 protofeatures ('feat_...')         
         OHLCBars = OHLC_BAR(
             grp_prices, grp_time, grp_vols
             ) #ad '_VEC' to func. name for vectorized version
@@ -2181,16 +2237,40 @@ def barsNameDefinition(bartype,
                                           "close", "open_date", 
                                           "high_date", "low_date", 
                                           "close_date", "basic_volatility",
-                                          "bar_cum_volume", "vwap", "fracdiff"]
+                                          "bar_cum_volume", 
+                                          "feat_buyInitTotal",
+                                          "feat_sellInitTotal",
+                                          "feat_signVolSide",
+                                          "feat_accumulativeVolBuyInit",
+                                          "feat_accumulativeVolSellInit",
+                                          "feat_accumulativeDollarValue",
+                                          "feat_hasbrouckSign",                                          
+                                          "vwap", 
+                                          "fracdiff"]
                        ):
     """
     Function to add a prefix ('bartype') to each information column name.
     """
     return [bartype +  "_" + colName for colName in columnBaseNames]
     
-dataset_column_names = ["open_price", "high_price", "low_price", "close_price", 
-                        "open_date", "high_date", "low_date", "close_date", 
-                        "basic_volatility", "bar_cum_volume", "vwap", 
+dataset_column_names = ["open_price", 
+                        "high_price", 
+                        "low_price", 
+                        "close_price", 
+                        "open_date", 
+                        "high_date", 
+                        "low_date", 
+                        "close_date", 
+                        "basic_volatility", 
+                        "bar_cum_volume",
+                        "feat_buyInitTotal",
+                        "feat_sellInitTotal",
+                        "feat_signVolSide",
+                        "feat_accumulativeVolBuyInit",
+                        "feat_accumulativeVolSellInit",
+                        "feat_accumulativeDollarValue",
+                        "feat_hasbrouckSign",
+                        "vwap", 
                         "fracdiff"]
 
 ##############################################################################
@@ -2593,3 +2673,96 @@ def enigmxSplit(df, pct_average, backtest_comb = 0.5):
     
     return train, test, combinatorial
 
+
+# FUNCION QUE CONVIERTE UN ARRAY DE 1D 
+def decodifierNNKerasPredictions(array_predictions):
+    assert len(array_predictions.shape) == 1, 'input should be 1D only'
+    return array_predictions - 1
+
+# FUNCION QUE TRANSFORMA UN VECTOR DE ETIQUETAS PARA NN DE KERAS
+def transformYLabelsVector(original_labels):
+    # cambiamos los labels de pd.Series a encoderVector
+    encoder = LabelEncoder()
+    encoder.fit(original_labels)
+    encoded_Y = encoder.transform(original_labels)
+    
+    # redefinimos labels como dummy variables (one hot encoded)
+    # este es un array 2D -0D: [#POS 0: -1, #POS 1: 0, #POS 2: -1]
+    lbl = np_utils.to_categorical(encoded_Y)    
+    return lbl
+
+##############################################################################
+############################### KENDALL METHOD ###############################
+##############################################################################
+
+def kendall_evaluation(importance_series, pca_series, threshold = 0.5):
+    
+    # calcula el valor de seleccion segun el critico asignado en el imp. vector
+    critic_value = importance_series.quantile(0.5)
+    
+    # determina los feature seleccionados con sus respectivos values segun el critico   
+    importance_selection = importance_series[importance_series>critic_value].sort_values(
+        ascending=False
+        )
+    
+    importanceSeriesSelection = importance_series[importance_series>critic_value].rank()
+    pcaImportanceSelection = pca_series[importanceSeriesSelection.index.values].rank()
+    
+    print('importance selection quantile')
+    print(importanceSeriesSelection)
+    print(' ')
+    
+    
+    print('pca selection quantile')
+    print(pcaImportanceSelection)
+    print(' ')
+    
+    #pca_rank = pcaSelectionCritic.rank()
+    
+    #pca_rank_sorted_values = pca_rank.sort_values()
+    
+    #pca_rank_sorted_features = pca_rank_sorted_values.index.values
+    
+    #importance_values_vector = importance_series.loc[pca_rank_sorted_features]
+    
+    #print('PCA RANK SORTED')
+    #print(importanceSeriesSelection)
+    #print(' ')
+    
+    #print('IMP VALUES VECTOR')
+    #print(pcaImportanceSelection)
+    #print(' ')
+    
+    kendallVal = stats.weightedtau(
+                importanceSeriesSelection.values**-1,
+                pcaImportanceSelection.values, 
+        )[0]
+    
+    
+    # determina los nombres de los features seleccionados segun el critico (np.array)
+    importance_selected_features = importance_selection.index.values
+    
+    # extrae los features del Imp. en el PCA con sus respectivos valores var.
+    pca_join_features = pca_series.loc[importance_selected_features]
+        
+    # rankea los features join entre Imp. y el PCA  
+    pca_ranked_join_features = pca_join_features.rank()
+    
+    # determina el valor del Weighted Kendall's Tau (Corr: 0 to 1)
+    #kendallVal = stats.weightedtau(importance_selection.values, pca_ranked_join_features.values**-1)[0]
+    
+    # error de mensaje en caso no se cumpla la condicion
+    errorMsgg = "Kendall Test failed. KendallTau = {} (abs ver.) vs Threshold = {}. \
+        Please, check!".format(
+        kendallVal, threshold
+    )
+    
+    # condicion: que el kendallVal resultante sea mayor al threshold asignado de Corr
+    assert abs(kendallVal) > threshold, errorMsgg
+    
+    print(f"     >>>>>> Weighted Kendall's Tau Corr: {kendallVal}.")
+    
+    # une los dataframes con los importance del Imp. y del PCA
+    dfMatrix = pd.concat([pca_join_features, importance_selection],axis=1)
+    
+    return dfMatrix

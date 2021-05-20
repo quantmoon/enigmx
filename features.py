@@ -99,7 +99,7 @@ class FeaturesClass():
         - features: este método aplica los 4 métodos anteriores para unificar todos los features computables por esta clase
     """    
     
-    def __init__(self,df):
+    def __init__(self,df, num_days = 15):
         self.df = df
         self.o = df['open_price']
         self.h = df['high_price']

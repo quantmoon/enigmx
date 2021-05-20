@@ -6,12 +6,20 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold
 from enigmx.betsize import betsize_livetrading
+
+from keras.models import Sequential
+
+from keras.wrappers.scikit_learn import KerasClassifier
 from enigmx.utils import (
     nCk, 
     paths,
     master_sets,
     split_map_CPCV,  
+    transformYLabelsVector,
+    decodifierNNKerasPredictions
     )
+
+from enigmx.classModelTunning import list_heuristic_elements
 
 class GeneralModel(object):
     """
@@ -43,7 +51,10 @@ class GeneralModel(object):
     """
     def __init__(self, MA, MB):
         
+        # modelo exogeno
         self.MA = MA 
+        
+        # modelo endogeno
         self.MB = MB
     
     def __dataPreparation__(self, idxs, basedata):
@@ -62,12 +73,19 @@ class GeneralModel(object):
         
         if type(basedata) == pd.DataFrame:    
             basedata = basedata.reset_index(drop=True).values
-
+            
         #select features and labels
         featuresMatrix, labelsVector = (
                 basedata[idxs,:-1].astype(np.float32), 
                 basedata[idxs,-1:]
             )        
+
+        assert len(np.unique(labelsVector)) > 2, \
+            'Only 2 of 3 labels exist. Increase sample to get more labels.'
+    
+        # revisamos si el modelo ingresado es una NN de Keras
+        if type(self.MA) in (KerasClassifier, Sequential):
+            labelsVector = transformYLabelsVector(labelsVector)
 
         return featuresMatrix, labelsVector
     
@@ -81,7 +99,8 @@ class GeneralModel(object):
         X, y = self.__dataPreparation__(idxs, basedata)
 
         #fitting/update training process in exogenous model (side)
-        self.MA = self.MA.fit(X,y)
+        print(':::: >> Fitting Exogenous Model...')
+        self.MA.fit(X,y)
     
     def predict(self, idxs, basedata, y_true=False):
         """
@@ -92,6 +111,17 @@ class GeneralModel(object):
         
         #prediction process in exogenous model (side)
         predictionA = self.MA.predict(X)
+        
+        # revisamos si el modelo ingresado es una NN de Keras
+        if type(self.MA) in (KerasClassifier, Sequential):
+             
+            # reduce 3D predictions to single prediction
+            predictionA = np.argmax(predictionA, axis=-1)
+            
+            # Transform values from 3Label vector to original (-1,0,1) labels
+            predictionA  = decodifierNNKerasPredictions(
+                predictionA 
+                )
         
         #prediction process in endogenous model (size | metalabelling)
         predictionB = betsize_livetrading(
@@ -165,7 +195,7 @@ class CPKFCV(object):
         #item 1 | idxs to construct paths along each group/splits: N elements 
         split_map = split_map_CPCV(self.N, self.k) 
         
-        #item 2 | idxs to construct 
+        #item 2 | idxs to construct | error here
         masterSets = master_sets(
             self.N, self.k, split_map, pieces, self.data, self.embargo_level
         )

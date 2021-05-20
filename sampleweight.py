@@ -2,7 +2,6 @@
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
-import sys
 import itertools
 import numpy as np
 import pandas as pd
@@ -44,21 +43,26 @@ def mpSampleW(df):
   """
   # define al precio de cierre como index del dataframe
   df = df.set_index("close_date")
+  
   # calcula el log-return de los precios close 
   ret = np.log(df.close_price).diff() # log-returns, so that they are additive
-  # define un pd.Series vacío con index 'close_date' y valores flaot64
+  
+  # define un pd.Series vacío con index 'close_date' y valores float64
   wght = pd.Series(index=ret.index, dtype='float64') 
-  # revisa si existen o no valores TS en el dataframe de entrada
-  if df["barrierTime"].empty:
-    # detiene el proceso en caso no existan elementos en el dataframe
-    sys.exit("Error! 'barrierTime' column is empty! | file: sampleweight.py")
+
   # iteración para llenar el pd.Series con los sample-weights corrsp.
-  for tIn,tOut in df["barrierTime"].iteritems():
+  for tIn, tOut in df["barrierTime"].iteritems():
     # tIn: fecha de término de la barra
     # tOut: fecha de materialización del evento objetivo (barrierTime)  
-    # ERROR DE SUPERPOSICIÓN!
-    # Asignación del peso correspondiente según la fecha "tIn"
-    wght.loc[tIn] = (ret.loc[tIn:tOut]/df.overlap.loc[tIn:tOut]).sum()
+    
+    # segmentamos los valores de los retornos segun tIn y tOut
+    locElements1 = ret[(ret.index >= tIn) & (ret.index <= tOut)]
+    
+    # segmentamos la existencia de overlaps en del df princ. segun tIn y tOut
+    locElements2 = df[(df.index >= tIn) & (df.index <= tOut)].overlap
+    
+    # asignación del peso correspondiente según la fecha "tIn" 
+    wght.loc[tIn] = (locElements1 / locElements2).sum()
 
   # devolvemos el 'absolute' return con reemplazo de 'inf' por 0
   return wght.abs().replace([np.inf, -np.inf], 0)

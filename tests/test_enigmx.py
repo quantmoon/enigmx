@@ -3,36 +3,79 @@
 webpage: https://www.quantmoon.tech//
 """
 
+import ray
+ray.init(include_dashboard=(False),ignore_reinit_error=(True))
+
 from enigmx.classEnigmx import EnigmX
-#from enigmx.utils import EquitiesEnigmxUniverse
+
+from keras.layers import Dense
+from keras.models import Sequential
+
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import GradientBoostingClassifier 
+from enigmx.utils import EquitiesEnigmxUniverse
 
+##############################################################################
 
+# NN Keras model
+def kerasModel(num_features):
+    model = Sequential()
+    model.add(
+        Dense(8, input_dim = num_features, activation='relu') 
+    )
+    model.add(Dense(3, activation='softmax')) 
+    # Compile model
+    model.compile(loss='categorical_crossentropy', 
+                  optimizer='adam', 
+                  metrics=['accuracy'])
+    return model
+
+# dict with models, and params
+dict_models = {
+    'decisionTree': (
+        DecisionTreeClassifier(), 
+        {'max_leaf_nodes': list(range(2, 20)), 
+         'min_samples_split': [2, 3, 4]} 
+        ), 
+    'keras': (
+        kerasModel, 
+        dict(
+            batch_size = [10, 20, 40, 60, 80, 100], 
+            epochs = [10, 50, 100]
+            ) 
+        )
+     }
+
+##############################################################################
+
+main_path = 'C:/data/'
+
+# EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
                   method = 'MDA', 
-                  base_path = './',
+                  base_path = main_path,
                   cloud_framework = False
                   ) 
 
-params_for_tuning = {
-    'max_leaf_nodes': list(range(2, 20)), 
-    'min_samples_split': [2, 3, 4]
-    }
+# feature importance
 
 instance.get_feature_importance(    
-                   model = GradientBoostingClassifier(), 
-                   list_stocks = ['AFL', 'AGCO', 'AGI', 'AGIO'], 
-                   score_constraint = 0.3,
-                   server_name="35.223.72.148",
-                   database="BARS_FEATURES",
-                   uid = 'sqlserver',
-                   pwd='quantmoon2019',
-                   driver = "{ODBC Driver 17 for SQL Server}"
-                   )
-
-instance.get_model_tunning(exo_process = True, endo_process = True, 
-                           exo_model = DecisionTreeClassifier(),  
-                           exo_dic_params = params_for_tuning)
+                       model = DecisionTreeClassifier(), 
+                       list_stocks = EquitiesEnigmxUniverse(main_path), 
+                       score_constraint = 0.3,
+                       server_name = "WINDOWS-NI805M6",
+                       database = "BARS_FEATURES",
+                       uid = '',
+                       pwd = '',
+                       driver = "{SQL Server}",
+                       kendall_threshold = 0.00000000000001
+                      )
     
-instance.get_combinatorial_backtest(trials = 11, partitions = 2)
+
+# get multi process for tunning and backtest
+#instance.get_multi_process(
+#    code_backtest = '001', 
+#    dict_exo_models = dict_models,
+#    endogenous_model_sufix= 'rf',    
+#    trials = 11, 
+#    partitions = 2, 
+#    )

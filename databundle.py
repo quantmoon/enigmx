@@ -7,6 +7,7 @@ import zarr
 import pyodbc
 import numpy as np
 
+from enigmx.protofeatures import tickRuleVector 
 
 import pandas as pd
 from itertools import chain
@@ -63,7 +64,8 @@ class QuantmoonSQLManager(object):
         self.pwd = pwd
         
         self.database_name = database_name.upper()
-
+        
+        print(' ')
         print('Accessing SQL Info --->>>')
         
 
@@ -238,8 +240,10 @@ class QuantmoonSQLManager(object):
             
     def select_database(self):
         # método para seleccionar una base de datos
-        
-        # intenta
+        print(":::::::::>> SQL Connection Path...")
+        print(self.access)
+        print(' ')
+
         try: 
             # conexión a la base de datos y creación de cursor
             dbconn = pyodbc.connect(self.access)
@@ -350,6 +354,13 @@ class QuantmoonSQLManager(object):
                     row.close_date, 
                     row.basic_volatility, 
                     row.bar_cum_volume, 
+                    row.feat_buyInitTotal,
+                    row.feat_sellInitTotal,
+                    row.feat_signVolSide,
+                    row.feat_accumulativeVolBuyInit,
+                    row.feat_accumulativeVolSellInit,
+                    row.feat_accumulativeDollarValue,
+                    row.feat_hasbrouckSign,
                     row.vwap, 
                     row.fracdiff,
                     row.volatility, 
@@ -372,6 +383,13 @@ class QuantmoonSQLManager(object):
                     row.close_date, 
                     row.basic_volatility, 
                     row.bar_cum_volume, 
+                    row.feat_buyInitTotal,
+                    row.feat_sellInitTotal,
+                    row.feat_signVolSide,
+                    row.feat_accumulativeVolBuyInit,
+                    row.feat_accumulativeVolSellInit,
+                    row.feat_accumulativeDollarValue,
+                    row.feat_hasbrouckSign,                    
                     row.vwap, 
                     row.fracdiff,
                     row.volatility, 
@@ -395,6 +413,13 @@ class QuantmoonSQLManager(object):
                     row.close_date, 
                     row.basic_volatility, 
                     row.bar_cum_volume, 
+                    row.feat_buyInitTotal,
+                    row.feat_sellInitTotal,
+                    row.feat_signVolSide,
+                    row.feat_accumulativeVolBuyInit,
+                    row.feat_accumulativeVolSellInit,
+                    row.feat_accumulativeDollarValue,
+                    row.feat_hasbrouckSign,                    
                     row.vwap, 
                     row.fracdiff,
                     row.volatility, 
@@ -418,6 +443,13 @@ class QuantmoonSQLManager(object):
                     row.close_date, 
                     row.basic_volatility, 
                     row.bar_cum_volume, 
+                    row.feat_buyInitTotal,
+                    row.feat_sellInitTotal,
+                    row.feat_signVolSide,
+                    row.feat_accumulativeVolBuyInit,
+                    row.feat_accumulativeVolSellInit,
+                    row.feat_accumulativeDollarValue,
+                    row.feat_hasbrouckSign,                    
                     row.vwap, 
                     row.fracdiff,
                     row.volatility, 
@@ -443,6 +475,13 @@ class QuantmoonSQLManager(object):
                     row.close_date, 
                     row.basic_volatility, 
                     row.bar_cum_volume, 
+                    row.feat_buyInitTotal,
+                    row.feat_sellInitTotal,
+                    row.feat_signVolSide,
+                    row.feat_accumulativeVolBuyInit,
+                    row.feat_accumulativeVolSellInit,
+                    row.feat_accumulativeDollarValue,
+                    row.feat_hasbrouckSign,                    
                     row.vwap, 
                     row.fracdiff,
                     row.volatility, 
@@ -524,22 +563,16 @@ class DataRespositoryInitialization(object):
             self.pathFullZarr = self.data_dir + self.stock + ".zarr"
         else:
             self.pathFullZarr = self.data_dir + '/' + self.stock + ".zarr"
-
+        
         #Get Zarr Base Object
         self.zarrObject = zarr.open(self.pathFullZarr)
-        
-        #Check error in zarr composition
-        try: 
-            self.zarrObject.date or len(self.zarrObject.date[0]) > 0
-        except Exception as error:
-            print("Process Stopped!")
-            print(f"Error message: ArrayObject for {pathFullZarr} 'date' is empty or 'date' att. doesn't exist.")
 
         #get dates from object
         self.zarrDates = np.array(
             self.zarrObject.date)
         
         #Get information from the base DataRepository Instance
+        
         #check if days are well-defined
         if check_days: 
                    
@@ -560,7 +593,7 @@ class DataRespositoryInitialization(object):
 
         #Get ticks information of Time, Prices and Vol from Zarr Objects    
         self.infoTimePriceVol = open_zarr_general(
-            self.zarrDates, self.range_dates, self.zarrObject
+            self.zarrDates, self.range_dates, self.zarrObject, self.stock
             ) 
 
         #Check ticks information for removing/fixed missed values
@@ -613,6 +646,9 @@ class DataRespositoryInitialization(object):
                     )
             )
         
+        #get tick rule over general 1d price vector
+        main_tick_rule_vector = tickRuleVector(self.__stateResults__[1])
+        
         #get general IdX info from dates
         generalIdxInfo = np.unique(
                             datesOnly, 
@@ -634,6 +670,11 @@ class DataRespositoryInitialization(object):
             self.__stateResults__[2], generalIdxInfo
             )[:-1]
         
+        #OUTPUT 4: 'group_data' resample outputs by TickRule
+        groupTickRule = np.split(
+            main_tick_rule_vector, generalIdxInfo
+            )[:-1]
+        
         #OUTPUT 4: num time bars
         num_time_bars = len(groupDataTime)
         
@@ -648,13 +689,14 @@ class DataRespositoryInitialization(object):
         #OUTPUT 6: total ticks
         total_ticks = self.__stateResults__[1].shape[0]
         
-        return (
+        return ( #agregar el groupTickRule
             groupDataTime, 
             groupDataPrice, 
             groupDataVolume, 
             num_time_bars, 
             priceVol, 
-            total_ticks
+            total_ticks,
+            groupTickRule
             )
         
 
@@ -690,12 +732,11 @@ class DataRespositoryInitialization(object):
             
         """
 
-            
         if bartype=='tick':
             
             #get list of column names for dataframe construction 
             
-            #results_ tuple info (last arg. is 'alpha_calibration')   
+            #results_tuple info (last arg. is 'alpha_calibration')   
             result_info = __newTickBarConstruction__(
                 info_tuple[0][0], 
                 info_tuple[1][0], 
@@ -725,14 +766,18 @@ class DataRespositoryInitialization(object):
             result_info = __newVolumeBarConstruction__(
                 info_tuple[0][0], 
                 info_tuple[1][0], 
-                info_tuple[2][0], 
+                info_tuple[2][0],
+                info_tuple[6][0],
                 alpha_calibration=daily_time_bars
                 )
             
             
             #elementos: [0] OHLC info (prices + dtimes + volatility), [1] vwap
+            #computa tambien los proto-features: 7 en total
             resultInfo = infoBarGenerator(
-                result_info[0], result_info[1], result_info[2], bartype
+                result_info[0], result_info[1], 
+                result_info[2], result_info[3], 
+                bartype #groupTickRule agrupado 
                 )
 
             #array OHLC list of list transformation & VWAP dim concadenation
@@ -882,15 +927,17 @@ class DataRespositoryInitialization(object):
         Deprecated method to organize an iterative bar-no-vect-construction.
         """
         
-        # método en desuso para computar las barras 
-
+        # método para computar las barras | computa el contenido esencial
         info_tuple = self.__makeTupleContent__(freq, time)
         
+        # define la frecuencia de las barras a computarse
         daily_time_bars = info_tuple[3]
         
+        # revisa si se define una seleccion de barras concreta por dia para redf.
         if daily_time_bars_organization != None:
             daily_time_bars = daily_time_bars_organization
                     
+        # inicializa la generacion de las barras (metodo no vectorizado)
         barConstructed = self.bar_novect_construction(
                 bartype, 
                 info_tuple,

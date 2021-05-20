@@ -7,7 +7,10 @@ import datetime
 import pandas as pd
 pd.options.mode.chained_assignment = None  
 from enigmx.combinatorial_backtest import CPKFCV
-from enigmx.utils import dataPreparation
+from enigmx.utils import dataPreparation, data_heuristic_preparation_for_tunning
+from keras.models import load_model
+
+from enigmx.classModelTunning import list_heuristic_elements
 
 class EnigmxBacktest(object):
     
@@ -62,7 +65,10 @@ class EnigmxBacktest(object):
                  endogenous_model_name = "endogenous_model.pkl",
                  timeIndexName = "close_date",
                  timeLabelName = "horizon",
-                 y_true = True):
+                 y_true = True,
+                 exo_openning_method_as_h5 = False,
+                 heuristic_model = False,
+                 list_heuristic_elements = list_heuristic_elements):
         
         # ingesta de parámetros a la clase
         self.base_path = base_path
@@ -88,10 +94,19 @@ class EnigmxBacktest(object):
         self.timeLabelName = timeLabelName
         self.y_true = y_true
         
+        self.exo_openning_method_as_h5 = exo_openning_method_as_h5
+        self.heuristic_model = heuristic_model
+        
+        self.list_heuristic_elements = list_heuristic_elements
+        
     def __infoReader__(self):
         
-        # carga de modelos desde formato pickle
-        self.exogenousModel = pickle.load(open(self.exogenous_path, 'rb'))
+        # carga de modelos desde formato pickle o h5 dependiendo del caso
+        if self.exo_openning_method_as_h5: #abre h5 si es un kerasModel
+            self.exogenousModel = load_model(self.exogenous_path + '.h5')
+        else: #abre pickle si es cualquier otro formato de modelo
+            self.exogenousModel = pickle.load(open(self.exogenous_path, 'rb'))
+            
         self.endogenousModel = pickle.load(open(self.endogenous_path, 'rb'))     
         
         # carga de csv con data ciega stacked para backtest
@@ -105,14 +120,23 @@ class EnigmxBacktest(object):
         # seteo de datetime como índice
         self.dfStacked = self.dfStacked.set_index(self.timeIndexName)        
         
-        # dataset útil para el combinatorial 
-        self.dataset = dataPreparation(
-            data_csv = self.csv_path, 
-            feature_sufix= self.feature_sufix,
-            label_name= self.label_name, 
-            timeIndexName = self.timeIndexName,
-            timeLabelName = self.timeLabelName            
-            )
+        # check if model is heuristic
+        if self.heuristic_model:
+            self.dataset = data_heuristic_preparation_for_tunning(
+                csv_path = self.csv_path,
+                list_heuristic_elements = self.list_heuristic_elements
+                )
+        
+        # if model is not heuristic
+        else:
+            # dataset útil para el combinatorial 
+            self.dataset = dataPreparation(
+                data_csv = self.csv_path, 
+                feature_sufix= self.feature_sufix,
+                label_name= self.label_name, 
+                timeIndexName = self.timeIndexName,
+                timeLabelName = self.timeLabelName            
+                )
         
     def __computeCombinatorialBacktest__(self, n, k, embargo_level = 5):
         
@@ -183,22 +207,27 @@ class EnigmxBacktest(object):
             # unión de todos los trial (n)
             generalFrame = pd.concat(list_frame_trials).reset_index(drop=True)
             
-            if save: 
-                
-                trialTime = datetime.datetime.now() 
-                iDTime = "{}{}{}{}".format(
+            # config. de IdTime para identificar el df base
+            trialTime = datetime.datetime.now() 
+            iDTime = "{}{}{}{}".format(
                     format(trialTime.day, '02'), format(trialTime.month, '02'), 
                     format(trialTime.hour, '02'), format(trialTime.minute, '02')
                     )
-                print("::::::::::::::::::::: BACKTEST CODE: {}".format(iDTime))
+            print("::::::::::::::::::::: BACKTEST CODE: {}".format(iDTime))
                 
-                self.iDTime = iDTime
-                
+            self.iDTime = iDTime
+            
+            if save: 
+                # ejecuta almacenamiento obligatorio local/cloud como backup
                 generalFrame.to_csv(
                     "{}BACKTEST_RESULTS_{}.csv".format(self.base_path, self.iDTime), 
                     index=False
                     ) 
                 
+                # return general frame with results + id name
+                return generalFrame, self.iDTime
+            
+            else:
                 # return general frame with results + id name
                 return generalFrame, self.iDTime
             

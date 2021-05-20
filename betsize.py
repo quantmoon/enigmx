@@ -124,7 +124,7 @@ class BetSize(object):
                array_labels,
                endogenous_model = 'rf',
                test_size = 0.25,
-               rebalance = True, 
+               rebalance = False, 
                balance_method = 'smote'):
     
     self.array_features = array_features
@@ -167,17 +167,10 @@ class BetSize(object):
       )
     
     
-    #if len(self.array_labels.shape) == 1:
-    #  self.array_labels = self.array_labels.reshape(
-    #      self.array_labels.reshape(
-    #          self.array_labels.shape[0], 1
-    #          )
-    #      )
-    
   def __dataManagement__(self):
     self.__warningStatements__()
 
-    #features matrix inc. [-1,0,1] prediction as new feature
+    #features matrix inc. [-1,0,1] prediction as new feature    
     new_array_features = np.hstack(
         (
             self.array_features, 
@@ -219,32 +212,30 @@ class BetSize(object):
 
     return new_x_train_res, new_x_test, new_y_train_res, new_y_test    
 
-  def __randomGridVariablesRF__(self): #AGREGAR AQUI MÁS PARÁMETROS!!!
-
+  def __randomGridVariablesRF__(self): 
     #parameters for RandomForest RandomGridSearch
-      # Number of trees in random forest
+    
+    # Number of trees in random forest
     n_estimators = [int(x) for x in np.linspace(
         start = 100, 
-        stop = 1000, 
-        num = 1) #10
-    ]
-    
-      # Number of features to consider at every split
+        stop = 2000, 
+        num = 20) 
+        ]
+
+    # Number of features to consider at every split
     max_features = ['auto', 'sqrt']
 
-      # Maximum number of levels in tree
-    max_depth = [int(x) for x in np.linspace(
-        start = 10, 
-        stop = 100, 
-        num = 10)
-    ]
+    # Maximum number of levels in tree
+    max_depth = [int(x) for x in np.linspace(10, 110, num = 11)]
     max_depth.append(None)
 
-      # Minimum number of samples required to split a node
+    # Minimum number of samples required to split a node
     min_samples_split = [2, 5, 10]
-      # Minimum number of samples required at each leaf node
+    
+    # Minimum number of samples required at each leaf node
     min_samples_leaf = [1, 2, 4]
-      # Method of selecting samples for training each tree
+    
+    # Method of selecting samples for training each tree
     bootstrap = [True, False]
 
       #return random grid dictionary
@@ -258,13 +249,16 @@ class BetSize(object):
   def __randomGridVariablesSVM__(self):
       
       #parameters for SVM RandomGridSearch
-      list_nus = np.linspace(0.01,0.99,2)
-      list_kernels = ["rbf", "sigmoid"]  
+      list_nus = np.linspace(0.1,1,10)[:-1]
+      list_kernels = ["rbf", "sigmoid", "linear", "poly"]
       list_coef0 = [0.0,.1,.5,.9]      
+      list_gamma = ["scale", "auto"]
+      
 
       return {'nu': list_nus,
             'kernel': list_kernels,
-            'coef0': list_coef0}
+            'coef0': list_coef0,
+            'gamma':list_gamma}
 
   def __endogenousModel__(self):
     
@@ -310,7 +304,7 @@ class BetSize(object):
 
       model_selected = rf_random.best_estimator_
     
-    #otherwise, the endogenous model is a SVM
+    #otherwise, the endogenous model is a SVM (NuSVC version)
     else:
       
       #SVM Dict of parameters  
@@ -339,7 +333,7 @@ class BetSize(object):
   def __predictionEndogenousModel__(self, 
                                     plot_confusion_matrix = False):
 
-    #get endogenous trained model 
+    #get endogenous trained model | base return if 'explore data' is not activated
     model_selection = self.__endogenousModel__()
     
     #prediction of label size - category [1, 0]
@@ -347,11 +341,10 @@ class BetSize(object):
 
     #prediction of label size - probability
     probabilities_label_size = model_selection.predict_proba(self.new_x_test)
-
-    #final dataframe with general information
+    
+    #final dataframe with general information | add name for features if you want
     final_set = pd.DataFrame(
-          self.new_x_test, 
-          columns=['volume', 'volatility', 'fracdiff', 'bet_side']
+          self.new_x_test
           )
 
     #bet size prediction inclusion from new bet side    

@@ -268,7 +268,6 @@ class Extractor(BaseExtractor):
                 vol_final[0,:] = vol
                 coords = list(range(length)) 
                 
-                                                
                 ts_arr = xr.DataArray(ts_final,coords=[date,coords],
                                       dims=['date','coords'])
 
@@ -281,9 +280,14 @@ class Extractor(BaseExtractor):
                         "timestamp":ts_arr,
                                 "value":value_arr
                                  })  
-
+                
                 # Path construction   
-                path_ = self.path + "/" + symbol + ".zarr"   
+                
+                if self.path[-1] == '/':
+                    path_ = self.path + symbol + ".zarr"   
+                else:
+                    path_ = self.path + "/" + symbol + ".zarr"   
+                
                 symbol_dir = symbol + ".zarr"
                 
                 if symbol_dir not in os.listdir(self.path) :

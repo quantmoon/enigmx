@@ -8,23 +8,23 @@ ray.init(include_dashboard=(False),ignore_reinit_error=(True))
 #from enigmx.utils import EquitiesEnigmxUniverse
 from enigmx.databundle_interface import SQLEnigmXinterface
 
-server_name = "35.223.72.148" 
+server_name = "WINDOWS-NI805M6" 
 referential_base_database = 'TSQL'
-pathzarr = '/home/dataquantmoon/.local/lib/python3.7/site-packages/enigmx/transform/'
-list_stocks = ['AFL', 'AGCO', 'AGI', 'AGIO']
-start_date = "2020-08-09" 
-end_date = "2020-09-09" 
+pathzarr = 'C:/data/'
+list_stocks = ['ACIW', 'KLXE', 'AZN', 'TH']
+start_date = "2021-01-25" 
+end_date = "2021-03-25" 
 desired_bars = 10
 bartype = 'volume'
-driver = "{ODBC DRIVER 17 for SQL Server}"
-uid = "sqlserver"
-pwd = "quantmoon2019"
+driver = "{SQL Server}"
+uid = ""
+pwd = ""
 
 print("inicializando clase")
 enigmxsql = SQLEnigmXinterface(
    driver = driver,
     uid = uid,
-    pwd = pwd,
+    pwd = pwd, 
     server = server_name, 
     pathzarr = pathzarr, 
     list_stocks = list_stocks, 
@@ -41,9 +41,9 @@ enigmxsql.create_table_database(
     bars_entropy = False, 
     etfs_trick = True, 
     bars_sampled = True, 
-    bars_barrier =True,
+    bars_barrier = True,
     bars_weights = True,
-    bars_features =True,
+    bars_features = True,
     creation_database = True)
 
 print("subiendo info")
@@ -56,8 +56,7 @@ enigmxsql.compute_info_to_sql(
     triple_barrier_computation_process = True,
     sample_weight_computation_process = True,
     features_bar_computation_process = True,
-    tunning_interval = "15D",
+    tunning_interval = "10D",
     )
 
 
- 

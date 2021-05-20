@@ -11,5 +11,8 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
+import tensorflow as tf
+tf.get_logger().setLevel('ERROR')
+
 #from enigmx.backtester.core import Backtest
 #from enigmx.extractor import Extractor
