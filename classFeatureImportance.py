@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from enigmx.utils import enigmxSplit, kendall_evaluation
 from enigmx.features_algorithms import FeatureImportance
-
+from scipy.stats import kendalltau,weightedtau
 
 class featureImportance(object):
     
@@ -161,7 +161,10 @@ class featureImportance(object):
         ############################# Computar aqui el Kendall #################
         # paquete: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kendalltau.html 
  
-        
+        kt = kendalltau(featImpRank,featPcaRank)
+        wk = weightedtau(featImpRank,featPcaRank)
+
+        print(kt,wk)
             
         
         return #retornar nada, por el momento.
