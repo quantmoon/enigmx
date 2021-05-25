@@ -5,10 +5,11 @@ webpage: https://www.quantmoon.tech//
 import sys
 import numpy as np
 import pandas as pd
+import random
 from enigmx.utils import enigmxSplit, kendall_evaluation
 from enigmx.features_algorithms import FeatureImportance
 from scipy.stats import kendalltau,weightedtau
-
+from itertools import combinations
 class featureImportance(object):
     
     """
@@ -82,7 +83,11 @@ class featureImportance(object):
                  col_weight_type = 'weightTime',
                  col_t1_type  = 'horizon',
                  col_label_type = 'barrierLabel', 
-                 pca_min_var_expected = 0.05):
+                 pca_min_var_expected = 0.05,
+                 select_sample = True,
+                 combinations_on = 30,
+                 n_samples = 10,
+                 ):
         
         # ingesta de parámetros
         self.model = model
@@ -115,7 +120,16 @@ class featureImportance(object):
         self.pca_min_var_expected = pca_min_var_expected
         
         self.cloud_framework = cloud_framework #cloud activation
+        self.select_sample = select_sample
+        self.combinations = combinations
+        self.n_samples = n_samples
         
+    def __getSubsamples__(self, standardMatrix):
+        combs = combinations(standardMatrix.columns,self.combinations_on)
+        total_combs = [list(i) for i in combs]
+        samples = random.sample(total_combs,self.n_samples)
+        return samples
+    
     def __instanceOverture__(self):
         
         # instancia feature importance base
@@ -141,11 +155,34 @@ class featureImportance(object):
         
         print("----------Process {} started---------- \n".format(self.method))
         
-        # feature importance DF, no-scored purged float, scored purged float y stacked DF
-        featImpRank, featPcaRank, scoreNoPurged, scorePurged, dfStacked = instance.get_feature_importance(
+        # extrae la matriz de features estacionaria y estandarizada, el vector de labels y el df stacked
+        featStandarizedMatrix, labelsDataframe, dfStacked = instance.__checkingStationary__()
+        
+        if self.select_sample:
+            samples = self.__getSubsamples__(featStandarizedMatrix)
+            best_sample = 0
+            pval = 1
+            kendalls = pd.DataFrame()
+            for sample in samples:
+                featImpRank, featPcaRank, scoreNoPurged, scorePurged, dfStacked = instance.get_feature_importance(
+                featStandarizedMatrix[sample], labelsDataframe, dfStacked,self.pictures_pathout, self.method, self.model, 
+                )
+                kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
+                if pValKendall < pval:
+                    pval = pValKendall
+                    best_sample = sample
+                kendalls.iloc[len(kendalls)] = [sample,kendallCorrelation,pValKendall]
+            dfStacked = featStandarizedMatrix[best_sample]
+            featPcaRank = instance.get_feature_importance(
+                featStandarizedMatrix[best_sample], labelsDataframe, dfStacked,self.pictures_pathout, self.method, self.model, 
+                )[1]
+        else:
+            # feature importance DF, no-scored purged float, scored purged float y stacked DF
+            featImpRank, featPcaRank, scoreNoPurged, scorePurged, dfStacked = instance.get_feature_importance(
             self.pictures_pathout, self.method, self.model, 
             )
-                
+        
+            
         # revisar si el score constraint no es mayor al score No Purged (Warning!)
         if self.score_constraint > scoreNoPurged: 
             print("Warning! NoPurgedScore < ScoreConstraint \n")

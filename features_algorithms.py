@@ -70,7 +70,8 @@ class FeatureImportance(object):
                  add_parameter = None, 
                  col_weight_type = 'weightTime',
                  col_t1_type  = 'horizon',
-                 col_label_type = 'barrierLabel'):
+                 col_label_type = 'barrierLabel',
+                 ):
         
         self.driver = driver
         self.uid = uid
@@ -258,6 +259,9 @@ class FeatureImportance(object):
         return dfStandarized, yVectorArray, df_global_stacked
     
     def get_feature_importance(self, 
+                               featStandarizedMatrix,
+                               labelsDataframe,
+                               dfStacked,
                                pathOut, 
                                method, 
                                model_selected,
@@ -269,8 +273,6 @@ class FeatureImportance(object):
         Método central para el proceso de feature importance.
         """
         
-        # extrae la matriz de features estacionaria y estandarizada, el vector de labels y el df stacked
-        featStandarizedMatrix, labelsDataframe, dfStacked = self.__checkingStationary__() 
         
         # ejecuta el proceso de ortogonalizacion 
         orthogonalized_features_matrix, pca_egienvalues = orthoFeats(
