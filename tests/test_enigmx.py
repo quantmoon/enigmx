@@ -7,11 +7,21 @@ import ray
 ray.init(include_dashboard=(False),ignore_reinit_error=(True))
 
 from enigmx.classEnigmx import EnigmX
-
+import numpy as np
 from keras.layers import Dense
 from keras.models import Sequential
-
 from sklearn.tree import DecisionTreeClassifier
+
+
+from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC,NuSVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import SGDClassifier
+
+
 from enigmx.utils import EquitiesEnigmxUniverse
 
 ##############################################################################
@@ -34,8 +44,48 @@ dict_models = {
     'decisionTree': (
         DecisionTreeClassifier(), 
         {'max_leaf_nodes': list(range(2, 20)), 
-         'min_samples_split': [2, 3, 4]} 
+         'min_samples_split': [2, 3, 4],
+         'max_features' : 1} 
         ), 
+    'perceptron':(
+        MLPClassifier(),
+        {'activation' : ['logistic','relu','tanh'],
+         'early_stopping' : True}
+        ),
+    'svm' :(
+        SVC(),
+        {'C' : np.arange(0.5,0.9,0.1),
+         'kernel' : ['linear','poly','rbf','sigmoid']}),
+    'nu' : (
+        NuSVC(),
+        {'nu' : np.arange(0.1,0.5,0.1),
+         'kernel' : ['linear','poly','rbf','sigmoid']}),
+    'randomForest' :(
+        RandomForestClassifier(),
+        {'max_leaf_nodes': list(range(2, 20)), 
+         'min_samples_split': [2, 3, 4],
+         'max_features' : 1,
+         'max_samples': 100,
+         'n_estimators' : 10} 
+        ),
+    'stochasticGradient' : 
+        (SGDClassifier(), 
+         {'loss':['log', 'modified_huber'],
+          'penalty':['l2', 'l1', 'elasticnet'],
+          'max_iter':list(range(1,10))}),
+    'qda' : (QuadraticDiscriminantAnalysis(),
+             {}),
+    'gaussianNB' : 
+        (GaussianNB(), {}),
+    'Kneighbors' : 
+        (KNeighborsClassifier(), 
+            {'n_neighbors': list(range(1, 5)),
+             'weights':['uniform', 'distance'],
+             'algorithm':['auto', 'ball_tree', 'kd_tree', 'brute']}),
+    'XGBoost' : 
+        (GradientBoostingClassifier(), 
+         {'loss':['deviance', 'exponential'],
+          'min_samples_split': [2, 3, 4]}),
     'keras': (
         kerasModel, 
         dict(
