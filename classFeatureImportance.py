@@ -10,6 +10,10 @@ from enigmx.utils import enigmxSplit, kendall_evaluation
 from enigmx.features_algorithms import FeatureImportance
 from scipy.stats import kendalltau,weightedtau
 from itertools import combinations
+from enigmx.clusterization import clusterKMeansTop
+from enigmx.purgedkfold_features import featImpMDI_Clustered , featImpMDA_Clustered
+from sklearn.ensemble import RandomForestClassifier
+
 class featureImportance(object):
     
     """
@@ -87,6 +91,7 @@ class featureImportance(object):
                  select_sample = True,
                  combinations_on = 30,
                  n_samples = 10,
+                 clustered_features = False
                  ):
         
         # ingesta de parámetros
@@ -123,6 +128,7 @@ class featureImportance(object):
         self.select_sample = select_sample
         self.combinations = combinations
         self.n_samples = n_samples
+        self.clustered_features = clustered_features
         
     def __getSubsamples__(self, standardMatrix):
         combs = combinations(standardMatrix.columns,self.combinations_on)
@@ -158,6 +164,23 @@ class featureImportance(object):
         # extrae la matriz de features estacionaria y estandarizada, el vector de labels y el df stacked
         featStandarizedMatrix, labelsDataframe, dfStacked = instance.__checkingStationary__()
         
+        
+        
+        if self.clustered_features:
+            clf  = RandomForestClassifier().fit(featStandarizedMatrix,
+                                            labelsDataframe)
+            corr_matrix, clusters, silh = clusterKMeansTop(
+                featStandarizedMatrix.corr(), maxNumClusters = self.max_num_clusters)
+            
+            if self.method == 'MDI':
+                featImpMDI_Clustered(clf,corr_matrix.columns[1:],clusters)
+            elif self.method == 'MDA':
+                featImpMDA_Clustered(clf,
+                                     featStandarizedMatrix,
+                                     labelsDataframe,
+                                     clusters)
+        
+        # Si se aplica el método del subconjunto de features
         if self.select_sample:
             samples = self.__getSubsamples__(featStandarizedMatrix)
             best_sample = 0

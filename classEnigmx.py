@@ -161,6 +161,7 @@ class EnigmX:
             "select_sample" : True,
             "combinations_on" : 30,
             "n_samples" : 10,
+            "clustered_features" : False,
             #############Constant Method Params###################
             "filtering_featimp": True,
             "save_featimp": True,
