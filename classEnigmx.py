@@ -158,6 +158,9 @@ class EnigmX:
             "global_range": True,
             "col_weight_type": 'weightTime',
             "pca_min_var_expected": 0.05,
+            "select_sample" : True,
+            "combinations_on" : 30,
+            "n_samples" : 10,
             #############Constant Method Params###################
             "filtering_featimp": True,
             "save_featimp": True,

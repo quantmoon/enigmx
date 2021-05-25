@@ -173,9 +173,10 @@ class featureImportance(object):
                     best_sample = sample
                 kendalls.iloc[len(kendalls)] = [sample,kendallCorrelation,pValKendall]
             dfStacked = featStandarizedMatrix[best_sample]
-            featPcaRank = instance.get_feature_importance(
+            featImpRank,featPcaRank = instance.get_feature_importance(
                 featStandarizedMatrix[best_sample], labelsDataframe, dfStacked,self.pictures_pathout, self.method, self.model, 
-                )[1]
+                )[0:1]
+            kendalls.to_csv(self.pictures_pathout+'kendall_values.csv')
         else:
             # feature importance DF, no-scored purged float, scored purged float y stacked DF
             featImpRank, featPcaRank, scoreNoPurged, scorePurged, dfStacked = instance.get_feature_importance(
