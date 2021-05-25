@@ -143,7 +143,7 @@ class EnigmX:
         # diccionario con los parámetros generales del Feature Importance
         KfeatureImportanceParams = {
             "pca_comparisson": True,
-            "kendall_threshold": 0.5,
+            "pval_kendall": 0.5,
             "score_constraint": 0.6, 
             "driver": "{ODBC Driver 17 for SQL Server}", #change for local SQL
             "uid":"sqlserver", #change for local SQL
@@ -244,7 +244,7 @@ class EnigmX:
             list_stocks = list_stocks,
             pca_comparisson = self.pca_comparisson,
             cloud_framework = self.cloud_framework, #cloud activation
-            kendall_threshold = self.kendall_threshold,
+            pval_kendall = self.pval_kendall,
             score_constraint= self.score_constraint,
             server_name = self.server_name,
             database = self.database,
@@ -424,7 +424,7 @@ class EnigmX:
                                  embargo_level,
                                  max_leverage,
                                  df_format, 
-                                 dict_critics_for_metrics,                                
+                                 dict_critics_for_metrics
                                  ):
         """
         Function intermediadora que reune los prorcesos de Tunning + Backtest.
@@ -561,6 +561,8 @@ class EnigmX:
             - 'csv' jerárquico en path local/cloud para backtest.
         """        
         
+        print('\n      ::::: >>>> MultiProcess for CPKF as Backtesting started...')
+        
         # ingesting ModelTunning Params + BacktestParams
         for (prop, default) in self.multiTuningParams.items():
             setattr(self, prop, kwargs.get(prop, default))
@@ -594,7 +596,8 @@ class EnigmX:
                                  embargo_level = self.embargo_level,
                                  max_leverage = self.max_leverage,
                                  df_format = self.df_format, 
-                                 dict_critics_for_metrics = self.dict_critics_for_metrics) 
+                                 dict_critics_for_metrics = self.dict_critics_for_metrics
+                                 ) 
         for model_name, tuple_info_model in dict_exo_models.items()
         ]
         
@@ -617,12 +620,12 @@ class EnigmX:
         
         # saving metrics csv's 
         dataset_metrics.to_csv(
-            '{}_METRICS_TRIAL_{}.csv'.format(self.base_path, code_backtest), 
+            '{}METRICS_TRIAL_{}.csv'.format(self.base_path, code_backtest), 
             index=False
             ) 
         
         # saving backtests results csv's
         dataset_backtests.to_csv(
-            '{}_BACKTEST_TRIAL_{}.csv'.format(self.base_path, code_backtest), 
+            '{}BACKTEST_TRIAL_{}.csv'.format(self.base_path, code_backtest), 
             index=False
             )        

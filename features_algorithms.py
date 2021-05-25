@@ -3,6 +3,8 @@
 webpage: https://www.quantmoon.tech//
 """
 
+import pickle
+import datetime
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
@@ -125,7 +127,7 @@ class FeatureImportance(object):
                 )
             for stock in self.list_stocks
             ]
-        
+
         #proceso de rolling para uniformizar la dist. de los features
         if self.rolling:
             
@@ -148,7 +150,7 @@ class FeatureImportance(object):
                         ], axis=1
                                 ).dropna()  for dataframe in list_df
                         ]
-        
+            
         #dataset final concadenado
         df_ = pd.concat(list_df).sort_index(
             kind='merge'
@@ -162,8 +164,23 @@ class FeatureImportance(object):
         
         Outputs : devuelve organizados el df de features y el df de labels
         """
-        #obtener el dataframe de los valores stacked + columnas de features
+        #obtener el dataframe de los valores stacked (rolleado) + columnas de features
         df_global_stacked, features_col_name = self.__getStacked__()
+        
+        #seleccionamos los features para su escalamiento
+        elementsToScale = df_global_stacked[features_col_name]
+        
+        # definimos el objeto de escalamiento general de los features
+        self.scalerObj = StandardScaler() 
+        
+        # fiteamos el objeto de escalamiento con todo los features del stacked
+        self.scalerObj.fit(elementsToScale)
+        
+        # transformamos los features del stacked a valores escalados
+        elementsScaled = self.scalerObj.transform(elementsToScale)
+                
+        # redefinimos los valores de los features con sus valores escalados
+        df_global_stacked[features_col_name] = elementsScaled 
         
         #depuracion del dataframe de entrada, seleccionando solo los features
         if self.depured: 
@@ -186,12 +203,12 @@ class FeatureImportance(object):
         x.set_index(df_global_stacked['close_date'],inplace=True)
 
         #retorna dataframe de features y dataframe de etiquetas
-        return x, y
+        return x, y, df_global_stacked
     
     def __checkingStationary__(self, pval_adf = '5%'):
         
-        # extrae matriz de features, y vector de labels del split stacked
-        df_base_matrix, yVectorArray = self.__organizationDataProcess__()
+        # extrae matriz de features, vector de labels del split stacked, y el global stacked
+        df_base_matrix, yVectorArray, df_global_stacked = self.__organizationDataProcess__()
         
         # generamos copia del dataset
         xMatrixDf = df_base_matrix.copy()
@@ -238,7 +255,7 @@ class FeatureImportance(object):
             xMatrixDf.mean(), axis=1
             ).div(xMatrixDf.std(),axis=1)   
         
-        return dfStandarized, yVectorArray, df_base_matrix   
+        return dfStandarized, yVectorArray, df_global_stacked
     
     def get_feature_importance(self, 
                                pathOut, 
@@ -252,7 +269,7 @@ class FeatureImportance(object):
         Método central para el proceso de feature importance.
         """
         
-        # extrae la matriz de features estacionaria y estandarizada, y el vector de labels
+        # extrae la matriz de features estacionaria y estandarizada, el vector de labels y el df stacked
         featStandarizedMatrix, labelsDataframe, dfStacked = self.__checkingStationary__() 
         
         # ejecuta el proceso de ortogonalizacion 
@@ -334,11 +351,14 @@ class FeatureImportance(object):
                         simNum= method + '_' + type(model_selected).__name__,
                         model=type(model_selected).__name__)
         
-        
         print("Feature Importance picture Saved in {}".format(
             pathOut)
             )
-
-        # retorna los rank de los feature, y del pca
-        return featureImportanceRank, pcaImportanceRank, score_sin_cpkf, oos
         
+        nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
+        
+        print('        >>> Saving Scaler Object... at ', pathOut)
+        pickle.dump(self.scalerObj, open('{}/scaler_{}.pkl'.format(pathOut, nowTimeID),'wb'))
+
+        # retorna featuresRank (0), pcaRank (1), accuracy CPKF, accuracy con CPKF, y el stacked
+        return featureImportanceRank, pcaImportanceRank, score_sin_cpkf, oos, dfStacked

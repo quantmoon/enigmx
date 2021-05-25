@@ -36,25 +36,25 @@ enigmxsql = SQLEnigmXinterface(
 
 print("creando tablas")
 enigmxsql.create_table_database(
-    bars_tunning = True, 
-    bars_basic = True, 
+    bars_tunning = False, 
+    bars_basic = False, 
     bars_entropy = False, 
-    etfs_trick = True, 
-    bars_sampled = True, 
-    bars_barrier = True,
-    bars_weights = True,
+    etfs_trick = False, 
+    bars_sampled = False, 
+    bars_barrier = False,
+    bars_weights = False,
     bars_features = True,
-    creation_database = True)
+    creation_database = False)
 
 print("subiendo info")
 enigmxsql.compute_info_to_sql(
-    bars_tunning_process = True, 
-    bar_construction_process = True, 
+    bars_tunning_process = False, 
+    bar_construction_process = False, 
     entropy_construction_process = False, 
-    etftrick_construction_process = True, 
-    sampling_features_process = True, 
-    triple_barrier_computation_process = True,
-    sample_weight_computation_process = True,
+    etftrick_construction_process = False, 
+    sampling_features_process = False, 
+    triple_barrier_computation_process = False,
+    sample_weight_computation_process = False,
     features_bar_computation_process = True,
     tunning_interval = "10D",
     )

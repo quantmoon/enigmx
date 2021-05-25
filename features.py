@@ -176,8 +176,6 @@ class FeaturesClass():
         others = self.others()
         df = pd.concat([self.df,technicals,tsfresh,others,alphas],axis=1).dropna()
         
-        #names = []
-        
         for i in df.columns:
             
             if i not in nonFeatures:

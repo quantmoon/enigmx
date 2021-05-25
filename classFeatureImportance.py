@@ -63,7 +63,7 @@ class featureImportance(object):
                  list_stocks,
                  pca_comparisson,
                  cloud_framework = True,
-                 kendall_threshold = 0.5,
+                 pval_kendall = 0.5,
                  score_constraint = 0.6,
                  server_name = "DESKTOP-N8JUB39", 
                  driver="{ODBC Driver 17 for SQL Server}",
@@ -93,7 +93,7 @@ class featureImportance(object):
         self.uid = uid
         self.pwd = pwd
 
-        self.kendall_threshold = kendall_threshold
+        self.pval_kendall = pval_kendall
         self.pca_comparisson = pca_comparisson
         
         self.server_name = server_name
@@ -142,8 +142,8 @@ class featureImportance(object):
         print("----------Process {} started---------- \n".format(self.method))
         
         # feature importance DF, no-scored purged float, scored purged float y stacked DF
-        featImpRank, featPcaRank, scoreNoPurged, scorePurged = instance.get_feature_importance(
-            self.pictures_pathout, self.method, self.model, #varsThre
+        featImpRank, featPcaRank, scoreNoPurged, scorePurged, dfStacked = instance.get_feature_importance(
+            self.pictures_pathout, self.method, self.model, 
             )
                 
         # revisar si el score constraint no es mayor al score No Purged (Warning!)
@@ -157,17 +157,23 @@ class featureImportance(object):
                 )             
             # detener proceso
             sys.exit("{}".format(message))
-        
-        ############################# Computar aqui el Kendall #################
-        # paquete: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kendalltau.html 
- 
-        kt = kendalltau(featImpRank,featPcaRank)
-        wk = weightedtau(featImpRank,featPcaRank)
-
-        print(kt,wk)
+                
+        kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
             
+        print(':::::: >>> Kendall Test :')
+        print(f'     Kendall Correlation calculated is : {kendallCorrelation}')
+        print(f'     Kendall PValue calculated is      : {pValKendall}\n')
         
-        return #retornar nada, por el momento.
+        kendallMessage = f'The Kendall PH fails. Pvalue Test = {pValKendall} | Min. Pvalue Req.= {self.pval_kendall}'
+        
+        if self.pval_kendall >= pValKendall:  
+            print('-----------> PH Kendall Critic Value Accepted')
+            
+            # retorna el dataframe stackead y los nombres de los features
+            return dfStacked, featPcaRank.index.values 
+        
+        else:
+            sys.exit("{}".format(kendallMessage))
         
     def get_relevant_features(self, 
                               filtering = True, 
@@ -178,30 +184,18 @@ class featureImportance(object):
         # revisa que el pct_split no sea menor a 0.6
         assert pct_split >= 0.6, "Percentage of 'splits' should be 0.6 (60%) as min."
         
-        # df matriz features seleccionados, stackedDF, lista general de features
-        dfMatrix, stacked, listaGlobalFeat = self.__instanceOverture__()
+        # retorna el dataframe stackeado de features (rolleado = escalado )
+        stacked, list_features_tested = self.__instanceOverture__()
         
         # si se activa el proceso de filtrado
         if filtering:
-
+            
+            # stacked roleado y escalado proveniente del 'features_algorithms.py'
             stacked = stacked.reset_index(drop=True)
             
-            # extraemos las columnas que no están en la lista global de features
-            stackedDiff = stacked[
-                stacked.columns.difference(
-                    list(listaGlobalFeat)
-                    ).values
-                ]            
-            
-            # seleccionamos únicamente las columnas con los features
-            stackedSel = stacked[list(dfMatrix.index.values)]
-            
-            # stacked df filtrado por features seleccionados con col. no-features
-            stackedFilteredDf = pd.concat([stackedDiff, stackedSel],axis=1) 
-            
             # conversión a dtypes de las fechas de las columnas
-            colDates = stackedFilteredDf.dtypes.where(
-                        stackedFilteredDf.dtypes == "datetime64[ns]"
+            colDates = stacked.dtypes.where(
+                        stacked.dtypes == "datetime64[ns]"
                         ).dropna().index.values
                                 
             # si se activa proceso de split
@@ -209,7 +203,7 @@ class featureImportance(object):
                 
                 # obtención de df aleatorio para modelo exogeno, endogeno y backtest
                 df_exo, df_endo, backtest = enigmxSplit(
-                        df = stackedFilteredDf, 
+                        df = stacked, 
                         pct_average = pct_split
                         )
                 
@@ -286,11 +280,11 @@ class featureImportance(object):
                 if save: 
                     
                     # conversión de string
-                    stackedFilteredDf[colDates] = stackedFilteredDf[colDates].astype(str)                
+                    stacked[colDates] = stacked[colDates].astype(str)                
                     
                     # se guarda stacked filtered df 
-                    stackedFilteredDf.to_csv(
-                                                 "STACKED_{}_{}.csv".format(
+                    stacked.to_csv(
+                        "STACKED_{}_{}.csv".format(
                                 self.bartype, self.method
                                 ), index=False, date_format='%Y-%m-%d %H:%M:%S'
                             )
@@ -301,8 +295,8 @@ class featureImportance(object):
                 
                 # caso contrario, retorna stacked filtered df                
                 else:
-                    return stackedFilteredDf
+                    return stacked
         
         # caso contrario, retorna los nombres de features seleccionados
         else:
-            return list(dfMatrix.index.values)
+            return list(list_features_tested) 
