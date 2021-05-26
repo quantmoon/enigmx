@@ -7,7 +7,7 @@ import zarr
 import pyodbc
 import numpy as np
 
-from enigmx.protofeatures import tickRuleVector 
+from enigmx.protofeatures import tickRuleVector
 
 import pandas as pd
 from itertools import chain

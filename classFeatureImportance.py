@@ -167,41 +167,71 @@ class featureImportance(object):
         
         
         if self.clustered_features:
-            clf  = RandomForestClassifier().fit(featStandarizedMatrix,
-                                            labelsDataframe)
+            
+            
+            # Generación de clusters 
             corr_matrix, clusters, silh = clusterKMeansTop(
                 featStandarizedMatrix.corr(), maxNumClusters = self.max_num_clusters)
             
+            
+            # Entrenamiento del modelo para MDI / MDA
+            clf  = RandomForestClassifier().fit(featStandarizedMatrix,
+                                            labelsDataframe)
             if self.method == 'MDI':
-                featImpMDI_Clustered(clf,corr_matrix.columns[1:],clusters)
+                print("MDI results:",featImpMDI_Clustered(clf,corr_matrix.columns[1:],clusters))
             elif self.method == 'MDA':
-                featImpMDA_Clustered(clf,
+                print("MDA results:", featImpMDA_Clustered(clf,
                                      featStandarizedMatrix,
                                      labelsDataframe,
-                                     clusters)
+                                     clusters))
+            
+            
+            # Prueba de Kendall en los clusters generados
+            kendalls_clustered = pd.DataFrame()
+            
+            for idx,cluster in enumerate(clusters.values()):
+                featImpRank, featPcaRank, scoreNoPurged, scorePurged, dfStacked = instance.get_feature_importance(
+                featStandarizedMatrix[cluster], labelsDataframe, dfStacked,
+                self.pictures_pathout, self.method, self.model, 
+                )
+                kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
+                print(f':::::: >>> Kendall Test, Cluster {idx}:')
+                print(f'     Kendall Correlation calculated is : {kendallCorrelation}')
+                print(f'     Kendall PValue calculated is      : {pValKendall}\n')
+                
+                kendalls_clustered.iloc[len(kendalls_clustered)] = [
+                    cluster,kendallCorrelation,pValKendall]
+                kendalls_clustered.to_csv(self.pictures_pathout+'kendalls_clustered.csv')
+                
         
         # Si se aplica el método del subconjunto de features
         if self.select_sample:
+            
             samples = self.__getSubsamples__(featStandarizedMatrix)
             best_sample = 0
             pval = 1
             kendalls = pd.DataFrame()
+            
             for sample in samples:
                 featImpRank, featPcaRank, scoreNoPurged, scorePurged, dfStacked = instance.get_feature_importance(
-                featStandarizedMatrix[sample], labelsDataframe, dfStacked,self.pictures_pathout, self.method, self.model, 
+                featStandarizedMatrix[sample], labelsDataframe, dfStacked,
+                self.pictures_pathout, self.method, self.model, 
                 )
                 kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
                 if pValKendall < pval:
                     pval = pValKendall
                     best_sample = sample
                 kendalls.iloc[len(kendalls)] = [sample,kendallCorrelation,pValKendall]
+            
             dfStacked = featStandarizedMatrix[best_sample]
             featImpRank,featPcaRank = instance.get_feature_importance(
-                featStandarizedMatrix[best_sample], labelsDataframe, dfStacked,self.pictures_pathout, self.method, self.model, 
+                featStandarizedMatrix[best_sample], labelsDataframe, dfStacked,
+                self.pictures_pathout, self.method, self.model, 
                 )[0:1]
             kendalls.to_csv(self.pictures_pathout+'kendall_values.csv')
+        
         else:
-            # feature importance DF, no-scored purged float, scored purged float y stacked DF
+            # Feature Importance sin selección de features
             featImpRank, featPcaRank, scoreNoPurged, scorePurged, dfStacked = instance.get_feature_importance(
             self.pictures_pathout, self.method, self.model, 
             )

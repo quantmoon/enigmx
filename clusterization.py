@@ -102,5 +102,3 @@ def clusterKMeansTop(corr0,maxNumClusters=None,n_init=10):
         else:
             return corrNew,clstrsNew,silhNew
 
-
-
