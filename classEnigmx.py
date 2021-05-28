@@ -143,7 +143,7 @@ class EnigmX:
         # diccionario con los parámetros generales del Feature Importance
         KfeatureImportanceParams = {
             "pca_comparisson": True,
-            "pval_kendall": 0.5,
+            "pval_kendall": 0.05,
             "score_constraint": 0.6, 
             "driver": "{ODBC Driver 17 for SQL Server}", #change for local SQL
             "uid":"sqlserver", #change for local SQL
@@ -159,9 +159,9 @@ class EnigmX:
             "col_weight_type": 'weightTime',
             "pca_min_var_expected": 0.05,
             "select_sample" : True,
-            "combinations_on" : 30,
             "n_samples" : 10,
             "clustered_features" : False,
+            "k_min" : 3,
             #############Constant Method Params###################
             "filtering_featimp": True,
             "save_featimp": True,

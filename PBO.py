@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[2]:
-
-
 import pandas as pd
 import numpy as np
 from itertools import combinations 
@@ -15,10 +9,6 @@ def Sharpe_Ratio(array):
     mu_A,std_A = np.average(array, axis=0),np.std(array, axis=0)
     SR = mu_A/std_A
     return SR
-
-
-# In[5]:
-
 
 class Overfit_Stats():
     
@@ -77,9 +67,6 @@ class Overfit_Stats():
 #         StochDom
         
 #         ProbLoss_IS,ProbLoss_OOS
-
-
-# In[6]:
 
 
 import pandas as pd
@@ -262,22 +249,20 @@ class CSCV():
         return ranks
 
 
-
-# # EJEMPLO
-
-# In[43]:
-
-
+print('VEAMOS R')
 r = np.random.rand(1000)
+print(r.shape)
+print(' ')
 
+print('VEAMOS MODELS')
 models = np.rint(2*np.random.rand(1000,100)-1)
+print(models.shape)
+print(' ')
 
 print(r[0:10])
 
 print(models[0:10,0:5])
 
-
-# In[54]:
 
 
 lambda_c,R_triple = CSCV(r,models,tipoPL= False,S = 16 , metric = Sharpe_Ratio,fix_n_star = None).Lambda
@@ -291,10 +276,6 @@ ProbLoss_IS, ProbLoss_OOS = OvStats.ProbLoss
 
 print("PBO =",PBO," |  Prob of Loss OOS = ",ProbLoss_OOS)
 
-
-# ## Stochastic Dominance 
-
-# In[55]:
 
 
 num_comb = len(R_triple[:,0])

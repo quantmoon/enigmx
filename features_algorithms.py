@@ -13,7 +13,7 @@ from statsmodels.tsa.stattools import adfuller
 from sklearn.preprocessing import StandardScaler
 from enigmx.dbgenerator import databundle_instance 
 from sklearn.model_selection import train_test_split
-from enigmx.purgedkfold_features import featImportances, plotFeatImportance
+from enigmx.purgedkfold_features import featImportances
 
 
 # PCA computation Snippet (8.5 page 119)
@@ -206,7 +206,7 @@ class FeatureImportance(object):
         #retorna dataframe de features y dataframe de etiquetas
         return x, y, df_global_stacked
     
-    def __checkingStationary__(self, pval_adf = '5%'):
+    def __checkingStationary__(self, pathOut, pval_adf = '5%'):
         
         # extrae matriz de features, vector de labels del split stacked, y el global stacked
         df_base_matrix, yVectorArray, df_global_stacked = self.__organizationDataProcess__()
@@ -255,6 +255,11 @@ class FeatureImportance(object):
         dfStandarized = xMatrixDf.sub(
             xMatrixDf.mean(), axis=1
             ).div(xMatrixDf.std(),axis=1)   
+        
+        nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
+        
+        print('        >>> Saving Scaler Object... at ', pathOut)
+        pickle.dump(self.scalerObj, open('{}/scaler_{}.pkl'.format(pathOut, nowTimeID),'wb')) 
         
         return dfStandarized, yVectorArray, df_global_stacked
     
@@ -341,26 +346,5 @@ class FeatureImportance(object):
         print("FeatImportance Score without PurgedKFold:", score_sin_cpkf)
         print("FeatImportance Score with PurgedKFold:", oos)
         
-        print("Saving featImportance picture...")
-        # guardado imagen de feature importance como prueba de control
-        plotFeatImportance(
-                        pathOut,    
-                        imp,
-                        0,
-                        oos,
-                        method=method, 
-                        tag='First try',
-                        simNum= method + '_' + type(model_selected).__name__,
-                        model=type(model_selected).__name__)
-        
-        print("Feature Importance picture Saved in {}".format(
-            pathOut)
-            )
-        
-        nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
-        
-        print('        >>> Saving Scaler Object... at ', pathOut)
-        pickle.dump(self.scalerObj, open('{}/scaler_{}.pkl'.format(pathOut, nowTimeID),'wb'))
-
         # retorna featuresRank (0), pcaRank (1), accuracy CPKF, accuracy con CPKF, y el stacked
-        return featureImportanceRank, pcaImportanceRank, score_sin_cpkf, oos, dfStacked
+        return featureImportanceRank, pcaImportanceRank, score_sin_cpkf, oos, dfStacked,imp

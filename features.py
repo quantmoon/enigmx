@@ -291,8 +291,10 @@ class FeaturesClass():
         kyle = kyle85(self.df)
         amihud = amihud2002(self.df)
         hasb = hasbrouck(self.df)
-        vpin = vpin2008(self.df)
-        self.dfmicrostructural = pd.DataFrame({'roll' : roll,'corwinschultz' : corSchultz,
+        vpin = vpin2008(self.df, sum_win = 5).fillna(0) #definimos la ventana del SumWin
+        
+        # construye el df con los features de microestructura         
+        self.dfmicrostructural = pd.DataFrame({'roll' : roll,'corwinschultz' : corSchultz[0],
                                              'kyle' : kyle, 'amihud' : amihud,
                                              'hasbrouck' : hasb, 'vpin' : vpin})
         return self.dfmicrostructural
@@ -318,13 +320,13 @@ class FeaturesClass():
         alphas = self.alphas()
         technicals = self.technicals()
         tsfresh = self.tsfresh()
-        #microstructural = self.microstructural()
+        microstructural = self.microstructural()
         others = self.others()
         df = pd.concat([self.df,
                         technicals,
                         tsfresh,
                         others,
-                        #microstructural,
+                        microstructural,
                         alphas
                         ],axis=1).dropna()
         
@@ -338,5 +340,5 @@ class FeaturesClass():
         return df
 
 
-dataframe = pd.read_csv("C:/Users/ASUS/Desktop/HELI/Quantmoon/enigmx-repo/.STACKED_EXO_VOLUME_MDA.csv")
-FeaturesClass(dataframe).features().to_excel('C:/Users/ASUS/Desktop/gas.xlsx')
+#dataframe = pd.read_csv("C:/Users/ASUS/Desktop/HELI/Quantmoon/enigmx-repo/.STACKED_EXO_VOLUME_MDA.csv")
+#FeaturesClass(dataframe).features().to_excel('C:/Users/ASUS/Desktop/gas.xlsx')
