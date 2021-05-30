@@ -161,7 +161,7 @@ class EnigmX:
             "select_sample" : True,
             "n_samples" : 10,
             "clustered_features" : False,
-            "k_min" : 3,
+            "k_min" : 5,
             #############Constant Method Params###################
             "filtering_featimp": True,
             "save_featimp": True,
@@ -264,7 +264,9 @@ class EnigmX:
             col_weight_type = self.col_weight_type,
             col_t1_type = self.time_label_name,
             col_label_type = self.label_name,
-            pca_min_var_expected = self.pca_min_var_expected
+            pca_min_var_expected = self.pca_min_var_expected,
+            k_min = self.k_min,
+            n_samples = self.n_samples
             )        
         
         # resultado del feature importance (dataframe)

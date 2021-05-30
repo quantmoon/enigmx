@@ -21,7 +21,6 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import SGDClassifier
 
-
 from enigmx.utils import EquitiesEnigmxUniverse
 
 ##############################################################################
@@ -45,12 +44,12 @@ dict_models = {
         DecisionTreeClassifier(), 
         {'max_leaf_nodes': list(range(2, 20)), 
          'min_samples_split': [2, 3, 4],
-         'max_features' : 1} 
+         'max_features' : [1]} 
         ), 
     'perceptron':(
         MLPClassifier(),
         {'activation' : ['logistic','relu','tanh'],
-         'early_stopping' : True}
+         'early_stopping' : [True]}
         ),
     'svm' :(
         SVC(),
@@ -64,9 +63,9 @@ dict_models = {
         RandomForestClassifier(),
         {'max_leaf_nodes': list(range(2, 20)), 
          'min_samples_split': [2, 3, 4],
-         'max_features' : 1,
-         'max_samples': 100,
-         'n_estimators' : 10} 
+         'max_features' : [1],
+         'max_samples': [100],
+         'n_estimators' : [10]} 
         ),
     'stochasticGradient' : 
         (SGDClassifier(), 
@@ -101,31 +100,32 @@ main_path = 'C:/data/'
 
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
-                  method = 'MDA', 
+                  method = 'MDI', 
                   base_path = main_path,
                   cloud_framework = False
                   ) 
 
 # feature importance
-
 instance.get_feature_importance(    
-                       model = DecisionTreeClassifier(), 
-                       list_stocks = EquitiesEnigmxUniverse(main_path), 
-                       score_constraint = 0.3,
-                       server_name = "WINDOWS-NI805M6",
-                       database = "BARS_FEATURES",
-                       uid = '',
-                       pwd = '',
-                       driver = "{SQL Server}",
-                       kendall_threshold = 0.00000000000001
+                      model = RandomForestClassifier(max_features=1, random_state=0), 
+                      list_stocks = EquitiesEnigmxUniverse(main_path), 
+                      score_constraint = 0.3, #activar 
+                      server_name = "WINDOWS-NI805M6",
+                      database = "BARS_FEATURES",
+                      uid = '',
+                      pwd = '',
+                      driver = "{SQL Server}",
+                      pval_kendall = 0.1,
+                      k_min = 10,
+                      n_samples = 10
                       )
     
 
 # get multi process for tunning and backtest
-#instance.get_multi_process(
-#    code_backtest = '001', 
-#    dict_exo_models = dict_models,
-#    endogenous_model_sufix= 'rf',    
-#    trials = 11, 
-#    partitions = 2, 
-#    )
+instance.get_multi_process(
+    code_backtest = '001', 
+    dict_exo_models = dict_models,
+    endogenous_model_sufix= 'rf',    
+    trials = 11, 
+    partitions = 2, 
+    )

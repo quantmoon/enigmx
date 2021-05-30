@@ -7,7 +7,6 @@ import pickle
 import datetime
 import numpy as np
 import pandas as pd
-from sklearn.decomposition import PCA
 from enigmx.utils import simpleFracdiff
 from statsmodels.tsa.stattools import adfuller
 from sklearn.preprocessing import StandardScaler
@@ -165,9 +164,9 @@ class FeatureImportance(object):
         
         Outputs : devuelve organizados el df de features y el df de labels
         """
-        #obtener el dataframe de los valores stacked (rolleado) + columnas de features
+        #obtener el dataframe de los valores stacked (solo rolleado) + columnas de features
         df_global_stacked, features_col_name = self.__getStacked__()
-        
+                
         #seleccionamos los features para su escalamiento
         elementsToScale = df_global_stacked[features_col_name]
         
@@ -261,12 +260,12 @@ class FeatureImportance(object):
         print('        >>> Saving Scaler Object... at ', pathOut)
         pickle.dump(self.scalerObj, open('{}/scaler_{}.pkl'.format(pathOut, nowTimeID),'wb')) 
         
+        # elementos utiles del feat improtance (3) + el base matrix org (feat roleados + datos add.)
         return dfStandarized, yVectorArray, df_global_stacked
     
     def get_feature_importance(self, 
                                featStandarizedMatrix,
                                labelsDataframe,
-                               dfStacked,
                                pathOut, 
                                method, 
                                model_selected,
@@ -336,15 +335,14 @@ class FeatureImportance(object):
         # computamos el PCA rank utilizando los eigenvalues
         pcaImportanceRank = pca_egienvalues.rank()
 
-        print("       >>>> Complementary research...")
         # fit del modelo seleccionado para el featImp
         model_selected.fit(x_train,y_train['labels'])
         
         # score sin combinatorial purged kfold (socre del modelo)
         score_sin_cpkf = model_selected.score(x_test, y_test['labels'])
         
-        print("FeatImportance Score without PurgedKFold:", score_sin_cpkf)
-        print("FeatImportance Score with PurgedKFold:", oos)
+        print("FeatImportance Score without PurgedKFold :", score_sin_cpkf)
+        print("FeatImportance Score with PurgedKFold    :", oos)
         
         # retorna featuresRank (0), pcaRank (1), accuracy CPKF, accuracy con CPKF, y el stacked
-        return featureImportanceRank, pcaImportanceRank, score_sin_cpkf, oos, dfStacked,imp
+        return featureImportanceRank, pcaImportanceRank, score_sin_cpkf, oos, imp

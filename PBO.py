@@ -1,8 +1,12 @@
-import pandas as pd
-import numpy as np
-from itertools import combinations 
+"""
+@author: Quantmoon Technologies
+webpage: https://www.quantmoon.tech//
+"""
 
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+from itertools import combinations 
 
 def Sharpe_Ratio(array):
     
@@ -58,21 +62,6 @@ class Overfit_Stats():
         ProbLoss_OOS = len(R_test_n_star[R_test_n_star<0])/len(R_test_n_star)
         
         return ProbLoss_IS,ProbLoss_OOS
-
-#     def StochDom(self,R_triple):
-        
-#         R_test_n_star = R_triple[:,1]
-#         R_test_mean  = R_triple[:,2]
-        
-#         StochDom
-        
-#         ProbLoss_IS,ProbLoss_OOS
-
-
-import pandas as pd
-import numpy as np
-from itertools import combinations 
-import matplotlib.pyplot as plt
 
 class CSCV():
     
@@ -249,21 +238,58 @@ class CSCV():
         return ranks
 
 
-print('VEAMOS R')
-r = np.random.rand(1000)
-print(r.shape)
-print(' ')
+class OverfittingTesting(Object):
+    """
+    Clase que resume el proceso de testing del PBO y POL.
+    
+    Method central: 'get_test'. 
+    
+    Params esenciales de la clase: 
+        - Path donde se encuentre el csv con los resultados del backtest.
+        - Nombre de la columna con la metrica base (normalmente, 'returnsPred').
+        - Nombre de la columna con las predicciones (normalmente, 'predCat').
+    """
+    def __init__(self, 
+                 path_backtest, 
+                 metric_name = 'returnsPred', 
+                 predictions_name = 'predCat'):
+        
+        self.path_backtest = path_backtest 
+        self.metric_name = metric_name
+        self.predictions_name = predictions_name
+        
+    def get_test(self, 
+                 pbo_threshold = 0.2, 
+                 pol_threshold = 0.1, 
+                 metric = Sharpe_Ratio, 
+                 s_value = 16, 
+                 tipoPL= False,
+                 fix_n_star = None):
+        
+        # definimos el vector de la metrica base (retornos)
+        
+        backtestDataset = pd.read_csv(self.path_backtest, index = False)
 
-print('VEAMOS MODELS')
-models = np.rint(2*np.random.rand(1000,100)-1)
-print(models.shape)
-print(' ')
+        listaPredCatsByModel = []
+        for modelGroups in backtestDataset.groupby('model_name').predCat.groups.keys():
+            groupValues= backtestDataset.groupby('model_name').predCat.get_group(modelGroups).values
+            listaPredCatsByModel.append(groupValues)       
+            
+        models = np.array(listaPredCatsByModel) 
+        
 
-print(r[0:10])
+        lambda_c, R_triple = CSCV(
+            r, 
+            models, 
+            tipoPL= tipoPL,
+            S = s_value, 
+            metric = Sharpe_Ratio,
+            fix_n_star = fix_n_star).Lambda
 
-print(models[0:10,0:5])
 
+r = np.random.rand(1000) #metrica (retornos)
 
+models = np.rint(2*np.random.rand(1000,100)-1) #(predicciones de modelos)
 
 lambda_c,R_triple = CSCV(r,models,tipoPL= False,S = 16 , metric = Sharpe_Ratio,fix_n_star = None).Lambda
 

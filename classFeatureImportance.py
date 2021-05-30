@@ -10,9 +10,10 @@ from enigmx.features_algorithms import FeatureImportance
 from scipy.stats import kendalltau
 from itertools import combinations
 from enigmx.purgedkfold_features import plotFeatImportance
-# from enigmx.clusterization import clusterKMeansTop
-# from enigmx.purgedkfold_features import featImpMDI_Clustered , featImpMDA_Clustered
-# from sklearn.ensemble import RandomForestClassifier
+
+def sorts(i):
+    i.sort()
+    return i
 
 class featureImportance(object):
     
@@ -98,7 +99,7 @@ class featureImportance(object):
         self.model = model
         self.list_stocks = list_stocks
         self.method = method.upper()
-        self.score_constraint = score_constraint
+        self.score_constraint = score_constraint #ACTIVAR!
         self.driver = driver
         self.uid = uid
         self.pwd = pwd
@@ -131,14 +132,20 @@ class featureImportance(object):
         
         self.k_min = k_min
         
+        self.ErrorKendallMessage = 'Any valid kendall value exists in the set of trials'
+        
     def __getSubsamples__(self, standardMatrix):
-        total_samples = set()
-        for i in range(self.k_min,len(standardMatrix.columns) -3 ):
-            for j in range(self.n_samples):
-                samples = random.sample(standardMatrix.columns,i)
-                total_samples.add(tuple(samples))
+        total_samples = [] 
+        for i in range(self.k_min,len(standardMatrix.columns) + 1): 
+            for j in range(self.n_samples): 
+                samples = random.sample(list(standardMatrix.columns.values),i)
+                total_samples.append(tuple(samples))
                 total_samples = [list(tup) for tup in total_samples]
-        return total_samples
+
+        listSamples1 = [sorts(i) for i in total_samples]
+        listSamples2 = [list(tupl) for tupl in {tuple(item) for item in listSamples1}]
+        
+        return listSamples2
     
     
     def __instanceOverture__(self):
@@ -167,123 +174,74 @@ class featureImportance(object):
         print("----------Process {} started---------- \n".format(self.method))
         
         # extrae la matriz de features estacionaria y estandarizada, el vector de labels y el df stacked
-        featStandarizedMatrix, labelsDataframe, dfStacked = instance.__checkingStationary__(self.pictures_pathout) 
-        
-        # if self.clustered_features:
-        #     # Generación de clusters 
-        #     corr_matrix, clusters, silh = clusterKMeansTop(
-        #         featStandarizedMatrix.corr(), 
-        #         maxNumClusters = self.max_num_clusters
-        #         )
-                        
-        #     # Entrenamiento del modelo para MDI / MDA
-        #     clf  = RandomForestClassifier().fit(
-        #         featStandarizedMatrix,
-        #         labelsDataframe
-        #         )
+        featStandarizedMatrix, labelsDataframe, original_stacked = instance.__checkingStationary__(
+            self.pictures_pathout
+            ) 
             
-        #     if self.method == 'MDI':
-        #         print("MDI results:", featImpMDI_Clustered(
-        #                                                 clf, 
-        #                                                 corr_matrix.columns[1:], 
-        #                                                 clusters
-        #                                                 )
-        #             )
-                
-        #     elif self.method == 'MDA':
-        #         print("MDA results:", featImpMDA_Clustered(
-        #                                                 clf,
-        #                                                 featStandarizedMatrix,
-        #                                                 labelsDataframe,
-        #                                                 clusters
-        #                                                 )
-        #             )
+        print("         :::: >>> Running Iteration over samples for Kendall Test...")
             
-        #     # Prueba de Kendall en los clusters generados
-        #     kendalls_clustered = pd.DataFrame()
-        #     for idx,cluster in enumerate(clusters.values()):                
-        #         featImpRank, featPcaRank, scoreNoPurged, scorePurged, dfStacked = instance.get_feature_importance(
-        #         featStandarizedMatrix[cluster], labelsDataframe, dfStacked,
-        #         self.pictures_pathout, self.method, self.model, 
-        #         )
-        #         kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
-        #         print(f':::::: >>> Kendall Test, Cluster {idx}:')
-        #         print(f'     Kendall Correlation calculated is : {kendallCorrelation}')
-        #         print(f'     Kendall PValue calculated is      : {pValKendall}\n')
-                
-        #         kendalls_clustered.iloc[len(kendalls_clustered)] = [
-        #             cluster,kendallCorrelation,pValKendall]
-        #         kendalls_clustered.to_csv(self.pictures_pathout+'kendalls_clustered.csv')
-                
-        
-        # Si se aplica el método del subconjunto de features
-        if self.select_sample:
+        samples = self.__getSubsamples__(featStandarizedMatrix)
+
+        itterIdx = 0
+        kendalls = {}
             
-            samples = self.__getSubsamples__(featStandarizedMatrix)
-            best_sample = 0
-            best_kendall = 0
-            pval = 0
-            itterIdx = 0
-            kendalls = {}
-            
-            for sample in samples:
-                featImpRank, featPcaRank, scoreNoPurged, scorePurged, dfStacked, imp = instance.get_feature_importance(
-                featStandarizedMatrix[sample], labelsDataframe, dfStacked,
+        for sample in samples:
+            print(f'Running combination        : {itterIdx}')
+            featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = instance.get_feature_importance(
+                featStandarizedMatrix[sample], labelsDataframe, 
                 self.pictures_pathout, self.method, self.model, 
                 )
-                
-                kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
-                
-                print(f'Temporal Correlation {kendallCorrelation}')                
-                print(f'Temporal p-value {pValKendall}')    
-                                
-                if kendallCorrelation > best_kendall:
-                    best_kendall = kendallCorrelation
-                    pval = pValKendall
-                    best_sample = sample
-                    
-                kendalls[itterIdx] = [sample, kendallCorrelation, pValKendall]
-                
-                itterIdx +=1
-                
-            kendalls = pd.DataFrame.from_dict(kendalls, orient='index')
-            kendalls.columns = ['best_feature_combination', 'kendall_correlation', 'kendall_pval']
+             # si no pasa el score_constraint del 'scorePurged', no usas ese sample
+             
+            kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
+            print(f'Temporal Kendall Correlation             : {kendallCorrelation}')                
+            print(f'Temporal Kendall p-value                 : {pValKendall}')
+            print(f'Lenght of features tested at Kendall     : {len(sample)}\n')
             
-            dfStacked = featStandarizedMatrix[best_sample]
-
-            featImpRank,featPcaRank = instance.get_feature_importance(
-                featStandarizedMatrix[best_sample], labelsDataframe, dfStacked,
-                self.pictures_pathout, self.method, self.model, 
-                )[0:2]
-            
-            kendalls.to_csv(self.pictures_pathout+'kendall_values.csv')
-            print(':::::: >>> Kendall Test :')
-            print(f'     Kendall Correlation calculated is : {best_kendall}')
-            print(f'     Kendall PValue calculated is      : {pval}\n')
-            kendallMessage = f'The Kendall PH fails. Pvalue Test = {pValKendall} | Min. Pvalue Req.= {self.pval_kendall}'
-            
-            if self.pval_kendall >= pValKendall:  
-                print('-----------> PH Kendall Critic Value Accepted')
-                print("Saving featImportance picture...")
-                # guardado imagen de feature importance como prueba de control
-                plotFeatImportance(
-                                self.pictures_pathout,    
-                                imp,
-                                0,
-                                scorePurged,
-                                method=self.method, 
-                                tag='First try',
-                                simNum= self.method + '_' + type(self.model).__name__,
-                                model=type(self.model).__name__)
+            kendalls[itterIdx] = [sample, kendallCorrelation, pValKendall]
                 
-                print("Feature Importance picture Saved in {}".format(
-                    self.pictures_pathout)
+            itterIdx +=1 
+            
+        kendalls = pd.DataFrame.from_dict(kendalls, orient='index')
+        kendalls.columns = ['best_feature_combination', 'kendall_correlation', 'kendall_pval']
+                        
+        kendalls.to_csv(self.pictures_pathout+'kendall_values.csv', index = False)
+            
+        groupedPvalCond = kendalls.loc[kendalls.kendall_pval < self.pval_kendall]
+            
+        if groupedPvalCond.shape[0] == 0:
+            sys.exit("{}".format(self.ErrorKendallMessage))
+                
+        else:
+            bestSetFeatures = groupedPvalCond.loc[groupedPvalCond.kendall_correlation.idxmax()]            
+                
+            kendallCorrSelected, pvalKendallSelected, combFeaturesSelected =  (
+                                        bestSetFeatures.loc['kendall_correlation'], 
+                                        bestSetFeatures.loc['kendall_pval'], 
+                                        bestSetFeatures.loc['best_feature_combination']
+                                    )
+            
+        print(':::::: >>> Kendall Test :')
+        print(f'     Best Kendall Correlation calculated is     : {kendallCorrSelected}')
+        print(f'     Best Kendall PValue calculated is          : {pvalKendallSelected}')
+        print(f'     Lenght of Best Useful Features Combination : {len(combFeaturesSelected)}')
+            
+        plotFeatImportance(
+                self.pictures_pathout,    
+                imp,
+                0,
+                scorePurged,
+                method=self.method, 
+                tag='First try',
+                simNum= self.method + '_' + type(self.model).__name__,
+                model=type(self.model).__name__
+                )
+                
+        print("Feature Importance picture Saved in {}".format(
+                self.pictures_pathout)
                     )
-                # retorna el dataframe stackead y los nombres de los features
-                return dfStacked, featPcaRank.index.values 
-            
-            else:
-                sys.exit("{}".format(kendallMessage))
+        # retorna el dataframe stacked (roleado original) y los nombres de los features
+        return original_stacked, combFeaturesSelected 
         
     def get_relevant_features(self, 
                               filtering = True, 
@@ -302,6 +260,21 @@ class featureImportance(object):
             
             # stacked roleado y escalado proveniente del 'features_algorithms.py'
             stacked = stacked.reset_index(drop=True)
+
+            # extraemos las columnas que no están en la lista global de features
+            stackedDiff = stacked[
+                stacked.columns.difference(
+                    list_features_tested
+                    ).values
+                ]                     
+            
+            # elimina los features marginales no utiles dejando la info general principal
+            stackedNoFeatures = stackedDiff[stackedDiff.columns.drop(
+                list(stackedDiff.filter(regex=self.features_sufix))
+                )]
+            
+            # stacked df filtrado por features seleccionados con col. no-features
+            stacked = pd.concat([stackedNoFeatures, stacked[list_features_tested]],axis=1) 
             
             # conversión a dtypes de las fechas de las columnas
             colDates = stacked.dtypes.where(

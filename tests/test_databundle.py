@@ -43,7 +43,7 @@ enigmxsql.create_table_database(
     bars_sampled = False, 
     bars_barrier = False,
     bars_weights = False,
-    bars_features = True,
+    bars_features = False,
     creation_database = False)
 
 print("subiendo info")
