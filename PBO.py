@@ -2,11 +2,12 @@
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
-
+import sys
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from itertools import combinations 
+from enigmx.PSO import ackley
+from enigmx.heuristic import heuristic
 
 def Sharpe_Ratio(array):
     
@@ -238,7 +239,7 @@ class CSCV():
         return ranks
 
 
-class OverfittingTesting(Object):
+class OverfittingTesting(object):
     """
     Clase que resume el proceso de testing del PBO y POL.
     
@@ -251,9 +252,11 @@ class OverfittingTesting(Object):
     """
     def __init__(self, 
                  path_backtest, 
+                 path_metrics, 
                  metric_name = 'returnsPred', 
                  predictions_name = 'predCat'):
         
+        self.path_metrics = path_metrics
         self.path_backtest = path_backtest 
         self.metric_name = metric_name
         self.predictions_name = predictions_name
@@ -264,19 +267,25 @@ class OverfittingTesting(Object):
                  metric = Sharpe_Ratio, 
                  s_value = 16, 
                  tipoPL= False,
-                 fix_n_star = None):
+                 fix_n_star = None,
+                 method = 'pso',
+                 fitness_function = ackley):
         
-        # definimos el vector de la metrica base (retornos)
+        # definimos el dataset central de datos
+        backtestDataset = pd.read_csv(self.path_backtest)
         
-        backtestDataset = pd.read_csv(self.path_backtest, index = False)
-
-        listaPredCatsByModel = []
-        for modelGroups in backtestDataset.groupby('model_name').predCat.groups.keys():
-            groupValues= backtestDataset.groupby('model_name').predCat.get_group(modelGroups).values
-            listaPredCatsByModel.append(groupValues)       
-            
-        models = np.array(listaPredCatsByModel) 
+        backtestDataset[self.metric_name] = backtestDataset.apply(
+            lambda x: (x.barrierPrice - x.close_price)/x.close_price, 
+            axis=1
+            )
         
+        pivotObject = backtestDataset[
+            [self.predictions_name, 'model_name', self.metric_name]
+                ].pivot(columns='model_name')
+        
+        r = pivotObject[self.metric_name].iloc[:,-1].dropna().values 
+        
+        models = pivotObject[self.predictions_name].fillna(method='bfill').dropna().values 
 
         lambda_c, R_triple = CSCV(
             r, 
@@ -285,29 +294,42 @@ class OverfittingTesting(Object):
             S = s_value, 
             metric = Sharpe_Ratio,
             fix_n_star = fix_n_star).Lambda
+        
+        OvStats = Overfit_Stats(lambda_c,R_triple)
+        
+        PBO = OvStats.PBO
+        
+        ProbLoss_IS, ProbLoss_OOS = OvStats.ProbLoss
+        
+        print("      >>>> Taking Overfitting Test Results...")
+        print("           PBO =",PBO, " |  Prob of Loss OOS = ",ProbLoss_OOS, "\n")
+        
+        print(f">>>> Being PBO benchmark '{pbo_threshold}' and POL benchmark '{pol_threshold}'...\n")
+        
+        if PBO < pbo_threshold and ProbLoss_OOS < pol_threshold:
+            
+            print("::::: >>> PBO & POL test passed successfully...")
+            
+            metricsDf = pd.read_csv(self.path_metrics, delimiter=",")
+            
+            vectorModelInformation = heuristic(
+                metricsDf, 
+                method = method, 
+                fitness_function = fitness_function
+            ).heuristic
+            
+            return vectorModelInformation
 
-
-r = np.random.rand(1000) #metrica (retornos)
-
-models = np.rint(2*np.random.rand(1000,100)-1) #(predicciones de modelos)
-
-lambda_c,R_triple = CSCV(r,models,tipoPL= False,S = 16 , metric = Sharpe_Ratio,fix_n_star = None).Lambda
-
-# print("valores de lambda_c")
-# print(np.unique(lambda_c))
-
-OvStats = Overfit_Stats(lambda_c,R_triple)
-PBO = OvStats.PBO
-ProbLoss_IS, ProbLoss_OOS = OvStats.ProbLoss
-
-print("PBO =",PBO," |  Prob of Loss OOS = ",ProbLoss_OOS)
-
-
-
-num_comb = len(R_triple[:,0])
-y = np.round(np.arange(0,num_comb)/(num_comb-1),4)
-plt.plot(np.sort(R_triple[:,1]),y, color='blue',label = "R_bar_n*")
-plt.plot(np.sort(R_triple[:,2]),y, color='red' ,label = "E[R_bar]")
-plt.legend()
-plt.show()
+        else:
+            print("Warning!!! :::: >>>") 
+            print("One of both POL & PBO test coulnd't pass. Please check information:")
+            
+            print("-------------------> PBO val        : ", PBO)
+            print("-------------------> PBO threshold  : ", pbo_threshold)
+            print(" ")
+            print("-------------------> POL val        : ", ProbLoss_OOS)
+            print("-------------------> POL threshold  : ", pol_threshold)            
+            
+            sys.exit('Process Execution Finished')
+            
 
