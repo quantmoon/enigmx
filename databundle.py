@@ -23,6 +23,7 @@ from enigmx.utils import (
     __newDollarBarConstruction__,
     infoBarGenerator,
     )
+from enigmx.tests.telegram import send_message
 
 #1. Main Quantmoon SQL Manager
 class QuantmoonSQLManager(object):
@@ -731,7 +732,7 @@ class DataRespositoryInitialization(object):
                 time: 'd'
             
         """
-
+        
         if bartype=='tick':
             
             #get list of column names for dataframe construction 
@@ -763,14 +764,19 @@ class DataRespositoryInitialization(object):
             #get list of column names for dataframe construction 
             
             #results_ tuple info (last arg. is 'alpha_calibration')   
-            result_info = __newVolumeBarConstruction__(
+            try:
+			
+                result_info = __newVolumeBarConstruction__(
                 info_tuple[0][0], 
                 info_tuple[1][0], 
                 info_tuple[2][0],
                 info_tuple[6][0],
                 alpha_calibration=daily_time_bars
                 )
-            
+            except:
+                print("Acción: ", self.stock, self.start_date)
+                print(info_tuple)
+                send_message("WE GOT IT!")
             
             #elementos: [0] OHLC info (prices + dtimes + volatility), [1] vwap
             #computa tambien los proto-features: 7 en total

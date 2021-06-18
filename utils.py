@@ -1798,7 +1798,8 @@ def __newTickBarConstruction__(arrayTime,
     return groupTime, groupPrice, groupVol
 
 #New Volume Bar Construction Function | No Vectorized
-def __newVolumeBarConstruction__(arrayTime, 
+def __newVolumeBarConstruction__(
+                                 arrayTime, 
                                  arrayPrice, 
                                  arrayVol, 
                                  arrayTickRule, 

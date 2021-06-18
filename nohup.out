@@ -1,0 +1,82 @@
+2021-06-18 00:27:38.006007: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2021-06-18 00:27:38.006066: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=80069)[0m 2021-06-18 00:28:05.732932: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=80069)[0m 2021-06-18 00:28:05.733019: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=80070)[0m 2021-06-18 00:28:05.807287: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=80070)[0m 2021-06-18 00:28:05.807361: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=80073)[0m 2021-06-18 00:28:05.807287: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=80073)[0m 2021-06-18 00:28:05.807361: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=80074)[0m 2021-06-18 00:28:05.856239: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=80074)[0m 2021-06-18 00:28:05.856328: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=80071)[0m 2021-06-18 00:28:05.891700: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=80071)[0m 2021-06-18 00:28:05.891785: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=80072)[0m 2021-06-18 00:28:06.054600: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=80072)[0m 2021-06-18 00:28:06.054676: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=80075)[0m 2021-06-18 00:28:06.120000: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=80075)[0m 2021-06-18 00:28:06.120088: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=80076)[0m 2021-06-18 00:28:06.229793: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=80076)[0m 2021-06-18 00:28:06.229874: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+3105
+inicializando clase
+subiendo info
+ 
+Accessing SQL Info --->>>
+|----- Cloud Process Detected -----|
+:::::::::>> SQL Connection Path...
+Driver={ODBC DRIVER 17 for SQL Server};Server=34.72.20.22;Database=BARS;Uid=sqlserver;Pwd=quantmoon2021;
+ 
+:::::::::: CONSTRUCTED BARS >>>>>>
+Largo: 3105
+[2m[36m(pid=80076)[0m Esta es la pinshi culera ENVI 2021-02-22
+[2m[36m(pid=80076)[0m ([], [], [], 0, array([], shape=(0, 2), dtype=float64), 0, [])
+Traceback (most recent call last):
+  File "tests/test_databundle.py", line 5, in <module>
+    import ray
+  File "/usr/local/lib/python3.8/dist-packages/ray/__init__.py", line 72, in <module>
+  File "python/ray/_raylet.pyx", line 108, in init ray._raylet
+  File "/usr/local/lib/python3.8/dist-packages/ray/exceptions.py", line 6, in <module>
+    import ray.cloudpickle as pickle
+  File "/usr/local/lib/python3.8/dist-packages/ray/cloudpickle/__init__.py", line 7, in <module>
+    from ray.cloudpickle.cloudpickle_fast import CloudPickler, dumps, dump  # noqa
+  File "/usr/local/lib/python3.8/dist-packages/ray/cloudpickle/cloudpickle_fast.py", line 487, in <module>
+    class CloudPickler(Pickler):
+  File "/usr/local/lib/python3.8/dist-packages/ray/cloudpickle/cloudpickle_fast.py", line 514, in CloudPickler
+    import numpy.core
+  File "/usr/local/lib/python3.8/dist-packages/numpy/__init__.py", line 145, in <module>
+    from . import core
+  File "/usr/local/lib/python3.8/dist-packages/numpy/core/__init__.py", line 22, in <module>
+    from . import multiarray
+  File "/usr/local/lib/python3.8/dist-packages/numpy/core/multiarray.py", line 12, in <module>
+    from . import overrides
+  File "/usr/local/lib/python3.8/dist-packages/numpy/core/overrides.py", line 7, in <module>
+    from numpy.core._multiarray_umath import (
+KeyboardInterrupt
+2021-06-18 03:54:44.140897: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2021-06-18 03:54:44.140939: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=81260)[0m 2021-06-18 03:55:12.154262: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=81260)[0m 2021-06-18 03:55:12.154334: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=81263)[0m 2021-06-18 03:55:12.233739: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=81263)[0m 2021-06-18 03:55:12.233810: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=81261)[0m 2021-06-18 03:55:12.260606: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=81261)[0m 2021-06-18 03:55:12.260686: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=81265)[0m 2021-06-18 03:55:12.265880: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=81265)[0m 2021-06-18 03:55:12.265945: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=81259)[0m 2021-06-18 03:55:12.233738: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=81259)[0m 2021-06-18 03:55:12.233810: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=81262)[0m 2021-06-18 03:55:12.447540: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=81262)[0m 2021-06-18 03:55:12.447624: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=81258)[0m 2021-06-18 03:55:12.510148: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=81258)[0m 2021-06-18 03:55:12.510224: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=81264)[0m 2021-06-18 03:55:12.622069: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=81264)[0m 2021-06-18 03:55:12.622148: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+3104
+inicializando clase
+subiendo info
+ 
+Accessing SQL Info --->>>
+|----- Cloud Process Detected -----|
+:::::::::>> SQL Connection Path...
+Driver={ODBC DRIVER 17 for SQL Server};Server=34.72.20.22;Database=BARS;Uid=sqlserver;Pwd=quantmoon2021;
+ 
+:::::::::: CONSTRUCTED BARS >>>>>>
+Largo: 3104

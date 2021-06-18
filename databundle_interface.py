@@ -17,6 +17,7 @@ from enigmx.features import FeaturesClass
 from enigmx.sampleweight import WeightsGeneration
 from enigmx.save_info import generate_datasets
 from enigmx.triplebarrier import new_triple_barrier_computation
+from enigmx.tests.telegram import send_message
 
 from enigmx.utils import (
     sel_days, 
@@ -95,7 +96,7 @@ class SQLEnigmXinterface(object):
                 - tunning_interval = '21D'
             
             #BASIC BAR CONSTRUCTION PARAMS
-                - volVersion = 'ver2'
+                - volVersion = 'ver1'
                 - fracdiffWindow = 2
                 - barrierWindow = 1
                 - barrierPrice = 'close'
@@ -244,17 +245,18 @@ class SQLEnigmXinterface(object):
                             ) 
             for stock in self.list_stocks
             ]
-        
+
         #extraemos los objetos ray con los dataframe para la escritura en SQL
+
+        print("Largo:",len(ray_object_list))
         list_datasets = ray.get(ray_object_list)
-    
+        send_message("Era hoy Ramón") 
         #primer bloque iterativo: loop sobre tipo de barra (si lo hubiere)
         for idx, dataset in enumerate(list_datasets):
             print("::::> RUNNING: Writting {} into SQL Table for BaseBars".format(
                     self.list_stocks[idx]
                     )
-                )        
-            
+                )
             #segundo bloque iterativo: loop por activo (si lo hubiere)
             for idx_bartype, dataframe in enumerate(dataset):    
                                 

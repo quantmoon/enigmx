@@ -386,7 +386,10 @@ def checkBarsRepeated(dataframes_list,
         else:
             for index,date in enumerate(dates):
                 if date in dates_list:
-                    date = datetime.strptime(date,'%Y-%m-%d %H:%M:%S.%f')
+                    try:
+                        date = datetime.strptime(date,'%Y-%m-%d %H:%M:%S.%f')
+                    except:
+                        pass
                     date = date + timedelta(microseconds=1000)
                     date = date.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                     dataframes_list[idx][column][index] = date
