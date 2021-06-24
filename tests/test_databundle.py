@@ -11,7 +11,7 @@ from enigmx.tests.telegram import send_message
 from enigmx.tests.stocks import stocks
 
 
-server_name = "34.72.20.22" 
+server_name = "34.67.4.196" 
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
 list_stocks = stocks
@@ -52,13 +52,13 @@ enigmxsql = SQLEnigmXinterface(
 print("subiendo info")
 try:
 	enigmxsql.compute_info_to_sql(
-        bars_tunning_process = False, 
-        bar_construction_process = True, 
+            bars_tunning_process = False, 
+            bar_construction_process = False, 
             entropy_construction_process = False, 
             etftrick_construction_process = True, 
-            sampling_features_process = True, 
+            sampling_features_process =True, 
             triple_barrier_computation_process = True, 
-            sample_weight_computation_process = True,
+            sample_weight_computation_process =True,
             features_bar_computation_process = True,
             tunning_interval = "10D",
 	    )

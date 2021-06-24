@@ -248,9 +248,9 @@ class SQLEnigmXinterface(object):
 
         #extraemos los objetos ray con los dataframe para la escritura en SQL
 
-        print("Largo:",len(ray_object_list))
+       
         list_datasets = ray.get(ray_object_list)
-        send_message("Era hoy Ramón") 
+        
         #primer bloque iterativo: loop sobre tipo de barra (si lo hubiere)
         for idx, dataset in enumerate(list_datasets):
             print("::::> RUNNING: Writting {} into SQL Table for BaseBars".format(

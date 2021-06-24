@@ -1,0 +1,1809 @@
+/usr/local/lib/python3.8/dist-packages/ray/autoscaler/_private/cli_logger.py:57: FutureWarning: Not all Ray CLI dependencies were found. In Ray 1.4+, the Ray CLI, autoscaler, and dashboard will only be usable via `pip install 'ray[default]'`. Please update your install command.
+  warnings.warn(
+2021-06-20 19:55:11.203627: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2021-06-20 19:55:11.203665: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+inicializando clase
+subiendo info
+ 
+Accessing SQL Info --->>>
+|----- Cloud Process Detected -----|
+:::::::::>> SQL Connection Path...
+Driver={ODBC DRIVER 17 for SQL Server};Server=34.67.4.196;Database=BARS;Uid=sqlserver;Pwd=quantmoon2021;
+ 
+:::::::::: CONSTRUCTED BARS >>>>>>
+[2m[36m(pid=79118)[0m 2 RLAY
+[2m[36m(pid=79121)[0m 2 CCAP
+[2m[36m(pid=79119)[0m 2 ES
+[2m[36m(pid=79116)[0m 2 ACTG
+[2m[36m(pid=79122)[0m 2 SGU
+[2m[36m(pid=79120)[0m 2 CORE
+[2m[36m(pid=79117)[0m 2 NUS
+[2m[36m(pid=79115)[0m 2 T
+[2m[36m(pid=79121)[0m 2 BOH
+[2m[36m(pid=79118)[0m 2 TTD
+[2m[36m(pid=79119)[0m 2 UGI
+[2m[36m(pid=79116)[0m 2 SNV
+[2m[36m(pid=79122)[0m 2 EPZM
+[2m[36m(pid=79117)[0m 2 GORO
+[2m[36m(pid=79120)[0m 2 EHTH
+Largo: 591
+[2m[36m(pid=79115)[0m 2
+[2m[36m(pid=79115)[0m  OYST
+[2m[36m(pid=79121)[0m 2 PAX
+[2m[36m(pid=79118)[0m 2 NOVT
+[2m[36m(pid=79119)[0m 2 MET
+[2m[36m(pid=79116)[0m 2 FRHC
+[2m[36m(pid=79122)[0m 2 GFF
+[2m[36m(pid=79117)[0m 2 TGNA
+[2m[36m(pid=79120)[0m 2 UONEK
+[2m[36m(pid=79115)[0m 2 IGAC
+[2m[36m(pid=79121)[0m 2 OBLG
+[2m[36m(pid=79118)[0m 2 PBH
+[2m[36m(pid=79119)[0m 2 OSMT
+[2m[36m(pid=79122)[0m 2 QDEL
+[2m[36m(pid=79116)[0m 2 CREE
+[2m[36m(pid=79117)[0m 2 RIG
+[2m[36m(pid=79120)[0m 2 TGTX
+[2m[36m(pid=79115)[0m 2 CYCN
+[2m[36m(pid=79118)[0m 2 INBX
+[2m[36m(pid=79121)[0m 2 AGLE
+[2m[36m(pid=79122)[0m 2 CRIS
+[2m[36m(pid=79119)[0m 2 EPM
+[2m[36m(pid=79116)[0m 2 CMRX
+[2m[36m(pid=79117)[0m 2 ANTM
+[2m[36m(pid=79120)[0m 2 CTLT
+[2m[36m(pid=79115)[0m 2 SMTC
+[2m[36m(pid=79118)[0m 2 TWI
+[2m[36m(pid=79121)[0m 2 HRTX
+[2m[36m(pid=79122)[0m 2 SCWX
+[2m[36m(pid=79116)[0m 2 SMG
+[2m[36m(pid=79119)[0m 2 SESN
+[2m[36m(pid=79117)[0m 2 GCP
+[2m[36m(pid=79120)[0m 2 GM
+[2m[36m(pid=79115)[0m 2 ARWR
+[2m[36m(pid=79118)[0m 2 FDP
+[2m[36m(pid=79121)[0m 2 ATO
+[2m[36m(pid=79122)[0m 2 TRUP
+[2m[36m(pid=79116)[0m 2 EVLO
+[2m[36m(pid=79119)[0m 2 AQST
+[2m[36m(pid=79117)[0m 2 ARPO
+[2m[36m(pid=79120)[0m 2 DTEA
+[2m[36m(pid=79118)[0m 2 COMS
+[2m[36m(pid=79115)[0m 2 LCAP
+[2m[36m(pid=79121)[0m 2 TK
+[2m[36m(pid=79122)[0m 2 ULTA
+[2m[36m(pid=79119)[0m 2 QTNT
+[2m[36m(pid=79116)[0m 2 KIN
+[2m[36m(pid=79120)[0m 2 MIME
+[2m[36m(pid=79117)[0m 2 LCII
+[2m[36m(pid=79118)[0m 2 HLX
+[2m[36m(pid=79115)[0m 2 DMS
+[2m[36m(pid=79121)[0m 2 FSK
+[2m[36m(pid=79122)[0m 2 INT
+[2m[36m(pid=79119)[0m 2 ATCX
+[2m[36m(pid=79116)[0m 2 MASI
+[2m[36m(pid=79120)[0m 2 SANW
+[2m[36m(pid=79117)[0m 2 HI
+[2m[36m(pid=79118)[0m 2 PSTG
+[2m[36m(pid=79115)[0m 2 GLOP
+[2m[36m(pid=79121)[0m 2
+[2m[36m(pid=79121)[0m  NOW
+[2m[36m(pid=79122)[0m 2 DISCB
+[2m[36m(pid=79119)[0m 2 LAZ
+[2m[36m(pid=79116)[0m 2 CALM
+[2m[36m(pid=79120)[0m 2 LMNX
+[2m[36m(pid=79117)[0m 2 ANDE
+[2m[36m(pid=79118)[0m 2 OSBC
+[2m[36m(pid=79115)[0m 2 GILD
+[2m[36m(pid=79121)[0m 2 TCBI
+[2m[36m(pid=79116)[0m 2 ANGO
+[2m[36m(pid=79118)[0m 2 TSCO
+[2m[36m(pid=79120)[0m 2 BDSX
+[2m[36m(pid=79119)[0m 2 AZEK
+[2m[36m(pid=79117)[0m 2 NVMI
+[2m[36m(pid=79122)[0m 2 SCHN
+[2m[36m(pid=79115)[0m 2 SRRK
+[2m[36m(pid=79121)[0m 2 CB
+[2m[36m(pid=79118)[0m 2 VET
+[2m[36m(pid=79120)[0m 2 PWR
+[2m[36m(pid=79116)[0m 2 PERI
+[2m[36m(pid=79117)[0m 2 CNC
+[2m[36m(pid=79119)[0m 2 CCL
+[2m[36m(pid=79122)[0m 2 NBRV
+[2m[36m(pid=79115)[0m 2 USWS
+[2m[36m(pid=79121)[0m 2 FIX
+[2m[36m(pid=79118)[0m 2 XCUR
+[2m[36m(pid=79120)[0m 2 FMC
+[2m[36m(pid=79116)[0m 2 VRSK
+[2m[36m(pid=79117)[0m 2 IMPX
+[2m[36m(pid=79119)[0m 2 UCBI
+[2m[36m(pid=79122)[0m 2 GAU
+[2m[36m(pid=79115)[0m 2 EVER
+[2m[36m(pid=79121)[0m 2 AVLR
+[2m[36m(pid=79118)[0m 2 DPZ
+[2m[36m(pid=79116)[0m 2 HSTM
+[2m[36m(pid=79120)[0m 2 PPBI
+[2m[36m(pid=79117)[0m 2 BYSI
+[2m[36m(pid=79119)[0m 2 TTC
+[2m[36m(pid=79122)[0m 2 AEIS
+[2m[36m(pid=79115)[0m 2 HL
+[2m[36m(pid=79121)[0m 2 LOOP
+[2m[36m(pid=79118)[0m 2 THG
+[2m[36m(pid=79116)[0m 2 AWI
+[2m[36m(pid=79120)[0m 2 TTEC
+[2m[36m(pid=79117)[0m 2 ALJJ
+[2m[36m(pid=79122)[0m 2 SSD
+[2m[36m(pid=79119)[0m 2 GO
+[2m[36m(pid=79115)[0m 2 DOGZ
+[2m[36m(pid=79121)[0m 2 PROS
+[2m[36m(pid=79116)[0m 2 HEXO
+[2m[36m(pid=79118)[0m 2 ROLL
+[2m[36m(pid=79120)[0m 2 GRA
+[2m[36m(pid=79122)[0m 2 GNSS
+[2m[36m(pid=79119)[0m 2 CRVS
+[2m[36m(pid=79117)[0m 2 PTON
+[2m[36m(pid=79115)[0m 2 CSGP
+[2m[36m(pid=79121)[0m 2 RSSS
+[2m[36m(pid=79116)[0m 2 LSTR
+[2m[36m(pid=79118)[0m 2 TXMD
+[2m[36m(pid=79120)[0m 2 PII
+[2m[36m(pid=79122)[0m 2 ZTS
+[2m[36m(pid=79117)[0m 2 EGBN
+[2m[36m(pid=79119)[0m 2 LAZR
+[2m[36m(pid=79115)[0m 2 MANT
+[2m[36m(pid=79121)[0m 2 BLD
+[2m[36m(pid=79116)[0m 2 LMNL
+[2m[36m(pid=79118)[0m 2 MMM
+[2m[36m(pid=79120)[0m 2 BPOP
+[2m[36m(pid=79122)[0m 2 CC
+[2m[36m(pid=79117)[0m 2 ASM
+[2m[36m(pid=79119)[0m 2 CBSH
+[2m[36m(pid=79115)[0m 2 TACO
+[2m[36m(pid=79121)[0m 2 MNRL
+[2m[36m(pid=79116)[0m 2 CLGX
+[2m[36m(pid=79118)[0m 2 COUP
+[2m[36m(pid=79120)[0m 2 VG
+[2m[36m(pid=79122)[0m 2 GVA
+[2m[36m(pid=79117)[0m 2 CAAS
+[2m[36m(pid=79119)[0m 2 TDW
+[2m[36m(pid=79115)[0m 2 ACRX
+[2m[36m(pid=79121)[0m 2 KSS
+[2m[36m(pid=79116)[0m 2 PSN
+[2m[36m(pid=79118)[0m 2 WMG
+[2m[36m(pid=79120)[0m 2 MNKD
+[2m[36m(pid=79122)[0m 2 FN
+[2m[36m(pid=79117)[0m 2 PRMW
+[2m[36m(pid=79119)[0m 2 THCB
+[2m[36m(pid=79115)[0m 2 BNGO
+[2m[36m(pid=79121)[0m 2 CONX
+[2m[36m(pid=79116)[0m 2 APLT
+[2m[36m(pid=79118)[0m 2 CDLX
+[2m[36m(pid=79120)[0m 2 CLVS
+[2m[36m(pid=79122)[0m 2 BANC
+[2m[36m(pid=79117)[0m 2 JWN
+[2m[36m(pid=79119)[0m 2 AEP
+[2m[36m(pid=79115)[0m 2 FIXX
+[2m[36m(pid=79121)[0m 2 AXNX
+[2m[36m(pid=79118)[0m 2 IGT
+[2m[36m(pid=79116)[0m 2 ZION
+[2m[36m(pid=79120)[0m 2 TSHA
+[2m[36m(pid=79122)[0m 2 PGR
+[2m[36m(pid=79117)[0m 2 MODN
+[2m[36m(pid=79119)[0m 2 CRSP
+[2m[36m(pid=79115)[0m 2 CSCW
+[2m[36m(pid=79118)[0m 2 TOWN
+[2m[36m(pid=79116)[0m 2 CAMT
+[2m[36m(pid=79121)[0m 2 CMTL
+[2m[36m(pid=79120)[0m 2 IART
+[2m[36m(pid=79122)[0m 2 CLB
+[2m[36m(pid=79117)[0m 2 WMB
+[2m[36m(pid=79119)[0m 2 FSS
+[2m[36m(pid=79115)[0m 2 XM
+[2m[36m(pid=79118)[0m 2 NTLA
+[2m[36m(pid=79116)[0m 2 WCN
+[2m[36m(pid=79121)[0m 2 OFG
+[2m[36m(pid=79120)[0m 2 ENTG
+[2m[36m(pid=79122)[0m 2 WWD
+[2m[36m(pid=79117)[0m 2 LITE
+[2m[36m(pid=79119)[0m 2 RCI
+[2m[36m(pid=79115)[0m 2 EEFT
+[2m[36m(pid=79118)[0m 2 ANAT
+[2m[36m(pid=79116)[0m 2 WDAY
+[2m[36m(pid=79121)[0m 2 TROX
+[2m[36m(pid=79120)[0m 2 GSHD
+[2m[36m(pid=79122)[0m 2 ABST
+[2m[36m(pid=79117)[0m 2 ZYNE
+[2m[36m(pid=79119)[0m 2 CLII
+[2m[36m(pid=79118)[0m 2 PULM
+[2m[36m(pid=79115)[0m 2 AEZS
+[2m[36m(pid=79116)[0m 2 UPWK
+[2m[36m(pid=79121)[0m 2 NLSN
+[2m[36m(pid=79120)[0m 2 GLW
+[2m[36m(pid=79122)[0m 2 L
+[2m[36m(pid=79117)[0m 2 HES
+[2m[36m(pid=79119)[0m 2 HUN
+[2m[36m(pid=79118)[0m 2 XEL
+[2m[36m(pid=79116)[0m 2 HSTO
+[2m[36m(pid=79115)[0m 2 EVRI
+[2m[36m(pid=79121)[0m 2 ATIF
+[2m[36m(pid=79120)[0m 2 CAL
+[2m[36m(pid=79122)[0m 2 HMHC
+[2m[36m(pid=79117)[0m 2 PFS
+[2m[36m(pid=79119)[0m 2 FMTX
+[2m[36m(pid=79118)[0m 2 CVET
+[2m[36m(pid=79116)[0m 2 DM
+[2m[36m(pid=79115)[0m 2 CBB
+[2m[36m(pid=79121)[0m 2 RGLS
+[2m[36m(pid=79120)[0m 2 PRGS
+[2m[36m(pid=79122)[0m 2 RSVA
+[2m[36m(pid=79117)[0m 2 TCBK
+[2m[36m(pid=79119)[0m 2 BCO
+[2m[36m(pid=79118)[0m 2 NEOG
+[2m[36m(pid=79116)[0m 2 NEWR
+[2m[36m(pid=79115)[0m 2 BRP
+[2m[36m(pid=79121)[0m 2 AMAL
+[2m[36m(pid=79120)[0m 2 SWAV
+[2m[36m(pid=79122)[0m 2 MSI
+[2m[36m(pid=79117)[0m 2 ECOM
+[2m[36m(pid=79119)[0m 2 PTGX
+[2m[36m(pid=79118)[0m 2 CSTM
+[2m[36m(pid=79116)[0m 2 TGT
+[2m[36m(pid=79115)[0m 2 GSMG
+[2m[36m(pid=79121)[0m 2 EIGR
+[2m[36m(pid=79120)[0m 2 EVFM
+[2m[36m(pid=79122)[0m 2 ARCO
+[2m[36m(pid=79117)[0m 2 ROK
+[2m[36m(pid=79119)[0m 2 TPVG
+[2m[36m(pid=79118)[0m 2 JKHY
+[2m[36m(pid=79116)[0m 2 AGO
+[2m[36m(pid=79115)[0m 2 DAKT
+[2m[36m(pid=79121)[0m 2 MRO
+[2m[36m(pid=79120)[0m 2 NFH
+[2m[36m(pid=79122)[0m 2 BB
+[2m[36m(pid=79117)[0m 2 GIB
+[2m[36m(pid=79119)[0m 2 SNDL
+[2m[36m(pid=79118)[0m 2 DECK
+[2m[36m(pid=79116)[0m 2 STLA
+[2m[36m(pid=79115)[0m 2 PAG
+[2m[36m(pid=79120)[0m 2 RUTH
+[2m[36m(pid=79121)[0m 2 LPCN
+[2m[36m(pid=79122)[0m 2 RGEN
+[2m[36m(pid=79117)[0m 2 LVS
+[2m[36m(pid=79119)[0m 2 AXLA
+[2m[36m(pid=79118)[0m 2 FRGI
+[2m[36m(pid=79116)[0m 2 ECOR
+[2m[36m(pid=79115)[0m 2 GTT
+[2m[36m(pid=79120)[0m 2 RCL
+[2m[36m(pid=79121)[0m 2 ACB
+[2m[36m(pid=79122)[0m 2 THRY
+[2m[36m(pid=79117)[0m 2 AON
+[2m[36m(pid=79119)[0m 2 FUSE
+[2m[36m(pid=79118)[0m 2 ARKO
+[2m[36m(pid=79116)[0m 2 AIMC
+[2m[36m(pid=79115)[0m 2 AMPY
+[2m[36m(pid=79120)[0m 2 INFI
+[2m[36m(pid=79121)[0m 2 SNDR
+[2m[36m(pid=79122)[0m 2 PTMN
+[2m[36m(pid=79117)[0m 2 CM
+[2m[36m(pid=79119)[0m 2 GOGO
+[2m[36m(pid=79118)[0m 2 DELL
+[2m[36m(pid=79116)[0m 2 FTOC
+[2m[36m(pid=79115)[0m 2 DXCM
+[2m[36m(pid=79120)[0m 2 ALTR
+[2m[36m(pid=79121)[0m 2 CVX
+[2m[36m(pid=79122)[0m 2 HAIN
+[2m[36m(pid=79117)[0m 2 GOLF
+[2m[36m(pid=79119)[0m 2 OTEX
+[2m[36m(pid=79118)[0m 2 CRC
+[2m[36m(pid=79116)[0m 2 SRCE
+[2m[36m(pid=79120)[0m 2 TRP
+[2m[36m(pid=79115)[0m 2 HOOK
+[2m[36m(pid=79121)[0m 2 RUBY
+[2m[36m(pid=79122)[0m 2 PRTS
+[2m[36m(pid=79117)[0m 2 STC
+[2m[36m(pid=79119)[0m 2 AVO
+[2m[36m(pid=79118)[0m 2 ATKR
+[2m[36m(pid=79116)[0m 2 SRI
+[2m[36m(pid=79120)[0m 2 TTOO
+[2m[36m(pid=79115)[0m 2 IFMK
+[2m[36m(pid=79121)[0m 2 CLBK
+[2m[36m(pid=79122)[0m 2 USM
+[2m[36m(pid=79117)[0m 2 AOSL
+[2m[36m(pid=79119)[0m 2 EB
+[2m[36m(pid=79118)[0m 2 IAG
+[2m[36m(pid=79116)[0m 2 UEPS
+[2m[36m(pid=79120)[0m 2 ACIW
+[2m[36m(pid=79115)[0m 2 XSPA
+[2m[36m(pid=79122)[0m 2 LORL
+[2m[36m(pid=79121)[0m 2 TEX
+[2m[36m(pid=79117)[0m 2 TIGO
+[2m[36m(pid=79119)[0m 2 GPRO
+[2m[36m(pid=79118)[0m 2 CINF
+[2m[36m(pid=79116)[0m 2 ATEN
+[2m[36m(pid=79120)[0m 2 SMMT
+[2m[36m(pid=79115)[0m 2 SFTW
+[2m[36m(pid=79122)[0m 2 BIOL
+[2m[36m(pid=79121)[0m 2 BXS
+[2m[36m(pid=79117)[0m 2 DIOD
+[2m[36m(pid=79119)[0m 2 NTAP
+[2m[36m(pid=79118)[0m 2 TBPH
+[2m[36m(pid=79116)[0m 2 ASTC
+[2m[36m(pid=79120)[0m 2 SAND
+[2m[36m(pid=79115)[0m 2 SII
+[2m[36m(pid=79122)[0m 2 RTPZ
+[2m[36m(pid=79121)[0m 2 MICT
+[2m[36m(pid=79117)[0m 2 AJRD
+[2m[36m(pid=79119)[0m 2 ANF
+[2m[36m(pid=79118)[0m 2 TMQ
+[2m[36m(pid=79116)[0m 2 CNOB
+[2m[36m(pid=79120)[0m 2 HUBB
+[2m[36m(pid=79115)[0m 2 CRI
+[2m[36m(pid=79122)[0m 2 AI
+[2m[36m(pid=79121)[0m 2 HIMS
+[2m[36m(pid=79117)[0m 2 MOTV
+[2m[36m(pid=79119)[0m 2 CHWY
+[2m[36m(pid=79118)[0m 2 GNW
+[2m[36m(pid=79116)[0m 2 GPL
+[2m[36m(pid=79120)[0m 2 ISRG
+[2m[36m(pid=79115)[0m 2 CAE
+[2m[36m(pid=79122)[0m 2 ASPL
+[2m[36m(pid=79121)[0m 2 NRG
+[2m[36m(pid=79117)[0m 2 HLIT
+[2m[36m(pid=79119)[0m 2 RL
+[2m[36m(pid=79118)[0m 2 FMBI
+[2m[36m(pid=79116)[0m 2 FHN
+[2m[36m(pid=79120)[0m 2 ARNA
+[2m[36m(pid=79115)[0m 2 PNR
+[2m[36m(pid=79122)[0m 2 PFLT
+[2m[36m(pid=79121)[0m 2 SEDG
+[2m[36m(pid=79117)[0m 2 DORM
+[2m[36m(pid=79119)[0m 2 FOE
+[2m[36m(pid=79118)[0m 2 INOV
+[2m[36m(pid=79116)[0m 2 SEAC
+[2m[36m(pid=79120)[0m 2 HSIC
+[2m[36m(pid=79115)[0m 2 ITW
+[2m[36m(pid=79122)[0m 2 LRCX
+[2m[36m(pid=79121)[0m 2 TCRR
+[2m[36m(pid=79117)[0m 2 FLNT
+[2m[36m(pid=79119)[0m 2 AFIB
+[2m[36m(pid=79118)[0m 2 POST
+[2m[36m(pid=79116)[0m 2 HGV
+[2m[36m(pid=79120)[0m 2 CCMP
+[2m[36m(pid=79115)[0m 2 ECOL
+[2m[36m(pid=79122)[0m 2 MAT
+[2m[36m(pid=79121)[0m 2 GFL
+[2m[36m(pid=79117)[0m 2 TMDX
+[2m[36m(pid=79119)[0m 2 PHR
+[2m[36m(pid=79118)[0m 2 CFMS
+[2m[36m(pid=79120)[0m 2 AVAN
+[2m[36m(pid=79116)[0m 2 DYN
+[2m[36m(pid=79115)[0m 2 HCA
+[2m[36m(pid=79122)[0m 2 UPST
+[2m[36m(pid=79121)[0m 2 NI
+[2m[36m(pid=79117)[0m 2 NHIC
+[2m[36m(pid=79119)[0m 2 OSPN
+[2m[36m(pid=79118)[0m 2 IMVT
+[2m[36m(pid=79120)[0m 2 BY
+[2m[36m(pid=79116)[0m 2 MNST
+[2m[36m(pid=79122)[0m 2 ESNT
+[2m[36m(pid=79115)[0m 2 ETSY
+[2m[36m(pid=79121)[0m 2 QS
+[2m[36m(pid=79117)[0m 2 SCU
+[2m[36m(pid=79118)[0m 2 FEYE
+[2m[36m(pid=79119)[0m 2 AAWW
+[2m[36m(pid=79120)[0m 2 WHR
+[2m[36m(pid=79116)[0m 2 GAIN
+[2m[36m(pid=79122)[0m 2 EVOK
+[2m[36m(pid=79115)[0m 2 DVN
+[2m[36m(pid=79117)[0m 2 SFM
+[2m[36m(pid=79121)[0m 2 MD
+[2m[36m(pid=79118)[0m 2 WSBF
+[2m[36m(pid=79119)[0m 2 ARAY
+[2m[36m(pid=79120)[0m 2 EMX
+[2m[36m(pid=79116)[0m 2 BIPC
+[2m[36m(pid=79122)[0m 2 NDLS
+[2m[36m(pid=79115)[0m 2 ROP
+[2m[36m(pid=79117)[0m 2 LPG
+[2m[36m(pid=79121)[0m 2 LSCC
+[2m[36m(pid=79118)[0m 2 CORT
+[2m[36m(pid=79119)[0m 2 BWXT
+[2m[36m(pid=79120)[0m 2 SIOX
+[2m[36m(pid=79116)[0m 2 MBRX
+[2m[36m(pid=79122)[0m 2 CTAS
+[2m[36m(pid=79115)[0m 2 BCPC
+[2m[36m(pid=79117)[0m 2 TXRH
+[2m[36m(pid=79121)[0m 2 WETF
+[2m[36m(pid=79118)[0m 2 EOG
+[2m[36m(pid=79119)[0m 2 AVTR
+[2m[36m(pid=79120)[0m 2 LNDC
+[2m[36m(pid=79116)[0m 2 FMAC
+[2m[36m(pid=79122)[0m 2 ACN
+[2m[36m(pid=79115)[0m 2 WD
+[2m[36m(pid=79117)[0m 2 DPW
+[2m[36m(pid=79121)[0m 2 PLAN
+[2m[36m(pid=79118)[0m 2 QGEN
+[2m[36m(pid=79119)[0m 2 HONE
+[2m[36m(pid=79120)[0m 2 VLDR
+[2m[36m(pid=79116)[0m 2 ACAC
+[2m[36m(pid=79122)[0m 2 XENE
+[2m[36m(pid=79115)[0m 2 SGRY
+[2m[36m(pid=79117)[0m 2 CGEM
+[2m[36m(pid=79121)[0m 2 MUR
+[2m[36m(pid=79118)[0m 2 NFLX
+[2m[36m(pid=79119)[0m 2 GPC
+[2m[36m(pid=79120)[0m 2
+[2m[36m(pid=79120)[0m  MDCA
+[2m[36m(pid=79116)[0m 2 PNFP
+[2m[36m(pid=79122)[0m 2 NDSN
+[2m[36m(pid=79115)[0m 2 PRAX
+[2m[36m(pid=79117)[0m 2 GWGH
+[2m[36m(pid=79121)[0m 2 A
+[2m[36m(pid=79118)[0m 2 UMPQ
+[2m[36m(pid=79120)[0m 2 XLRN
+[2m[36m(pid=79119)[0m 2 EMR
+[2m[36m(pid=79116)[0m 2 YELP
+[2m[36m(pid=79122)[0m 2 AZZ
+[2m[36m(pid=79117)[0m 2 VRM
+[2m[36m(pid=79115)[0m 2 STON
+[2m[36m(pid=79121)[0m 2 EMKR
+[2m[36m(pid=79118)[0m 2 LAUR
+[2m[36m(pid=79120)[0m 2 STTK
+[2m[36m(pid=79119)[0m 2 CHX
+[2m[36m(pid=79116)[0m 2 OGI
+[2m[36m(pid=79121)[0m 2 WWR
+[2m[36m(pid=79122)[0m 2 PVG
+[2m[36m(pid=79117)[0m 2 TEL
+[2m[36m(pid=79115)[0m 2 AMPE
+[2m[36m(pid=79118)[0m 2 PD
+[2m[36m(pid=79120)[0m 2 LBRT
+[2m[36m(pid=79119)[0m 2 ESI
+[2m[36m(pid=79116)[0m 2 AMEH
+[2m[36m(pid=79121)[0m 2 CSTE
+[2m[36m(pid=79118)[0m 2 FGNA
+[2m[36m(pid=79122)[0m 2 KHC
+[2m[36m(pid=79117)[0m 2 RPRX
+[2m[36m(pid=79115)[0m 2 BERY
+[2m[36m(pid=79120)[0m 2 CNP
+[2m[36m(pid=79119)[0m 2 GPRE
+[2m[36m(pid=79116)[0m 2 UAA
+[2m[36m(pid=79118)[0m 2 CHTR
+[2m[36m(pid=79122)[0m 2 PCVX
+[2m[36m(pid=79121)[0m 2 CUE
+[2m[36m(pid=79117)[0m 2 OLMA
+[2m[36m(pid=79115)[0m 2 WOR
+[2m[36m(pid=79120)[0m 2 FRC
+[2m[36m(pid=79119)[0m 2 APH
+[2m[36m(pid=79116)[0m 2 M
+[2m[36m(pid=79118)[0m 2 CNI
+[2m[36m(pid=79121)[0m 2 TGI
+[2m[36m(pid=79122)[0m 2 FOSL
+[2m[36m(pid=79117)[0m 2 GAN
+[2m[36m(pid=79115)[0m 2 INTC
+[2m[36m(pid=79120)[0m 2 EVR
+[2m[36m(pid=79119)[0m 2 PRTH
+[2m[36m(pid=79116)[0m 2 CACI
+[2m[36m(pid=79118)[0m 2 WM
+[2m[36m(pid=79121)[0m 2 ARGO
+[2m[36m(pid=79122)[0m 2 BZH
+[2m[36m(pid=79117)[0m 2 FBP
+[2m[36m(pid=79115)[0m 2 LOPE
+[2m[36m(pid=79120)[0m 2 VACQ
+[2m[36m(pid=79119)[0m 2 MORN
+[2m[36m(pid=79118)[0m 2 REGN
+[2m[36m(pid=79116)[0m 2 ONEM
+[2m[36m(pid=79121)[0m 2 FMNB
+[2m[36m(pid=79122)[0m 2 GSV
+[2m[36m(pid=79117)[0m 2 TTGT
+[2m[36m(pid=79115)[0m 2 RLI
+[2m[36m(pid=79120)[0m 2 VSTA
+[2m[36m(pid=79119)[0m 2 SLF
+[2m[36m(pid=79118)[0m 2 NTCT
+[2m[36m(pid=79116)[0m 2 HD
+[2m[36m(pid=79122)[0m 2 SYN
+[2m[36m(pid=79121)[0m 2 DRI
+[2m[36m(pid=79117)[0m 2 METC
+[2m[36m(pid=79115)[0m 2 OTLK
+[2m[36m(pid=79120)[0m 2 FAMI
+[2m[36m(pid=79119)[0m 2 VOR
+[2m[36m(pid=79118)[0m 2 EBAY
+[2m[36m(pid=79116)[0m 2 GPRK
+[2m[36m(pid=79121)[0m 2 VAC
+[2m[36m(pid=79117)[0m 2 HOPE
+[2m[36m(pid=79122)[0m 2 KNL
+[2m[36m(pid=79115)[0m 2 PARR
+[2m[36m(pid=79119)[0m 2 BKCC
+[2m[36m(pid=79118)[0m 2 KMDA
+[2m[36m(pid=79120)[0m 2 STOK
+[2m[36m(pid=79116)[0m 2 EGO
+[2m[36m(pid=79121)[0m 2 ACET
+[2m[36m(pid=79117)[0m 2 VXRT
+[2m[36m(pid=79115)[0m 2 BMI
+[2m[36m(pid=79122)[0m 2 TENB
+[2m[36m(pid=79119)[0m 2 WWW
+[2m[36m(pid=79118)[0m 2 VISL
+[2m[36m(pid=79120)[0m 2 VSTO
+[2m[36m(pid=79116)[0m 2 SWTX
+[2m[36m(pid=79121)[0m 2 ALRM
+[2m[36m(pid=79122)[0m 2 SDPI
+[2m[36m(pid=79117)[0m 2 ARCE
+[2m[36m(pid=79115)[0m 2 FUV
+[2m[36m(pid=79119)[0m 2 GMED
+[2m[36m(pid=79118)[0m 2 ETRN
+[2m[36m(pid=79120)[0m 2 RILY
+[2m[36m(pid=79116)[0m 2 TYL
+[2m[36m(pid=79121)[0m 2 AYI
+[2m[36m(pid=79115)[0m 2 YUMC
+[2m[36m(pid=79117)[0m 2 IVC
+[2m[36m(pid=79122)[0m 2 CNQ
+[2m[36m(pid=79118)[0m 2 MBIN
+[2m[36m(pid=79119)[0m 2 COO
+[2m[36m(pid=79120)[0m 2 VLY
+[2m[36m(pid=79116)[0m 2 CNSP
+[2m[36m(pid=79121)[0m 2 AZRX
+[2m[36m(pid=79115)[0m 2 HYLN
+[2m[36m(pid=79117)[0m 2 CGNX
+[2m[36m(pid=79122)[0m 2 HNGR
+[2m[36m(pid=79118)[0m 2 NVCR
+[2m[36m(pid=79119)[0m 2 TGB
+[2m[36m(pid=79120)[0m 2 SGMS
+[2m[36m(pid=79116)[0m 2 WMS
+[2m[36m(pid=79121)[0m 2 ARCC
+[2m[36m(pid=79115)[0m 2 MAS
+[2m[36m(pid=79117)[0m 2 CDAY
+[2m[36m(pid=79122)[0m 2 NNI
+[2m[36m(pid=79118)[0m 2 BLDR
+[2m[36m(pid=79119)[0m 2 PBPB
+[2m[36m(pid=79120)[0m 2 PFPT
+[2m[36m(pid=79121)[0m 2 TDY
+[2m[36m(pid=79116)[0m 2 APEN
+[2m[36m(pid=79115)[0m 2 GMDA
+[2m[36m(pid=79122)[0m 2 SDC
+[2m[36m(pid=79117)[0m 2 GEG
+[2m[36m(pid=79118)[0m 2 CPHI
+[2m[36m(pid=79119)[0m 2 CMS
+[2m[36m(pid=79120)[0m 2 MORF
+[2m[36m(pid=79116)[0m 2 ANAB
+[2m[36m(pid=79121)[0m 2 DLB
+[2m[36m(pid=79115)[0m 2 CTIC
+[2m[36m(pid=79122)[0m 2 ITCI
+[2m[36m(pid=79118)[0m 2 TWCT
+[2m[36m(pid=79120)[0m 2 AVA
+[2m[36m(pid=79119)[0m 2 LFMD
+[2m[36m(pid=79117)[0m 2 STT
+[2m[36m(pid=79116)[0m 2 LEAF
+[2m[36m(pid=79121)[0m 2 ECPG
+[2m[36m(pid=79115)[0m 2
+[2m[36m(pid=79115)[0m  LEG
+[2m[36m(pid=79122)[0m 2 LYB
+[2m[36m(pid=79118)[0m 2 SBNY
+[2m[36m(pid=79120)[0m 2 VRA
+[2m[36m(pid=79119)[0m 2 JAZZ
+[2m[36m(pid=79117)[0m 2 FPH
+[2m[36m(pid=79121)[0m 2 GABC
+[2m[36m(pid=79116)[0m 2 WSC
+[2m[36m(pid=79115)[0m 2 TSN
+[2m[36m(pid=79118)[0m 2 NSC
+[2m[36m(pid=79122)[0m 2 STL
+[2m[36m(pid=79120)[0m 2 GALT
+[2m[36m(pid=79119)[0m 2 UA
+[2m[36m(pid=79117)[0m 2 GNRC
+[2m[36m(pid=79121)[0m 2 PRG
+[2m[36m(pid=79116)[0m 2 CYD
+[2m[36m(pid=79115)[0m 2 TRTN
+[2m[36m(pid=79118)[0m 2 LAC
+[2m[36m(pid=79122)[0m 2 CATY
+[2m[36m(pid=79120)[0m 2 CTB
+[2m[36m(pid=79119)[0m 2 NNOX
+[2m[36m(pid=79117)[0m 2 MTEM
+[2m[36m(pid=79116)[0m 2 VERU
+[2m[36m(pid=79121)[0m 2 CCS
+[2m[36m(pid=79115)[0m 2 RXN
+[2m[36m(pid=79118)[0m 2 UFPI
+[2m[36m(pid=79122)[0m 2 CAG
+[2m[36m(pid=79120)[0m 2 THC
+[2m[36m(pid=79119)[0m 2 APD
+[2m[36m(pid=79117)[0m 2 HRMY
+[2m[36m(pid=79116)[0m 2 JRVR
+[2m[36m(pid=79121)[0m 2 SNA
+[2m[36m(pid=79115)[0m 2 INVA
+[2m[36m(pid=79118)[0m 2 IMTX
+::::> RUNNING: Writting SGU into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ACTG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ES into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting T into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CCAP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RLAY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CORE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NUS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BOH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TTD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting UGI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SNV into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EPZM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GORO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EHTH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting OYST into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PAX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NOVT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MET into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FRHC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GFF into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TGNA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting UONEK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting IGAC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting OBLG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PBH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting OSMT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CREE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting QDEL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RIG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TGTX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CYCN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AGLE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting INBX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EPM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CRIS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CMRX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ANTM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CTLT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SMTC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TWI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HRTX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SCWX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SESN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SMG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GCP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ARWR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FDP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ATO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TRUP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EVLO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AQST into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ARPO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DTEA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LCAP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting COMS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ULTA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting KIN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting QTNT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LCII into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MIME into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HLX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DMS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FSK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting INT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ATCX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MASI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SANW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PSTG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GLOP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NOW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DISCB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LAZ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CALM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LMNX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ANDE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting OSBC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GILD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TCBI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ANGO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AZEK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BDSX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NVMI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TSCO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SCHN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SRRK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PERI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VET into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PWR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CCL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CNC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NBRV into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting USWS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FIX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting XCUR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FMC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VRSK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting IMPX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting UCBI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GAU into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EVER into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AVLR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DPZ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PPBI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HSTM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BYSI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TTC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AEIS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LOOP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting THG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AWI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TTEC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ALJJ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SSD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DOGZ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PROS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ROLL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HEXO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GRA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PTON into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GNSS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CRVS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CSGP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RSSS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LSTR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TXMD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PII into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ZTS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LAZR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EGBN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MANT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BLD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LMNL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MMM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BPOP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ASM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CBSH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TACO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MNRL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CLGX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting COUP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GVA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CAAS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TDW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ACRX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting KSS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PSN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WMG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MNKD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PRMW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting THCB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BNGO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CONX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting APLT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CDLX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CLVS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BANC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting JWN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AEP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FIXX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AXNX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ZION into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting IGT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TSHA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PGR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MODN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CRSP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CSCW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CMTL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TOWN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CAMT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting IART into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CLB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WMB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FSS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting XM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NTLA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WCN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting OFG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ENTG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WWD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LITE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RCI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EEFT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ANAT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WDAY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TROX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GSHD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ABST into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ZYNE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CLII into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AEZS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PULM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting UPWK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NLSN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GLW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting L into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HES into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HUN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting XEL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EVRI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HSTO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ATIF into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CAL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HMHC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PFS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FMTX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CVET into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CBB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RGLS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PRGS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RSVA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TCBK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BCO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NEOG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NEWR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BRP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AMAL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SWAV into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MSI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ECOM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PTGX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CSTM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TGT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GSMG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EIGR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EVFM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ARCO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ROK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TPVG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting JKHY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AGO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DAKT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MRO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NFH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GIB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SNDL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DECK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting STLA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PAG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LPCN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RUTH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RGEN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LVS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AXLA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FRGI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ECOR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GTT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RCL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ACB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting THRY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AON into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FUSE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ARKO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AIMC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AMPY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting INFI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SNDR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PTMN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GOGO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DELL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FTOC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DXCM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ALTR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CVX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HAIN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GOLF into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting OTEX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CRC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SRCE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HOOK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TRP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RUBY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PRTS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting STC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AVO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ATKR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SRI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting IFMK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TTOO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CLBK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting USM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AOSL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting IAG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting UEPS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ACIW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting XSPA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TEX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LORL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TIGO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GPRO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CINF into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ATEN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SMMT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SFTW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BIOL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BXS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DIOD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NTAP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TBPH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ASTC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SAND into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SII into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RTPZ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MICT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AJRD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ANF into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TMQ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CNOB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HUBB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CRI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HIMS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MOTV into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CHWY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GNW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GPL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ISRG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CAE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ASPL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NRG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HLIT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FMBI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FHN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ARNA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PNR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PFLT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SEDG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DORM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FOE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting INOV into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SEAC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HSIC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ITW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LRCX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TCRR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FLNT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AFIB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting POST into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HGV into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CCMP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ECOL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MAT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GFL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TMDX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PHR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CFMS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DYN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AVAN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HCA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting UPST into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NHIC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting OSPN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting IMVT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MNST into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ETSY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ESNT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting QS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SCU into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AAWW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FEYE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WHR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GAIN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EVOK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DVN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SFM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WSBF into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ARAY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EMX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BIPC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NDLS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ROP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LPG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LSCC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CORT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BWXT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SIOX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MBRX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CTAS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BCPC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TXRH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WETF into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EOG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AVTR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LNDC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FMAC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ACN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DPW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PLAN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting QGEN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HONE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VLDR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ACAC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting XENE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SGRY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CGEM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MUR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NFLX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GPC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MDCA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PNFP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NDSN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PRAX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GWGH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting A into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting UMPQ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EMR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting XLRN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting YELP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AZZ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting STON into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VRM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EMKR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LAUR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting STTK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CHX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting OGI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PVG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TEL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AMPE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WWR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LBRT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ESI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AMEH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CSTE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting KHC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RPRX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BERY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FGNA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CNP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GPRE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting UAA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CHTR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CUE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PCVX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting OLMA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WOR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FRC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting APH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting M into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CNI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FOSL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TGI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GAN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting INTC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EVR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PRTH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CACI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ARGO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BZH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FBP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LOPE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VACQ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MORN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ONEM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting REGN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FMNB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GSV into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TTGT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RLI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VSTA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SLF into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NTCT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DRI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SYN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting METC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting OTLK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FAMI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VOR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EBAY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GPRK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting KNL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VAC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HOPE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PARR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BKCC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting KMDA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting STOK into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting EGO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ACET into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VXRT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TENB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BMI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WWW into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VISL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VSTO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SWTX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ALRM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FUV into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SDPI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ARCE into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GMED into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ETRN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RILY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TYL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AYI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CNQ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting IVC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting YUMC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting COO into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MBIN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VLY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CNSP into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AZRX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HYLN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CGNX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HNGR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NVCR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TGB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SGMS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WMS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ARCC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MAS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CDAY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NNI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting BLDR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PBPB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PFPT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting APEN into SQL Table for BaseBars[2m[36m(pid=79121)[0m 2021-06-20 19:55:27.535622: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=79121)[0m 2021-06-20 19:55:27.535690: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=79119)[0m 2021-06-20 19:55:27.538605: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=79119)[0m 2021-06-20 19:55:27.538655: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=79116)[0m 2021-06-20 19:55:27.536114: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=79116)[0m 2021-06-20 19:55:27.536154: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=79118)[0m 2021-06-20 19:55:27.564980: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=79118)[0m 2021-06-20 19:55:27.565040: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=79120)[0m 2021-06-20 19:55:27.550329: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=79120)[0m 2021-06-20 19:55:27.550392: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=79115)[0m 2021-06-20 19:55:27.659885: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=79115)[0m 2021-06-20 19:55:27.659947: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=79122)[0m 2021-06-20 19:55:27.829410: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=79122)[0m 2021-06-20 19:55:27.829477: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=79117)[0m 2021-06-20 19:55:27.966537: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=79117)[0m 2021-06-20 19:55:27.966643: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+---Information was written---
+::::> RUNNING: Writting TDY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GMDA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GEG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SDC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CPHI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CMS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MORF into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting DLB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ANAB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CTIC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ITCI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TWCT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LFMD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting STT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting AVA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LEAF into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting ECPG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LEG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LYB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SBNY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VRA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting JAZZ into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting FPH into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting WSC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GABC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TSN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting STL into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NSC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GALT into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting UA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting GNRC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting PRG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CYD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting TRTN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting LAC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CATY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CTB into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting NNOX into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting MTEM into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CCS into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting VERU into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting RXN into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting UFPI into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting CAG into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting THC into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting APD into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting HRMY into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting JRVR into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting SNA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting INVA into SQL Table for BaseBars
+---Information was written---
+::::> RUNNING: Writting IMTX into SQL Table for BaseBars
+---Information was written---
+<<<::::: BASIC BAR CONSTRUCTION SQL PROCESS FINISHED :::::>>>
+::::> UPDATED SQL INFORMATION FINISHED <::::

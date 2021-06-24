@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from enigmx.databundle import DataRespositoryInitialization
+from enigmx.tests.telegram import send_message
+
 
 from enigmx.utils import (
     getDailyVolatility, 
@@ -157,11 +159,11 @@ def generate_datasets(stock,
             ) 
         
         #take selected info (close|open) and compute Fractional Diff | *****
-        bar_price_fracdiff = simpleFracdiff(
-            arrayBarInfo[...,data_index_for_fracdiff_and_volatility], 
-            window_application_fracdiff
-            )
         
+        bar_price_fracdiff = simpleFracdiff(
+	    arrayBarInfo[...,data_index_for_fracdiff_and_volatility], 
+            window_application_fracdiff
+	    )
         #include fracdiff price series as one last dim in arrayBarInfo
         arrayBarInfoUpdated = np.column_stack(
             [arrayBarInfo, bar_price_fracdiff]
