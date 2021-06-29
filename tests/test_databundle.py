@@ -11,7 +11,7 @@ from enigmx.tests.telegram import send_message
 from enigmx.tests.stocks import stocks
 
 
-server_name = "34.67.4.196" 
+server_name = "34.71.105.233" 
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
 list_stocks = stocks
@@ -37,23 +37,23 @@ enigmxsql = SQLEnigmXinterface(
     desired_bars = desired_bars,
     referential_base_database = referential_base_database)
 
-#print("creando tablas")
-#enigmxsql.create_table_database(
-#    bars_tunning = True, 
-#    bars_basic = True, 
-#    bars_entropy = False, 
-#    etfs_trick = True, 
-#    bars_sampled = True, 
-#    bars_barrier = True,
-#    bars_weights = True,
-#    bars_features = True,
-#    creation_database = True)
+print("creando tablas")
+enigmxsql.create_table_database(
+    bars_tunning = True, 
+    bars_basic = True, 
+    bars_entropy = False, 
+    etfs_trick = True, 
+    bars_sampled = True, 
+    bars_barrier = True,
+    bars_weights = True,
+    bars_features = True,
+    creation_database = True)
 
 print("subiendo info")
 try:
 	enigmxsql.compute_info_to_sql(
-            bars_tunning_process = False, 
-            bar_construction_process = False, 
+            bars_tunning_process = True, 
+            bar_construction_process = True, 
             entropy_construction_process = False, 
             etftrick_construction_process = True, 
             sampling_features_process =True, 
