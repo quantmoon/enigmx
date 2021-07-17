@@ -405,16 +405,19 @@ class SQLEnigmXinterface(object):
                                     lagsDef, hBound):
         
         #extrae el pandas del ETF TRICK de la tabla SQL
-        etf_pandas = SQLFRAME.read_table_info(
-            statement="SELECT * FROM [ETFTRICK].[dbo].ETF_TRICK_{}_GLOBAL".format(
-               self. bartype.upper()
-                ), 
-            dbconn_= dbconn, 
-            cursor_= cursor, 
-            dataframe=True
-            )
+        pandas_basic_bars = [
+            SQLFRAME.read_table_info(
+                    statement="SELECT * FROM [BARS].[dbo].{}_{}_GLOBAL".format(
+                        stock, self.bartype.upper()
+                        ), 
+                    dbconn_= dbconn, 
+                    cursor_= cursor, 
+                    dataframe=True
+                ) 
+            for stock in self.list_stocks]        
         
         #utiliza df del ETF TRICK y añade col 'SADF' | entropy no habilitado
+
         etf_sadf_pandas = gettingSADF(
             etf_df = etf_pandas,
             #### Optional Params ####

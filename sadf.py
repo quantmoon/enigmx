@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from numba.typed import List
 from statsmodels.regression.linear_model import OLS
+from enigmx.sampling_features import getSamplingFeatures
 from numba import njit,float64,jit,float32,int64,typeof,char
 
 # FUNCION 1: Recibe de insumo un DataFrame en tiempo (Yt) 
@@ -172,12 +173,15 @@ def generalSADFMethod(original_frame, main_column_name, lags = None):
     # return reformed original frame
     return original_frame
 
-def gettingSADF(etf_df, 
+@ray.remote
+def gettingSADF_and_sampling(etf_df, 
                 lags = None, 
-                main_value_name = 'value'):
+                main_value_name = 'value',
+                hvalue = hBound):
     
     # función canalizadora del método SADF general
     
     sadf_frame = generalSADFMethod(etf_df, main_value_name, lags = lags)
+    sampled_frame = getSamplingFeatures(base_df = sadf_frame, main_column_name = 'sadf', hvalue = hBound,select_events=True)
 
     return sadf_frame

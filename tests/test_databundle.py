@@ -11,7 +11,7 @@ from enigmx.tests.telegram import send_message
 from enigmx.tests.stocks import stocks
 
 
-server_name = "34.71.105.233" 
+server_name = "34.66.109.5" 
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
 list_stocks = stocks
@@ -55,11 +55,11 @@ try:
             bars_tunning_process = True, 
             bar_construction_process = True, 
             entropy_construction_process = False, 
-            etftrick_construction_process = True, 
-            sampling_features_process =True, 
-            triple_barrier_computation_process = True, 
-            sample_weight_computation_process =True,
-            features_bar_computation_process = True,
+            etftrick_construction_process = False, 
+            sampling_features_process =False, 
+            triple_barrier_computation_process = False, 
+            sample_weight_computation_process =False,
+            features_bar_computation_process = False,
             tunning_interval = "10D",
 	    )
 	send_message('Se acabó!')
