@@ -4,7 +4,7 @@ Created on Sun Feb 21 15:21:55 2021
 
 @author: FRANK
 """
-
+import sys
 import ray
 import pyodbc
 import urllib
@@ -12,7 +12,7 @@ import sqlalchemy
 import numpy as np
 import pandas as pd
 from datetime import datetime 
-from enigmx.sadf import gettingSADF
+from enigmx.sadf import gettingSADF_and_sampling
 from enigmx.features import FeaturesClass
 from enigmx.sampleweight import WeightsGeneration
 from enigmx.save_info import generate_datasets
@@ -415,69 +415,27 @@ class SQLEnigmXinterface(object):
                     dataframe=True
                 ) 
             for stock in self.list_stocks]        
-        
-        #utiliza df del ETF TRICK y añade col 'SADF' | entropy no habilitado
+        #utiliza df de las barras iniciales y añade col 'SADF' | realiza el sampleo  |entropy no habilitado
 
-        etf_sadf_pandas = gettingSADF(
-            etf_df = etf_pandas,
+        ray_object_list = [gettingSADF_and_sampling.remote(
+            etf_df = bars,
             #### Optional Params ####
             lags = lagsDef, 
-            main_value_name = 'value'
-            )
-    
-        #samplea el ETF Trick en los valores relevantes
-        etf_sampled = getSamplingFeatures(
-            base_df = etf_sadf_pandas, 
-            main_column_name = 'sadf', #'entropy' or 'sadf'
-            h_value = hBound,
-            #### Optional Params ####
-            select_events=True
-            )
+            main_value_name = 'close_price',
+            hvalue = hBound
+            ) for bars in pandas_basic_bars]
+        print("::::> RUNNING SADF PROCESS <::::")
+
+        pandas_sampled_bars = ray.get(ray_object_list)
         
-        print("::::> RUNNING: Writting ETF TRICK 'SADF' into ETFTRICK SQL Table")
-        
-        #recopila stocks-name desde el etf_pandas | omite 1era columna 'value'
-        baseStockItems = etf_sampled.columns.values[1:]
-        
-        #convierte lista de stocks en un string único con las acciones
-        stock_list = ",".join(str(e) for e in baseStockItems)
-        
-        #construye un solo string por cada stock para rellenado de sql
-        signQuestionFillSQL = ",".join("?" for e in baseStockItems)        
-        
-        #statement para almacenamiento 
-        statement = "INSERT INTO ETFTRICK.dbo.ETF_TRICK_SAMPLED_{}_GLOBAL \
-               (value, {}) VALUES (?,{})".format(
-               self.bartype.upper(), stock_list, signQuestionFillSQL  
-               )
-        
-        #guardar la información del ETF SAMPLED TRICK en la tabla SQL correspd.
-        cursor.executemany(
-            statement, 
-            list(etf_sampled.itertuples(index=False, name=None))
-        )
-        
-        print("WARNING: don't interrupt | Writting Process continues...")     
-        
-        #abrimos las tablas en formato dataframe por acción desde SQL
-        pandas_basic_bars = [
-            SQLFRAME.read_table_info(
-                    statement="SELECT * FROM [BARS].[dbo].{}_{}_GLOBAL".format(
-                        stock, self.bartype.upper()
-                        ), 
-                    dbconn_= dbconn, 
-                    cursor_= cursor, 
-                    dataframe=True
-                ) 
-            for stock in self.list_stocks]
     
         #selección de eventos con "structural break" según SADF de c/ df org.
-        pandas_sampled_bars = crossSectionalDataSelection(
-            sampled_dataframe = etf_sampled, 
-            list_stocks_bars = pandas_basic_bars,
-            list_stocks = self.list_stocks
-            )
-        
+        #pandas_sampled_bars = crossSectionalDataSelection(
+        #    sampled_dataframe = etf_sampled, 
+         #   list_stocks_bars = pandas_basic_bars,
+         #   list_stocks = self.list_stocks
+         #   )
+       # 
         #bloque iterativo único escritura en tabla (no existe bloque 'bartype')
         for idx, dataset in enumerate(pandas_sampled_bars):
             

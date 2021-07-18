@@ -9,6 +9,7 @@ from numba.typed import List
 from statsmodels.regression.linear_model import OLS
 from enigmx.sampling_features import getSamplingFeatures
 from numba import njit,float64,jit,float32,int64,typeof,char
+import sys
 
 # FUNCION 1: Recibe de insumo un DataFrame en tiempo (Yt) 
 # y devuelve sus retornos (Yt, Yt-1,... Yt-n) para n lags
@@ -147,13 +148,13 @@ def generalSADFMethod(original_frame, main_column_name, lags = None):
     
     assert(
         type(original_frame) == pd.DataFrame
-        ), "'original_frame' param is not a pandas."
-    
+         ), "'original_frame' param is not a pandas."
+     
     # get the array price series
     price_array_series = np.log(
         original_frame[main_column_name].values
     ).reshape(-1,1)
-    
+      
     # if there is no lags, work time series as datapoints goes by
     if lags is None:
         lags = find_nlags(price_array_series, constant="nc", lags = 1)
@@ -175,13 +176,15 @@ def generalSADFMethod(original_frame, main_column_name, lags = None):
 
 @ray.remote
 def gettingSADF_and_sampling(etf_df, 
+                hvalue,
                 lags = None, 
-                main_value_name = 'value',
-                hvalue = hBound):
+                main_value_name = 'value'
+                ):
     
     # función canalizadora del método SADF general
     
     sadf_frame = generalSADFMethod(etf_df, main_value_name, lags = lags)
-    sampled_frame = getSamplingFeatures(base_df = sadf_frame, main_column_name = 'sadf', hvalue = hBound,select_events=True)
+    sampled_frame = getSamplingFeatures(base_df = sadf_frame, main_column_name = 'sadf', h_value = hvalue,select_events=True)
+    print('sampled')
 
     return sadf_frame
