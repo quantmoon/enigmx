@@ -158,16 +158,17 @@ class SQLEnigmXinterface(object):
         self.referential_base_database = referential_base_database
         self.global_range = global_range
         
-    def __barTunningProcess__(self, SQLFRAME, dbconn, cursor, tunning_interval):
+    def __barTunningProcess__(self, SQLFRAME, dbconn, cursor):
         
         #fecha inicial a partir de la fecha final (parametro "start_date")
-        data_tuple_range_for_tunning = (
-            (
-                datetime.strptime(self.start_date, '%Y-%m-%d').date() - 
-                pd.Timedelta(tunning_interval)
-                ).strftime('%Y-%m-%d'), 
-            self.start_date
-            )
+#        data_tuple_range_for_tunning = (
+#            (
+#                datetime.strptime(self.start_date, '%Y-%m-%d').date() - 
+#                pd.Timedelta(tunning_interval)
+#                ).strftime('%Y-%m-%d'), 
+#            self.start_date
+#            )
+        data_tuple_range_for_tunning = (self.start_date,self.end_date)
 
         #obtien obj. ray con los parametros tuneados por tipo de barra (dict)
         ray_object_list = [
@@ -416,18 +417,19 @@ class SQLEnigmXinterface(object):
                 ) 
             for stock in self.list_stocks]        
         #utiliza df de las barras iniciales y añade col 'SADF' | realiza el sampleo  |entropy no habilitado
-
+        
         ray_object_list = [gettingSADF_and_sampling.remote(
             etf_df = bars,
             #### Optional Params ####
             lags = lagsDef, 
             main_value_name = 'close_price',
-            hvalue = hBound
-            ) for bars in pandas_basic_bars]
+            hvalue = hBound,
+            stock = stock
+            ) for bars,stock in zip(pandas_basic_bars,self.list_stocks)]
         print("::::> RUNNING SADF PROCESS <::::")
 
         pandas_sampled_bars = ray.get(ray_object_list)
-        
+       
     
         #selección de eventos con "structural break" según SADF de c/ df org.
         #pandas_sampled_bars = crossSectionalDataSelection(
@@ -441,7 +443,7 @@ class SQLEnigmXinterface(object):
             
             print("::::> RUNNING: Writting {} into SQL Sampled Bars Table".format(
                 self.list_stocks[idx])
-                ) 
+               ) 
             
             statement = "INSERT INTO BARS_SAMPLED.dbo.{}_SAMPLED_{}_GLOBAL \
                 {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)".format(
@@ -449,8 +451,8 @@ class SQLEnigmXinterface(object):
                 "(open_price,high_price,low_price,close_price,\
                     open_date,high_date,low_date,close_date,basic_volatility,\
                         bar_cum_volume,\
-                            feat_buyInitTotal, feat_sellInitTotal, feat_signVolSide,\
-                                feat_accumulativeVolBuyInit, feat_accumulativeVolSellInit,\
+                           feat_buyInitTotal, feat_sellInitTotal, feat_signVolSide,\
+                               feat_accumulativeVolBuyInit, feat_accumulativeVolSellInit,\
                                     feat_accumulativeDollarValue, feat_hasbrouckSign,\
                                         vwap,fracdiff,volatility,\
                                             horizon,upper_barrier,lower_barrier)"
@@ -969,7 +971,7 @@ class SQLEnigmXinterface(object):
                             #GENERAL NAME FOR DATABASE | SOLO REF.
                             bartype_database = 'BARS',
                             #TUNNING PROCESS PARAMS
-                            tunning_interval = '21D', 
+                            #tunning_interval = '21D', 
                             #BASIC BAR CONSTRUCTION PARAMS
                             volVersion = 'ver2', 
                             fracdiffWindow = 2,
@@ -1008,8 +1010,8 @@ class SQLEnigmXinterface(object):
         
         #proceso de tunning de barras
         if bars_tunning_process:
-            self.__barTunningProcess__(SQLFRAME, dbconn, cursor,
-                                       tunning_interval)
+            self.__barTunningProcess__(SQLFRAME, dbconn, cursor
+                                       )
         
         #proceso de construcción de barras básicas
         if bar_construction_process:

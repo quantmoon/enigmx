@@ -57,37 +57,38 @@ def standard_bar_tunning(url,ticker,num_bar, date_tuple_range):
 
     #encuentra los idxs de la fecha min y fecha max dada en la tupla
     dateIdxs = np.searchsorted(zarr_dates, date_tuple_range)
-
+     
     #guarda número de días del zarr| dif. de indexes
-    num_days = dateIdxs[1]-dateIdxs[0]
+    num_days = dateIdxs[1]-dateIdxs[0] + 1 
 
     #guarda número prom diario de ticks, volumen o dollar | init: 0 all
     average_ticks_day, average_volume_day, average_dollar_day = 0, 0, 0
 
     #iteración por cada index: desde index 0 hasta final del zarr
     for i in range(dateIdxs[0], dateIdxs[1]):
-        value = zarrds.value[i]
-        value = value[value>0]
-        average_ticks_day  += len(value)/num_days
+#        value = zarrds.value[i]
+#        value = value[value>0]
+#        average_ticks_day  += len(value)/num_days
         vol = zarrds.vol[i]
         vol = vol[vol>0]
         average_volume_day += sum(vol)/num_days
-        fec = zarrds.date[i]
-        arr = np.array(zarrds.date)
-        _ = get_arrs(zarrds,arr,fec)
-        dol = sum(_[0] * _[1])
-        average_dollar_day += dol/num_days    
+#        fec = zarrds.date[i]
+#        arr = np.array(zarrds.date)
+#        _ = get_arrs(zarrds,arr,fec)
+#        dol = sum(_[0] * _[1])
+#        average_dollar_day += dol/num_days    
     
     
     #determina el promedio de los ticks, volumen o dollar de la iteración
-    average_ticks_day = int(average_ticks_day)
+#    average_ticks_day = int(average_ticks_day)
     average_volume_day = int(average_volume_day)
-    average_dollar_day = int(average_dollar_day)
+#    average_dollar_day = int(average_dollar_day)
     
     #se construye array resumen
-    dato = np.array(
-        [average_ticks_day, average_volume_day, average_dollar_day]
-        )
+#    dato = np.array(
+#        [average_ticks_day, average_volume_day, average_dollar_day]
+#       )
+     dato = np.array(average_volume_day)
 
     #calibrar los hierparámetros y guardarlos en un diccionario 
     dic = bar_para(dato,num_bar)

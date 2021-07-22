@@ -26,7 +26,7 @@ def getTEvents(gRaw,h):
             sNeg=0;tEvents.append(i)
         elif sPos>h:
             sPos=0;tEvents.append(i)
-    return tEvents#pd.DatetimeIndex(tEvents)
+    return tEvents #pd.DatetimeIndex(tEvents)
 
 def samplingFilter(base_dataframe, main_column_name, h, selection = True):
     
@@ -79,7 +79,8 @@ def getSamplingFeatures(
         base_df,
         main_column_name,
         h_value,
-        select_events = True):
+        select_events = True,
+        stock = None):
     
     """
     Función resumen que ingesta el proceso de sampling filter.
@@ -105,7 +106,6 @@ def getSamplingFeatures(
                                         h_value, 
                                         selection = select_events
                                         )    
-    
     return final_selected_object
 
 

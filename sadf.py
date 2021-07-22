@@ -9,7 +9,7 @@ from numba.typed import List
 from statsmodels.regression.linear_model import OLS
 from enigmx.sampling_features import getSamplingFeatures
 from numba import njit,float64,jit,float32,int64,typeof,char
-import sys
+from time import time
 
 # FUNCION 1: Recibe de insumo un DataFrame en tiempo (Yt) 
 # y devuelve sus retornos (Yt, Yt-1,... Yt-n) para n lags
@@ -178,13 +178,17 @@ def generalSADFMethod(original_frame, main_column_name, lags = None):
 def gettingSADF_and_sampling(etf_df, 
                 hvalue,
                 lags = None, 
-                main_value_name = 'value'
+                main_value_name = 'value',
+                stock = None
                 ):
     
     # función canalizadora del método SADF general
+   # print("Entering:",stock,len(etf_df),flush=True)
+    t = time()
+    print(stock,len(etf_df),flush=True)
+    #sadf_frame = generalSADFMethod(etf_df, main_value_name, lags = lags)
     
-    sadf_frame = generalSADFMethod(etf_df, main_value_name, lags = lags)
-    sampled_frame = getSamplingFeatures(base_df = sadf_frame, main_column_name = 'sadf', h_value = hvalue,select_events=True)
-    print('sampled')
+   # sampled_frame = getSamplingFeatures(base_df = sadf_frame, main_column_name = 'sadf', h_value = hvalue,select_events=True,stock = stock)
+#    print(stock,len(etf_df),time()-t,flush=True)
 
-    return sadf_frame
+    #return sadf_frame

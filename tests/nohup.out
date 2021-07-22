@@ -1662,4 +1662,39 @@ Table 'TREB_VOLUME_GLOBAL' has been successfully created.
 Table 'WCC_VOLUME_GLOBAL' has been successfully created.
 Table 'KSU_VOLUME_GLOBAL' has been successfully created.
 Table 'TUP_VOLUME_GLOBAL' has been successfully created.
-Table 'TFSL_VOLUME_GLOBAL' has been successfully created.
+Table 'TFSL_VOLUME_GLOBAL' has been successfully created./usr/local/lib/python3.8/dist-packages/ray/autoscaler/_private/cli_logger.py:57: FutureWarning: Not all Ray CLI dependencies were found. In Ray 1.4+, the Ray CLI, autoscaler, and dashboard will only be usable via `pip install 'ray[default]'`. Please update your install command.
+  warnings.warn(
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/ray/_private/services.py", line 309, in get_address_info_from_redis
+    return get_address_info_from_redis_helper(
+  File "/usr/local/lib/python3.8/dist-packages/ray/_private/services.py", line 268, in get_address_info_from_redis_helper
+    raise RuntimeError(
+RuntimeError: Redis has started but no raylets have registered yet.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "test_databundle.py", line 6, in <module>
+    ray.init(include_dashboard=(False),ignore_reinit_error=(True))
+  File "/usr/local/lib/python3.8/dist-packages/ray/_private/client_mode_hook.py", line 62, in wrapper
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/ray/worker.py", line 802, in init
+    _global_node = ray.node.Node(
+  File "/usr/local/lib/python3.8/dist-packages/ray/node.py", line 243, in __init__
+    address_info = (ray._private.services.get_address_info_from_redis(
+  File "/usr/local/lib/python3.8/dist-packages/ray/_private/services.py", line 321, in get_address_info_from_redis
+    time.sleep(1)
+KeyboardInterrupt
+/usr/local/lib/python3.8/dist-packages/ray/autoscaler/_private/cli_logger.py:57: FutureWarning: Not all Ray CLI dependencies were found. In Ray 1.4+, the Ray CLI, autoscaler, and dashboard will only be usable via `pip install 'ray[default]'`. Please update your install command.
+  warnings.warn(
+2021-07-21 01:30:59.303004: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2021-07-21 01:30:59.303048: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+Traceback (most recent call last):
+  File "test_databundle.py", line 9, in <module>
+    from enigmx.databundle_interface import SQLEnigmXinterface
+  File "/usr/local/lib/python3.8/dist-packages/enigmx/databundle_interface.py", line 41, in <module>
+    from enigmx.alternative_methods import (
+  File "/usr/local/lib/python3.8/dist-packages/enigmx/alternative_methods.py", line 91
+    dato = np.array(average_volume_day)
+    ^
+IndentationError: unexpected indent
