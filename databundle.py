@@ -530,6 +530,8 @@ class QuantmoonSQLManager(object):
 #2. Data Repository Initialization | General Class for Feature Construction                
 class DataRespositoryInitialization(object):
     """
+
+
     Clase para el manejo del repositorio de datos Zarr a SQL. 
     
     Clase DataRepositoryInitialization:
@@ -764,8 +766,11 @@ class DataRespositoryInitialization(object):
             #get list of column names for dataframe construction 
             
             #results_ tuple info (last arg. is 'alpha_calibration')   
-            
-			
+            try:
+                a=info_tuple[0][0]
+            except:
+                print(self.stock,"Gaaaaaaaaaaaa")
+
             result_info = __newVolumeBarConstruction__(
     	        info_tuple[0][0],
 		info_tuple[1][0], 

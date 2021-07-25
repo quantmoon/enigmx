@@ -185,10 +185,9 @@ def gettingSADF_and_sampling(etf_df,
     # función canalizadora del método SADF general
    # print("Entering:",stock,len(etf_df),flush=True)
     t = time()
-    print(stock,len(etf_df),flush=True)
-    #sadf_frame = generalSADFMethod(etf_df, main_value_name, lags = lags)
+    sadf_frame = generalSADFMethod(etf_df, main_value_name, lags = lags)
     
-   # sampled_frame = getSamplingFeatures(base_df = sadf_frame, main_column_name = 'sadf', h_value = hvalue,select_events=True,stock = stock)
-#    print(stock,len(etf_df),time()-t,flush=True)
+    sampled_frame = getSamplingFeatures(base_df = sadf_frame, main_column_name = 'sadf', h_value = hvalue,select_events=True,stock = stock)
+    print(stock,len(etf_df),time()-t,flush=True)
 
-    #return sadf_frame
+    return sadf_frame

@@ -34,7 +34,7 @@ class BaseExtractor(object):
         Gets trading days based on NYSE Calendar.
         """
         nyse = mcal.get_calendar('NYSE')
-        early = nyse.schedule(start_date='2015-01-01', end_date='2021-04-28')
+        early = nyse.schedule(start_date='2015-01-01', end_date='2021-12-31')
         dts = list(early.index.date)
         
         #transform as datetime.date() each string date
@@ -119,7 +119,7 @@ class Extractor(BaseExtractor):
     def __init__(self,list_stocks, start_date, end_date, 
                  path, limit = 25000, feature = 'tick',
                  api_key = "c04f66748v6u76cjieag",
-                 length = 1000000,
+                 length = 4000000,
                  chunk = 900000, 
                  stocks_file_info = "company_info_zarr.csv",
                  threads = 1, 
@@ -179,8 +179,8 @@ class Extractor(BaseExtractor):
         formatt = "%Y-%m-%d %H:%M:%S"
         
         
-        init = '09:30:00'
-        last = '16:00:00'  
+        init = '14:30:00'
+        last = '21:00:00'  
         init = date + " " + init
         last = date + " " + last
         init = dt.datetime.strptime(init,formatt)
@@ -188,8 +188,8 @@ class Extractor(BaseExtractor):
         ts_init = time.mktime(init.timetuple())*1000
         ts_last = time.mktime(last.timetuple())*1000
         
-        init2 = '08:30:00'
-        last2 = '15:00:00' 
+        init2 = '13:30:00'
+        last2 = '20:00:00' 
         init2 = date + " " + init2
         last2 = date + " " + last2
         init2 = dt.datetime.strptime(init2,formatt)
@@ -220,13 +220,13 @@ class Extractor(BaseExtractor):
             if df_['t'].shape[0] != 0:
             #Si hay data, los valores de timestamp, precio y volumen, se 
             #añaden a las listas que van a ser las variables del dataset
-                
                 if init.astimezone(timezone('US/Eastern')).hour == self.tupleTimeZone[0]:
                     df_ = df_[df_['t'] > ts_init]    
                     df_ = df_[df_['t'] < ts_last]
                     timestamp.extend(df_['t'].tolist())                
                     value.extend(df_['p'].tolist())
                     vol.extend(df_['v'].tolist())
+                    print(ts_init,ts_last)
                 
                 elif init.astimezone(timezone('US/Eastern')).hour == self.tupleTimeZone[1]:
                     df_ = df_[df_['t'] > ts_init2]
@@ -236,6 +236,7 @@ class Extractor(BaseExtractor):
                     timestamp.extend(timestamps)                
                     value.extend(df_['p'].tolist())
                     vol.extend(df_['v'].tolist())
+                    print(ts_init2,ts_last2)
                 
                 
             else:

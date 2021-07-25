@@ -11,12 +11,12 @@ from enigmx.tests.telegram import send_message
 from enigmx.tests.stocks import stocks
 
 
-server_name = "34.66.109.5" 
+server_name = "34.123.66.16" 
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
 list_stocks = stocks
-start_date = "2021-02-01" 
-end_date = "2021-05-31" 
+start_date = "2020-12-20" 
+end_date = "2021-07-21" 
 desired_bars = 10
 bartype = 'volume'
 driver = ("{ODBC DRIVER 17 for SQL Server}")
@@ -38,34 +38,34 @@ enigmxsql = SQLEnigmXinterface(
     referential_base_database = referential_base_database)
 
 #print("creando tablas")
-enigmxsql.create_table_database(
-    bars_tunning = True, 
-    bars_basic = True, 
-    bars_entropy = False, 
-    etfs_trick = False, 
-    bars_sampled = True, 
-    bars_barrier = True,
-    bars_weights = True,
-    bars_features = True,
-    creation_database = True)
+#enigmxsql.create_table_database(
+#    bars_tunning = True, 
+#    bars_basic = True, 
+#    bars_entropy = False, 
+#    etfs_trick = False, 
+#    bars_sampled = True, 
+#    bars_barrier = True,
+#    bars_weights = True,
+#    bars_features = True,
+#    creation_database = True)
 
 print("subiendo info")
-try:
-	enigmxsql.compute_info_to_sql(
-            bars_tunning_process = True, 
-            bar_construction_process = True, 
+#try:
+enigmxsql.compute_info_to_sql(
+            bars_tunning_process = False, 
+            bar_construction_process = False, 
             entropy_construction_process = False, 
             etftrick_construction_process = False, 
-            sampling_features_process = True, 
-            triple_barrier_computation_process = False, 
+            sampling_features_process = False, 
+            triple_barrier_computation_process = True, 
             sample_weight_computation_process =False,
             features_bar_computation_process = False,
             #tunning_interval = "10D",
 	    )
-	send_message('Se acabó!')
-except Exception as e:
-	txt = str(e)
-	send_message(txt)
+send_message('Se acabó!')
+#except Exception as e:
+#	txt = str(e)
+#	send_message(txt)
 
 
 

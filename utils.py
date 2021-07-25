@@ -1,5 +1,5 @@
 """
-@author: Quantmoon Technologies
+author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
 
@@ -2329,7 +2329,6 @@ def vectorizedTripleBarrier(path, init, init_ts, last, last_ts, upper_bound,
 
     #finding dates indices in zarr_dates | timeframe idxs
     dateIdxs = np.searchsorted(zarr_dates, daysList)    
-    
     #check in case there are no dates (missing data values)
     if len(dateIdxs)==0:
         finalPrice, finalLabel, finalTimestamp = 0,0,0
@@ -2339,7 +2338,6 @@ def vectorizedTripleBarrier(path, init, init_ts, last, last_ts, upper_bound,
 
         #getting general prices matrix in timeframe
         prices_timeframe  = zarrds.value.oindex[dateIdxs, :]
-      
         #getting general timestamp matrix in timeframe
         ts_timeframe = zarrds.timestamp.oindex[dateIdxs,:]    
         
@@ -2347,13 +2345,11 @@ def vectorizedTripleBarrier(path, init, init_ts, last, last_ts, upper_bound,
         selected_indexes = np.where(
             (ts_timeframe>init_ts)&(ts_timeframe<last_ts)
         )    
-        
         #prices array segmented by ts over the timeframe | 1D array
         segmented_vector_prices = prices_timeframe[selected_indexes] 
     
         #timestamp array segmented by ts over the timeframe | 1D array
         segmented_vector_timestamps = ts_timeframe[selected_indexes]    
-    
         #get the first index for each barrier touched
         first_upper_barrier_idx = ErrorIndexIdxFirstTrue(
             np.where(segmented_vector_prices>upper_bound)
@@ -2361,7 +2357,6 @@ def vectorizedTripleBarrier(path, init, init_ts, last, last_ts, upper_bound,
         first_lower_barrier_idx = ErrorIndexIdxFirstTrue(
             np.where(segmented_vector_prices<lower_bound)
         )
-        
         ####################barrier computation###############################
         
         #check if there is info available
@@ -2454,7 +2449,7 @@ def LabelTripleBarrierComputation(barDataframe, stock, data_dir):
             tripleBarrierInfo.tolist(), 
             index=tripleBarrierInfo.index
             )    
-        
+
     return barDataframe
 
 
@@ -2472,7 +2467,7 @@ def bar_para(dato,num_bar):
     bar_para = bar_para.astype(int)
     
     dic = {
-        'tick_t': bar_para[0], 
+        'tick_t': bar_para [0],
         'volume_t': bar_para[1], 
         'dollar_t':bar_para[2]
         }

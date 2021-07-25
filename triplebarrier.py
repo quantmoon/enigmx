@@ -209,12 +209,13 @@ def new_triple_barrier_computation(sampled_df, stock, zarr_path):
             * barrierPrice
     """
     # computación triplebarrera
+    print(stock)
     dataset = LabelTripleBarrierComputation(sampled_df, stock, zarr_path)
     
     # transformación de serie numérica timestamp a datetimeObj
     dataset["barrierTime"] = dataset.barrierTime.transform(
         lambda x: datetime.fromtimestamp(x/1e3)
         )
-    
+
     # retorno final del dataset
     return dataset

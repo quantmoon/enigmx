@@ -184,7 +184,7 @@ class SQLEnigmXinterface(object):
         
         #obten la lista de información con los diccionarios
         list_datasets =  ray.get(ray_object_list)
-
+        print('Pass')
         #transforma los diccionarios en un pandas con los params de tunning x bar
         tunning_pandas = construct_pandas_tunning(list_datasets, self.list_stocks)
         
@@ -429,7 +429,6 @@ class SQLEnigmXinterface(object):
         print("::::> RUNNING SADF PROCESS <::::")
 
         pandas_sampled_bars = ray.get(ray_object_list)
-       
     
         #selección de eventos con "structural break" según SADF de c/ df org.
         #pandas_sampled_bars = crossSectionalDataSelection(
