@@ -2,8 +2,8 @@
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
-import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True))
+#import ray
+#ray.init(include_dashboard=(False),ignore_reinit_error=(True))
 
 #from enigmx.utils import EquitiesEnigmxUniverse
 from enigmx.databundle_interface import SQLEnigmXinterface
@@ -62,7 +62,7 @@ enigmxsql.compute_info_to_sql(
             features_bar_computation_process = False,
             #tunning_interval = "10D",
 	    )
-send_message('Se acabó!')
+#send_message('Se acabó!')
 #except Exception as e:
 #	txt = str(e)
 #	send_message(txt)
