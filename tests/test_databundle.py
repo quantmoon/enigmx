@@ -2,8 +2,8 @@
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
-#import ray
-#ray.init(include_dashboard=(False),ignore_reinit_error=(True))
+import ray
+ray.init(include_dashboard=(False),ignore_reinit_error=(True))
 
 #from enigmx.utils import EquitiesEnigmxUniverse
 from enigmx.databundle_interface import SQLEnigmXinterface
@@ -15,7 +15,7 @@ server_name = "34.123.66.16"
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
 list_stocks = stocks
-start_date = "2020-12-20" 
+start_date = "2020-12-01" 
 end_date = "2021-07-21" 
 desired_bars = 10
 bartype = 'volume'
@@ -38,16 +38,16 @@ enigmxsql = SQLEnigmXinterface(
     referential_base_database = referential_base_database)
 
 #print("creando tablas")
-#enigmxsql.create_table_database(
-#    bars_tunning = True, 
-#    bars_basic = True, 
-#    bars_entropy = False, 
-#    etfs_trick = False, 
-#    bars_sampled = True, 
-#    bars_barrier = True,
-#    bars_weights = True,
-#    bars_features = True,
-#    creation_database = True)
+enigmxsql.create_table_database(
+    bars_tunning = False, 
+    bars_basic = False, 
+    bars_entropy = False, 
+    etfs_trick = False, 
+    bars_sampled = False, 
+    bars_barrier = True,
+    bars_weights = False,
+    bars_features = False,
+    creation_database = True)
 
 print("subiendo info")
 #try:

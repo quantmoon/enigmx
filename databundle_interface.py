@@ -483,9 +483,6 @@ class SQLEnigmXinterface(object):
                 ) 
             for stock in self.list_stocks}         
         
-        new_triple_barrier_computation(sampled_df = pandas_sampled_bars_from_sql[self.list_stocks[0]],stock = self.list_stocks[0],zarr_path=self.pathzarr) 
-        print("Se acabó")
-        sys.exit()
         #generación de la triple barrera a través de paralelización ray
         ray_object_list = [
             new_triple_barrier_computation.remote(

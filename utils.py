@@ -17,7 +17,7 @@ from scipy import stats
 from functools import reduce
 from numba.typed import List
 from datetime import datetime
-#from keras.utils import np_utils
+from keras.utils import np_utils
 import pandas_market_calendars as mcal
 from fracdiff import StationaryFracdiff
 from sklearn.preprocessing import LabelEncoder
@@ -2299,11 +2299,16 @@ def ErrorIndexIdxFirstTrue(param):
 
 
 
+
+
 @njit
 def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upper_bound,lower_bound):
+    
+    
     selected_indexes  = np.where((ts_timeframe>init_ts)&(ts_timeframe<last_ts))
     segmented_prices = prices_timeframe[selected_indexes[0]]
     segmented_timestamps = ts_timeframe[selected_indexes[0]]
+    
 
     try:
         first_upper_barrier_idx = np.where(segmented_prices > upper_bound)[0][0]
@@ -2315,19 +2320,21 @@ def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upp
         first_lower_barrier_idx = None
 
     if segmented_prices.shape[0] == 0:
-        finalPrice, finalLabel, finalTimestamp = (
-                0, 0, last_ts
-            )
+        #finalPrice, finalLabel, finalTimestamp = (
+        return  0, 0, last_ts
+           # )
+        
     #case upper/lower barrier idx values are equal (None)
     elif first_upper_barrier_idx == first_lower_barrier_idx:
             #definition of vertical barrier
-            finalPrice, finalLabel, finalTimestamp = (
-                segmented_prices[-1], 0, last_ts
-            )
- 
-#    print(segmented_prices[first_upper_barrier_idx,0]) 
+           # finalPrice, finalLabel, finalTimestamp = (
+        return segmented_prices[-1,0], 0, last_ts
+           # )
+        
 
-    else: #5
+ 
+
+    else: 
             #if just upper barrier idx is None (only lower exists)
         if first_upper_barrier_idx is None:
                 #set random greater value from lower idx for later comparisson
@@ -2341,24 +2348,23 @@ def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upp
             #upper barrier happens first (or it's unique) than lower barrier
         if first_upper_barrier_idx < first_lower_barrier_idx:
                 #definition of horizontal upper barrier
-                finalPrice = segmented_prices[first_upper_barrier_idx:,0][0]
-                finalLabel = 1
-                finalTimestamp = segmented_timestamps[first_upper_barrier_idx:,0][0]
+                return segmented_prices[first_upper_barrier_idx:,0][0], 1 , segmented_timestamps[first_upper_barrier_idx:,0][0] 
+#                finalPrice = segmented_prices[first_upper_barrier_idx:,0][0]
+#                finalLabel = 1
+#                finalTimestamp = segmented_timestamps[first_upper_barrier_idx:,0][0]
                 
 
             #lower barrier happens first (or it's unique) than upper barrier
-        else: #4
+        else:
                 #definition of horizontal lower barrier
-                finalPrice = segmented_prices[first_lower_barrier_idx:,0][0]
-                finalLabel = -1
-                finalTimestamp =segmented_timestamps[first_lower_barrier_idx:,][0]
-                
-    print(finalPrice)
-    print(finalLabel)
-    print(finalTimestamp)
-    return #finalPrice,finalLabel,finalTimestamp
+                return segmented_prices[first_lower_barrier_idx:,0][0],-1 , segmented_timestamps[first_lower_barrier_idx:,0][0]
 
-def vectorizedTripleBarrier(path, init, init_ts, last, last_ts, upper_bound, 
+#                finalPrice = segmented_prices[first_lower_barrier_idx:,0][0]
+#                finalLabel = -1
+#                finalTimestamp = segmented_timestamps[first_lower_barrier_idx:,0][0]
+  
+
+def vectorizedTripleBarrier(arr,arr2,path, init, init_ts, last, last_ts, upper_bound, 
                             lower_bound):
     """
     Función Principal para el cómputo de la Triple Barrera.
@@ -2383,106 +2389,39 @@ def vectorizedTripleBarrier(path, init, init_ts, last, last_ts, upper_bound,
             * finalLabel (int: -1, 0 ó 1)
             * finalTimestamp (float)
     """
-    t1 = time()
     #days range to search tripleBarrier | timeframe values
     daysList = sel_days(init, last) 
-    print("t1:",time()-t1)
 
     #open zarr of selected stock
-    zarrds = zarr.open_group(path)
-
+    #zarrds = zarr.open_group(path)
+    
     #general zarr dates 
-    zarr_dates = zarrds.date.get_basic_selection()
+    #zarr_dates = zarrds.date.get_basic_selection()
 
     #finding dates indices in zarr_dates | timeframe idxs
-    dateIdxs = np.searchsorted(zarr_dates, daysList)    
-
+    #dateIdxs = np.searchsorted(zarr_dates, daysList)    
+    dateIdxs = 1
     #check in case there are no dates (missing data values)
-    if len(dateIdxs)==0:
+    if dateIdxs==0:
         finalPrice, finalLabel, finalTimestamp = 0,0,0
         return finalPrice, finalLabel, finalTimestamp
     
-    else: #1
-
-        #getting general prices matrix in timeframe
-        prices_timeframe  = zarrds.value.oindex[dateIdxs,:].reshape(-1,1) #, :]
-        #getting general timestamp matrix in timeframe
-        ts_timeframe = zarrds.timestamp.oindex[dateIdxs,:].reshape(-1,1) #,:]    
-        
-
+    else: 
+        prices_timeframe = ts_timeframe = np.array([])
+        for i in daysList:
+             prices_timeframe = np.hstack([prices_timeframe,arr[i]])
+             ts_timeframe = np.hstack([ts_timeframe,arr2[i]])
+        #for i in dateIdxs:
+        #    prices_timeframe = np.hstack([prices_timeframe,arr[i+1]])
+        #    ts_timeframe = np.hstack([ts_timeframe,arr[i+1]])
+        prices_timeframe = prices_timeframe.reshape(-1,1)
+        ts_timeframe = ts_timeframe.reshape(-1,1)
         finalPrice, finalLabel, finalTimestamp = barrier_inside_computation(
                                                                         ts_timeframe,
                                                                         prices_timeframe,
                                                                         init_ts,last_ts,
                                                                         upper_bound,lower_bound)
-        sys.exit()
-    #    return finalPrice, finalLabel, finalTimestamp
-
-
-        #indexes selected by timestamp limits
-        selected_indexes = np.where(
-            (ts_timeframe>init_ts)&(ts_timeframe<last_ts)
-        )    
-        #prices array segmented by ts over the timeframe | 1D array
-        segmented_vector_prices = prices_timeframe[selected_indexes] 
-    
-        #timestamp array segmented by ts over the timeframe | 1D array
-        segmented_vector_timestamps = ts_timeframe[selected_indexes]    
-
-        #get the first index for each barrier touched
-        first_upper_barrier_idx = ErrorIndexIdxFirstTrue(
-            np.where(segmented_vector_prices>upper_bound)
-        )
-        first_lower_barrier_idx = ErrorIndexIdxFirstTrue(
-            np.where(segmented_vector_prices<lower_bound)
-        )
-
-        ####################barrier computation###############################
-        
-        #check if there is info available
-        if segmented_vector_prices.shape[0] == 0:
-            finalPrice, finalLabel, finalTimestamp = (
-                0, 0, last_ts
-            )
-        
-        #case upper/lower barrier idx values are equal (None)
-        elif first_upper_barrier_idx == first_lower_barrier_idx:
-            #definition of vertical barrier
-            finalPrice, finalLabel, finalTimestamp = (
-                segmented_vector_prices[-1], 0, last_ts
-            )
-    
-        else: #2
-            #if just upper barrier idx is None (only lower exists)
-            if first_upper_barrier_idx is None:
-                #set random greater value from lower idx for later comparisson
-                first_upper_barrier_idx = first_lower_barrier_idx+1
-                
-            #if just upper barrier idx is None (only lower exists)            
-            if first_lower_barrier_idx is None:
-                #set random greater value from upper idx for later comparisson
-                first_lower_barrier_idx = first_upper_barrier_idx+1
-            
-            #upper barrier happens first (or it's unique) than lower barrier
-            if first_upper_barrier_idx < first_lower_barrier_idx:
-                #definition of horizontal upper barrier
-                finalPrice, finalLabel, finalTimestamp = (
-                    segmented_vector_prices[first_upper_barrier_idx], 
-                    1, 
-                    segmented_vector_timestamps[first_upper_barrier_idx] 
-                ) 
-                
-            #lower barrier happens first (or it's unique) than upper barrier    
-            else: #3
-                #definition of horizontal lower barrier
-                finalPrice, finalLabel, finalTimestamp = (
-                    segmented_vector_prices[first_lower_barrier_idx],
-                    -1,
-                    segmented_vector_timestamps[first_lower_barrier_idx]
-                )
-#        return finalPrice, finalLabel, finalTimestamp
-    
-    
+    return finalPrice, finalLabel, finalTimestamp 
 
 ########### NEW TRIPLE BARRIER COMPUTATION ######################
 
@@ -2503,10 +2442,23 @@ def LabelTripleBarrierComputation(barDataframe, stock, data_dir):
             * 'barrierLabel'
             * 'barrierTime'
     """
+    zarrds = zarr.open_group(data_dir + stock + ".zarr")
+    t1 = time()
+    
+    arr = {}
+    arr2 = {}
+
+    for idx,i in enumerate(zarrds.date):
+        arr[i] = zarrds.value[idx]
+    for idx,i in enumerate(zarrds.timestamp):
+        arr2[zarrds.date[idx]] = zarrds.timestamp[idx]
+
+    print("Armado de arrays",stock,time() - t1)
+    t2 = time()
     #tripleBarrier vectorized computation version
     tripleBarrierInfo = barDataframe.apply( 
         lambda row: 
-            vectorizedTripleBarrier(
+            vectorizedTripleBarrier(arr,arr2,
                 path = data_dir + stock + ".zarr", 
                 init = row["close_date"],
                 init_ts = datetime.timestamp(
@@ -2521,14 +2473,13 @@ def LabelTripleBarrierComputation(barDataframe, stock, data_dir):
             , 
             axis=1
             )
-
     #barrier columns information generation
     barDataframe[['barrierPrice', 'barrierLabel', 'barrierTime']] = \
         pd.DataFrame(
             tripleBarrierInfo.tolist(), 
             index=tripleBarrierInfo.index
             )    
-
+    print(time()-t2)
     return barDataframe
 
 

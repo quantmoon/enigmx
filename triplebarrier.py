@@ -192,7 +192,7 @@ def getting_ray_triple_barrier(ray_object_list, data_dir_last, list_stocks):
 ###################### USEFUL TRIPLE BARRIER COMPUTATION #####################
 ##############################################################################
 
-#@ray.remote
+@ray.remote
 def new_triple_barrier_computation(sampled_df, stock, zarr_path):
     """
     Función ingesta la computación de la triple barrera usando 'Ray'.
