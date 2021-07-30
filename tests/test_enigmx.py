@@ -12,6 +12,7 @@ from keras.layers import Dense
 from keras.models import Sequential
 from sklearn.tree import DecisionTreeClassifier
 
+from enigmx.tests.stocks import stocks
 
 from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -96,7 +97,7 @@ dict_models = {
 
 ##############################################################################
 
-main_path = 'C:/data/'
+main_path = '/var/data/data/'
 
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
@@ -108,24 +109,24 @@ instance = EnigmX(bartype = 'VOLUME',
 # feature importance
 instance.get_feature_importance(    
                       model = RandomForestClassifier(max_features=1, random_state=0), 
-                      list_stocks = EquitiesEnigmxUniverse(main_path), 
+                      list_stocks = stocks, 
                       score_constraint = 0.3, #activar 
-                      server_name = "WINDOWS-NI805M6",
+                      server_name = "34.123.66.16",
                       database = "BARS_FEATURES",
-                      uid = '',
-                      pwd = '',
-                      driver = "{SQL Server}",
+                      uid = 'sqlserver',
+                      pwd = 'quantmoon2021',
+                      driver = ("{ODBC DRIVER 17 for SQL Server}"),
                       pval_kendall = 0.1,
-                      k_min = 10,
+                      k_min = 20,
                       n_samples = 10
                       )
     
 
 # get multi process for tunning and backtest
-instance.get_multi_process(
-    code_backtest = '001', 
-    dict_exo_models = dict_models,
-    endogenous_model_sufix= 'rf',    
-    trials = 11, 
-    partitions = 2, 
-    )
+#instance.get_multi_process(
+#    code_backtest = '001', 
+#    dict_exo_models = dict_models,
+#    endogenous_model_sufix= 'rf',    
+#    trials = 11, 
+#    partitions = 2, 
+#    )
