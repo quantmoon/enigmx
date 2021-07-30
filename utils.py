@@ -2473,13 +2473,14 @@ def LabelTripleBarrierComputation(barDataframe, stock, data_dir):
             , 
             axis=1
             )
+    print(tripleBarrierInfo)
     #barrier columns information generation
     barDataframe[['barrierPrice', 'barrierLabel', 'barrierTime']] = \
         pd.DataFrame(
             tripleBarrierInfo.tolist(), 
             index=tripleBarrierInfo.index
             )    
-    print(time()-t2)
+    print(stock, time()-t2)
     return barDataframe
 
 

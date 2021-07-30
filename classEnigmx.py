@@ -9,6 +9,7 @@ from enigmx.classFeatureImportance import featureImportance
 from enigmx.classCombinatorialPurged import EnigmxBacktest
 from enigmx.metrics import metricsByPath, baseCriticsDicforBacktestMetrics 
 
+from time import time
 
         
 class EnigmX:
@@ -237,7 +238,7 @@ class EnigmX:
         
         for (prop, default) in self.KfeatureImportanceParams.items():
             setattr(self, prop, kwargs.get(prop, default))
-        
+        t1 = time()
         # instancia feature importance
         instance = featureImportance(
             model = model, 
@@ -268,15 +269,17 @@ class EnigmX:
             k_min = self.k_min,
             n_samples = self.n_samples
             )        
-        
+        print("Resultado de la creación de la instancia feature importance:",time()-t1)
         # resultado del feature importance (dataframe)
+       
+        t1 = time()
         valueResultFeatImp = instance.get_relevant_features(
             filtering = self.filtering_featimp,
             save = self.save_featimp,
             split = self.split_featimp, 
             pct_split = self.pct_split_featimp
             )
-        
+        print("Get relevant features:",time()-t1)
         # si no se pide guardar, retornar dataframe
         if not self.save_featimp:
             return valueResultFeatImp

@@ -10,6 +10,8 @@ from enigmx.features_algorithms import FeatureImportance
 from scipy.stats import kendalltau
 from itertools import combinations
 from enigmx.purgedkfold_features import plotFeatImportance
+from time import time
+
 
 def sorts(i):
     i.sort()
@@ -172,21 +174,23 @@ class featureImportance(object):
                 )
         
         print("----------Process {} started---------- \n".format(self.method))
-        
+        t1 = time()
         # extrae la matriz de features estacionaria y estandarizada, el vector de labels y el df stacked
         featStandarizedMatrix, labelsDataframe, original_stacked = instance.__checkingStationary__(
             self.pictures_pathout
             ) 
-            
+        print("Chequeo de estacionariedad:", time() - t1)
         print("         :::: >>> Running Iteration over samples for Kendall Test...")
             
         samples = self.__getSubsamples__(featStandarizedMatrix)
 
         itterIdx = 0
         kendalls = {}
-            
+        
+       
         for sample in samples:
             print(f'Running combination        : {itterIdx}')
+            t1 = time()
             featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = instance.get_feature_importance(
                 featStandarizedMatrix[sample], labelsDataframe, 
                 self.pictures_pathout, self.method, self.model, 
@@ -201,7 +205,7 @@ class featureImportance(object):
             kendalls[itterIdx] = [sample, kendallCorrelation, pValKendall]
                 
             itterIdx +=1 
-            
+            print("Tiempo para hacer el árbol:",time()-t1)
         kendalls = pd.DataFrame.from_dict(kendalls, orient='index')
         kendalls.columns = ['best_feature_combination', 'kendall_correlation', 'kendall_pval']
                         

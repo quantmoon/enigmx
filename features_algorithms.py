@@ -7,6 +7,7 @@ import pickle
 import datetime
 import numpy as np
 import pandas as pd
+from time import time
 from enigmx.utils import simpleFracdiff
 from statsmodels.tsa.stattools import adfuller
 from sklearn.preprocessing import StandardScaler
@@ -33,9 +34,11 @@ def get_eVec(dot,varThres):
 #----------------------------------------------------------------------------#
 def orthoFeats(dfZ,varThres=.95):
     # Given a dataframe dfX of features, compute orthofeatures dfP
+    t1 = time()
     dot=pd.DataFrame(np.dot(dfZ.T,dfZ),index=dfZ.columns,columns=dfZ.columns)
     eVal,eVec=get_eVec(dot,varThres)
     dfP=np.dot(dfZ,eVec)
+    print("OrthoFeats:",time()-t1)
     return dfP, eVal
 #----------------------------------------------------------------------------#
 
@@ -116,6 +119,7 @@ class FeatureImportance(object):
                     )                    
         
         #lista con tablas/dataframes por acción extraídas de SQL
+        t1 = time()
         list_df = [
             SQLFRAME.read_table_info(
                 statement = "SELECT * FROM [{}].[dbo].{}_GLOBAL".format(
@@ -127,8 +131,9 @@ class FeatureImportance(object):
                 )
             for stock in self.list_stocks
             ]
-
+        print("Lectura de tablas SQL:",time()-t1)
         #proceso de rolling para uniformizar la dist. de los features
+        
         if self.rolling:
             
             #columnas para rolling 
@@ -137,6 +142,7 @@ class FeatureImportance(object):
                 ).columns.values)     
         
             #hace rolling solo sobre las columnas de feature de forma individual por accion
+            t1 = time()
             list_df = [
                 pd.concat(
                     [   #extrae aquellas columnas que no haran rolling
@@ -150,11 +156,13 @@ class FeatureImportance(object):
                         ], axis=1
                                 ).dropna()  for dataframe in list_df
                         ]
-            
+            t2 = time()
+            print("Rolling parte 1:",t2-t1)
         #dataset final concadenado
         df_ = pd.concat(list_df).sort_index(
             kind='merge'
             )
+        print("Rolling parte 2:",time()-t2)
         
         return df_, columns_for_rolling
     
@@ -166,7 +174,7 @@ class FeatureImportance(object):
         """
         #obtener el dataframe de los valores stacked (solo rolleado) + columnas de features
         df_global_stacked, features_col_name = self.__getStacked__()
-                
+        t1 = time()
         #seleccionamos los features para su escalamiento
         elementsToScale = df_global_stacked[features_col_name]
         
@@ -203,6 +211,7 @@ class FeatureImportance(object):
         x.set_index(df_global_stacked['close_date'],inplace=True)
 
         #retorna dataframe de features y dataframe de etiquetas
+        print("Escalamiento:",time()-t1)
         return x, y, df_global_stacked
     
     def __checkingStationary__(self, pathOut, pval_adf = '5%'):

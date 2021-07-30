@@ -3,9 +3,9 @@
 webpage: https://www.quantmoon.tech//
 """
 
-#import pickle
+import pickle
 #import marshal
-import dill as pickle
+#import dill as pickle
 import numpy as np
 
 from enigmx.betsize import BetSize
