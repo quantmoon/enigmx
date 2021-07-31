@@ -118,7 +118,7 @@ instance.get_feature_importance(
                       driver = ("{ODBC DRIVER 17 for SQL Server}"),
                       pval_kendall = 0.1,
                       k_min = 20,
-                      n_samples = 10
+                      n_samples = 17
                       )
     
 

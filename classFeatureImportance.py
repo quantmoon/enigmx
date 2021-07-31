@@ -3,6 +3,7 @@
 webpage: https://www.quantmoon.tech//
 """
 import sys
+import ray
 import pandas as pd
 import random
 from enigmx.utils import enigmxSplit, kendall_evaluation
@@ -133,6 +134,7 @@ class featureImportance(object):
         self.clustered_features = clustered_features
         
         self.k_min = k_min
+        self.kendalls = {}
         
         self.ErrorKendallMessage = 'Any valid kendall value exists in the set of trials'
         
@@ -149,7 +151,8 @@ class featureImportance(object):
         
         return listSamples2
     
-    
+
+  
     def __instanceOverture__(self):
         
         # instancia feature importance base
@@ -174,51 +177,70 @@ class featureImportance(object):
                 )
         
         print("----------Process {} started---------- \n".format(self.method))
-        t1 = time()
+
         # extrae la matriz de features estacionaria y estandarizada, el vector de labels y el df stacked
         featStandarizedMatrix, labelsDataframe, original_stacked = instance.__checkingStationary__(
             self.pictures_pathout
             ) 
-        print("Chequeo de estacionariedad:", time() - t1)
         print("         :::: >>> Running Iteration over samples for Kendall Test...")
             
         samples = self.__getSubsamples__(featStandarizedMatrix)
 
-        itterIdx = 0
-        kendalls = {}
+        itterIdx = range(len(samples))
         
-       
-        for sample in samples:
-            print(f'Running combination        : {itterIdx}')
-            t1 = time()
-            featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = instance.get_feature_importance(
-                featStandarizedMatrix[sample], labelsDataframe, 
-                self.pictures_pathout, self.method, self.model, 
-                )
+        ray_object_list = [
+                     __subsampleProcess__.remote(
+                                          self,sample, idx,featStandarizedMatrix,instance,labelsDataframe)
+                     for sample,idx in zip(samples,itterIdx)
+                     ]
+ 
+        list_correlations = ray.get(ray_object_list)
+        print(list_correlations)
+
+        kendalls = {}
+
+        for idx, i in enumerate(list_correlations):
+            kendalls[idx] = i
+
+#        for sample in samples:
+#            itterIdx += 1             
+#            print(f'Running combination        : {itterIdx}')
+#           
+#            t1 = time()
+#            featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = instance.get_feature_importance(
+#                featStandarizedMatrix[sample], labelsDataframe, 
+#                self.pictures_pathout, self.method, self.model, itterIdx
+#                )
+
              # si no pasa el score_constraint del 'scorePurged', no usas ese sample
-             
-            kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
-            print(f'Temporal Kendall Correlation             : {kendallCorrelation}')                
-            print(f'Temporal Kendall p-value                 : {pValKendall}')
-            print(f'Lenght of features tested at Kendall     : {len(sample)}\n')
             
-            kendalls[itterIdx] = [sample, kendallCorrelation, pValKendall]
+#            kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
+
+#            print(f'Temporal Kendall Correlation             : {kendallCorrelation}')                
+#            print(f'Temporal Kendall p-value                 : {pValKendall}')
+#            print(f'Lenght of features tested at Kendall     : {len(sample)}\n')
+            
+#            kendalls[itterIdx] = [sample, kendallCorrelation, pValKendall]
                 
-            itterIdx +=1 
-            print("Tiempo para hacer el árbol:",time()-t1)
+#            print("Tiempo para hacer el árbol:",time()-t1)
+        
+        
         kendalls = pd.DataFrame.from_dict(kendalls, orient='index')
+        
+        print("Kendalls",kendalls)
+
         kendalls.columns = ['best_feature_combination', 'kendall_correlation', 'kendall_pval']
-                        
+       
         kendalls.to_csv(self.pictures_pathout+'kendall_values.csv', index = False)
-            
+       
         groupedPvalCond = kendalls.loc[kendalls.kendall_pval < self.pval_kendall]
-            
+       
         if groupedPvalCond.shape[0] == 0:
             sys.exit("{}".format(self.ErrorKendallMessage))
-                
+       
         else:
             bestSetFeatures = groupedPvalCond.loc[groupedPvalCond.kendall_correlation.idxmax()]            
-                
+       
             kendallCorrSelected, pvalKendallSelected, combFeaturesSelected =  (
                                         bestSetFeatures.loc['kendall_correlation'], 
                                         bestSetFeatures.loc['kendall_pval'], 
@@ -230,6 +252,13 @@ class featureImportance(object):
         print(f'     Best Kendall PValue calculated is          : {pvalKendallSelected}')
         print(f'     Lenght of Best Useful Features Combination : {len(combFeaturesSelected)}')
             
+
+        featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = instance.get_feature_importance(
+                featStandarizedMatrix[combFeaturesSelected], labelsDataframe,
+                self.pictures_pathout, self.method, self.model, itterIdx
+                )
+
+
         plotFeatImportance(
                 self.pictures_pathout,    
                 imp,
@@ -387,3 +416,32 @@ class featureImportance(object):
         # caso contrario, retorna los nombres de features seleccionados
         else:
             return list(list_features_tested) 
+
+
+@ray.remote
+def __subsampleProcess__(self,sample,itterIdx,featStandarizedMatrix,instance,labelsDataframe):
+
+    print(f'Running combination        : {itterIdx}')
+
+    t1 = time()
+    featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = instance.get_feature_importance(
+                featStandarizedMatrix[sample], labelsDataframe,
+                self.pictures_pathout, self.method, self.model, itterIdx
+                )
+
+     # si no pasa el score_constraint del 'scorePurged', no usas ese sample
+
+    kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
+
+    print(f'Temporal Kendall Correlation             : {kendallCorrelation}')
+    print(f'Temporal Kendall p-value                 : {pValKendall}')
+    print(f'Lenght of features tested at Kendall     : {len(sample)}\n')
+
+    print("Tiempo para hacer el árbol:",time()-t1)
+
+    return  [sample, kendallCorrelation, pValKendall]
+
+
+
+
+

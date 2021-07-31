@@ -6,6 +6,7 @@ webpage: https://www.quantmoon.tech//
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from time import time
 from sklearn.metrics import log_loss,accuracy_score
 from sklearn.model_selection._split import _BaseKFold
 from sklearn.model_selection._split import KFold
@@ -154,28 +155,33 @@ def featImpMDA(clf,X,y,cv,sample_weight,t1,pctEmbargo,scoring='neg_log_loss'):
 
 
 #General Feature Importance Function    
-def featImportances(trnsX,cont,model,n_estimators=1000,cv=10,
+def featImportances(trnsX,cont,model,nSample,n_estimators=1000,cv=10,
                     max_samples=1.,numThreads=11,pctEmbargo=0,
                     scoring='accuracy',method='SFI',minWLeaf=0.,oob=False,
                     sample_weight = None,**kargs):
     
     #Feature Importance calculation based on MDI & MDA process
-
+    t1 = time()   
     fit=model.fit(X=trnsX,y=cont['labels'],sample_weight=sample_weight)
+    print("Tiempo de SOLO fiteo con todos los datos",time()-t1)
     if oob == True:
         oob=fit.oob_score_
     else:
         oob = None
     if method=='MDI':
         imp=featImpMDI(fit,featNames=trnsX.columns)
+        t2  = time()
         oos=cvScore(model,X=trnsX,y=cont['labels'],
                     cv=cv,sample_weight=sample_weight,
                     t1=cont['t1'],pctEmbargo=pctEmbargo,
                     scoring=scoring).mean()
+        print("cvScore:",time()-t2)
     elif method=='MDA':
+        t3 = time()
         imp,oos=featImpMDA(model,X=trnsX,y=cont['labels'],cv=cv,
                            sample_weight=sample_weight,t1=cont['t1'],
                            pctEmbargo=pctEmbargo,scoring=scoring)
+        print("MDA:", time() - t3)
     return imp,oos,oob
 
 # Media y desviación para MDI y MDA de features clusterizados

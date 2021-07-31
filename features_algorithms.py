@@ -34,11 +34,9 @@ def get_eVec(dot,varThres):
 #----------------------------------------------------------------------------#
 def orthoFeats(dfZ,varThres=.95):
     # Given a dataframe dfX of features, compute orthofeatures dfP
-    t1 = time()
     dot=pd.DataFrame(np.dot(dfZ.T,dfZ),index=dfZ.columns,columns=dfZ.columns)
     eVal,eVec=get_eVec(dot,varThres)
     dfP=np.dot(dfZ,eVec)
-    print("OrthoFeats:",time()-t1)
     return dfP, eVal
 #----------------------------------------------------------------------------#
 
@@ -119,7 +117,6 @@ class FeatureImportance(object):
                     )                    
         
         #lista con tablas/dataframes por acción extraídas de SQL
-        t1 = time()
         list_df = [
             SQLFRAME.read_table_info(
                 statement = "SELECT * FROM [{}].[dbo].{}_GLOBAL".format(
@@ -131,7 +128,6 @@ class FeatureImportance(object):
                 )
             for stock in self.list_stocks
             ]
-        print("Lectura de tablas SQL:",time()-t1)
         #proceso de rolling para uniformizar la dist. de los features
         
         if self.rolling:
@@ -142,7 +138,6 @@ class FeatureImportance(object):
                 ).columns.values)     
         
             #hace rolling solo sobre las columnas de feature de forma individual por accion
-            t1 = time()
             list_df = [
                 pd.concat(
                     [   #extrae aquellas columnas que no haran rolling
@@ -156,13 +151,10 @@ class FeatureImportance(object):
                         ], axis=1
                                 ).dropna()  for dataframe in list_df
                         ]
-            t2 = time()
-            print("Rolling parte 1:",t2-t1)
         #dataset final concadenado
         df_ = pd.concat(list_df).sort_index(
             kind='merge'
             )
-        print("Rolling parte 2:",time()-t2)
         
         return df_, columns_for_rolling
     
@@ -174,7 +166,7 @@ class FeatureImportance(object):
         """
         #obtener el dataframe de los valores stacked (solo rolleado) + columnas de features
         df_global_stacked, features_col_name = self.__getStacked__()
-        t1 = time()
+
         #seleccionamos los features para su escalamiento
         elementsToScale = df_global_stacked[features_col_name]
         
@@ -211,7 +203,6 @@ class FeatureImportance(object):
         x.set_index(df_global_stacked['close_date'],inplace=True)
 
         #retorna dataframe de features y dataframe de etiquetas
-        print("Escalamiento:",time()-t1)
         return x, y, df_global_stacked
     
     def __checkingStationary__(self, pathOut, pval_adf = '5%'):
@@ -224,42 +215,44 @@ class FeatureImportance(object):
         
         # contador de features no estacionarios transformados
         featuresTransformed = 0        
-        
-        for featuresName, featuresData in xMatrixDf.iteritems():
+        #xMatrixDf.to_csv('/var/data/df.csv')
+#        for featuresName, featuresData in xMatrixDf.iteritems():
             
-            # extrae el vector de la caracteristica sobre la que se itera
-            temporalFeatArray = featuresData.values
-
-            # calcula el Dickey-Fuller
-            critical_values_adf = adfuller(temporalFeatArray)
-            
-            # desagregando estadistico y valor critico del dickey-fuller
-            statVal, criticalVal = critical_values_adf[0], critical_values_adf[4][pval_adf]
-                        
-            # si el valor del estadistico no es menor al del valor critico 
-            if not (statVal < criticalVal): 
-                print("-----> Warning! '{}' is not stationary... ".format(
-                        featuresName
-                        )
-                    )
-                print(":::: Stationary Transformation Initialized >>>")
-                # aplica transformacion estacionaria con diferenciacion fraccional
-                newTemporalFeatArray = simpleFracdiff(
-                    temporalFeatArray
-                    )
-                
-                # reasigna la informacion estacionarizada al dataframe
-                xMatrixDf[featuresName] = newTemporalFeatArray
-                
-                # agrega un valor al contador de features modificacods
-                featuresTransformed+=1
-        
-        print(':::::::::::::'*5)
-        print(f'\n::: >>> Stationary Process Checked!\
-              Features Transformed {featuresTransformed} over {xMatrixDf.shape[1]}')
-        print(':::::::::::::'*5)            
-              
-        # estandarizacion Mean/Std de los valores de la matriz de features
+#            # extrae el vector de la caracteristica sobre la que se itera
+#            temporalFeatArray = featuresData.values
+#            print('ADF')
+#            t1 = time()
+#            # calcula el Dickey-Fuller
+#            critical_values_adf = adfuller(temporalFeatArray)
+#            print("ADF",time()-t1)
+#            # desagregando estadistico y valor critico del dickey-fuller
+#            statVal, criticalVal = critical_values_adf[0], critical_values_adf[4][pval_adf]
+#                        
+#            # si el valor del estadistico no es menor al del valor critico 
+#            if not (statVal < criticalVal): 
+#                print("-----> Warning! '{}' is not stationary... ".format(
+#                        featuresName
+#                        )
+#                    )
+#                print(":::: Stationary Transformation Initialized >>>")
+#                t1 = time()
+#                # aplica transformacion estacionaria con diferenciacion fraccional
+#                newTemporalFeatArray = simpleFracdiff(
+#                    temporalFeatArray
+#                    )
+#                print("Fracdiff:",time()-t1)
+#                # reasigna la informacion estacionarizada al dataframe
+#                xMatrixDf[featuresName] = newTemporalFeatArray
+#                
+#                # agrega un valor al contador de features modificacods
+#                featuresTransformed+=1
+#        
+#       print(':::::::::::::'*5)
+#        print(f'\n::: >>> Stationary Process Checked!\
+#              Features Transformed {featuresTransformed} over {xMatrixDf.shape[1]}')
+#        print(':::::::::::::'*5)            
+#              
+#        # estandarizacion Mean/Std de los valores de la matriz de features
         dfStandarized = xMatrixDf.sub(
             xMatrixDf.mean(), axis=1
             ).div(xMatrixDf.std(),axis=1)   
@@ -278,6 +271,7 @@ class FeatureImportance(object):
                                pathOut, 
                                method, 
                                model_selected,
+                               nSample,
                                pctEmbargo = 0.01, 
                                cv=5, 
                                oob=False, 
@@ -327,11 +321,11 @@ class FeatureImportance(object):
                         'RandomForestClassifier'
                         )
                     )
-            
         # importance values, score con cpkf, y mean val (NaN)
         imp,oos,oob = featImportances(x_train, 
                                       y_train, 
                                       model_selected,
+                                      nSample,
                                       method=method,
                                       sample_weight = y_train['w'],
                                       pctEmbargo=pctEmbargo,
