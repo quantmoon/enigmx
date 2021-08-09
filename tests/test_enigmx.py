@@ -97,7 +97,7 @@ dict_models = {
 
 ##############################################################################
 
-main_path = '/var/data/data/'
+main_path = 'D:/data_enigmx/'
 
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
@@ -109,16 +109,16 @@ instance = EnigmX(bartype = 'VOLUME',
 # feature importance
 instance.get_feature_importance(    
                       model = RandomForestClassifier(max_features=1, random_state=0), 
-                      list_stocks = stocks, 
+                      list_stocks = ['VTOL', 'ZNGA'], 
                       score_constraint = 0.3, #activar 
-                      server_name = "34.123.66.16",
+                      server_name = "DESKTOP-N8JUB39",
                       database = "BARS_FEATURES",
-                      uid = 'sqlserver',
-                      pwd = 'quantmoon2021',
-                      driver = ("{ODBC DRIVER 17 for SQL Server}"),
+                      uid = '',
+                      pwd = '',
+                      driver = "{SQL Server}",
                       pval_kendall = 0.1,
-                      k_min = 20,
-                      n_samples = 17
+                      k_min = 10,
+                      n_samples = 15
                       )
     
 

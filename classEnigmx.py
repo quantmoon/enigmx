@@ -162,7 +162,7 @@ class EnigmX:
             "select_sample" : True,
             "n_samples" : 10,
             "clustered_features" : False,
-            "k_min" : 5,
+            "k_min" : 2,
             #############Constant Method Params###################
             "filtering_featimp": True,
             "save_featimp": True,

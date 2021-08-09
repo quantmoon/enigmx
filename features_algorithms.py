@@ -215,6 +215,9 @@ class FeatureImportance(object):
         
         # contador de features no estacionarios transformados
         featuresTransformed = 0        
+        
+        # proceso cortado para la inserción de R
+        
         #xMatrixDf.to_csv('/var/data/df.csv')
 #        for featuresName, featuresData in xMatrixDf.iteritems():
             
@@ -277,7 +280,7 @@ class FeatureImportance(object):
                                oob=False, 
                                variance_explained = 0.95):
         """
-        Método central para el proceso de feature importance.
+        Método central para el proceso de feature importance NO clusterizado.
         """
         
         

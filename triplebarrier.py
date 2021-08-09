@@ -208,14 +208,30 @@ def new_triple_barrier_computation(sampled_df, stock, zarr_path):
             * barrierTime
             * barrierPrice
     """
+    
     # computación triplebarrera
     print(stock)
     dataset = LabelTripleBarrierComputation(sampled_df, stock, zarr_path)
     
     # transformación de serie numérica timestamp a datetimeObj
-    dataset["barrierTime"] = dataset.barrierTime.transform(
-        lambda x: datetime.fromtimestamp(x/1e3)
-        )
+    #try: 
+            
+    listDates = []
+    for date in dataset.barrierTime: 
+        new_date = datetime.fromtimestamp(date/1e3)
+        listDates.append(new_date)
+        
+    dataset["barrierTime"] = listDates
+    
+    
+    #dataset["barrierTime"] = dataset.barrierTime.transform(
+    #        lambda x: datetime.fromtimestamp(x/1e3)
+    #        )
+
+    #except:
+    #    print("ValueError ::: > No timestamp registered for:")
+    #    print(stock)
+
 
     # retorno final del dataset
     return dataset
