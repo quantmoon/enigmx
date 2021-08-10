@@ -2304,6 +2304,8 @@ def ErrorIndexIdxFirstTrue(param):
 @njit
 def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upper_bound,lower_bound):
     
+    print("Veamos Inner barrier_inside_computation")    
+    
     
     selected_indexes  = np.where((ts_timeframe>init_ts)&(ts_timeframe<last_ts))
     segmented_prices = prices_timeframe[selected_indexes[0]]
@@ -2314,54 +2316,56 @@ def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upp
         first_upper_barrier_idx = np.where(segmented_prices > upper_bound)[0][0]
     except:
         first_upper_barrier_idx = None
+        
     try:
         first_lower_barrier_idx = np.where(segmented_prices < lower_bound)[0][0]
     except:
         first_lower_barrier_idx = None
 
+    # conditional definition of barrierBoolValues (horizontal barrier)
     if segmented_prices.shape[0] == 0:
-        #finalPrice, finalLabel, finalTimestamp = (
         return  0, 0, last_ts
-           # )
-        
-    #case upper/lower barrier idx values are equal (None)
+
+    # upper/lower barrier idx values are equal (None)
     elif first_upper_barrier_idx == first_lower_barrier_idx:
-            #definition of vertical barrier
-           # finalPrice, finalLabel, finalTimestamp = (
-        return segmented_prices[-1,0], 0, last_ts
-           # )
-        
-
- 
-
+        return segmented_prices[-1, 0], 0, last_ts
+    
+    # case in which one barrier-type is touched
     else: 
-            #if just upper barrier idx is None (only lower exists)
+        
+        #if just upper barrier idx is None (only lower exists)
         if first_upper_barrier_idx is None:
-                #set random greater value from lower idx for later comparisson
-                first_upper_barrier_idx = first_lower_barrier_idx+1
+            #set random greater value from lower idx for later comparisson
+            first_upper_barrier_idx = first_lower_barrier_idx+1
 
-            #if just upper barrier idx is None (only lower exists)
+        #if just lower barrier idx is None (only upper exists)
         if first_lower_barrier_idx is None:
-                #set random greater value from upper idx for later comparisson
-                first_lower_barrier_idx = first_upper_barrier_idx+1
+            #set random greater value from upper idx for later comparisson
+            first_lower_barrier_idx = first_upper_barrier_idx+1
 
-            #upper barrier happens first (or it's unique) than lower barrier
+        #upper barrier happens first (or it's unique) than lower barrier
         if first_upper_barrier_idx < first_lower_barrier_idx:
-                #definition of horizontal upper barrier
-                return segmented_prices[first_upper_barrier_idx:,0][0], 1 , segmented_timestamps[first_upper_barrier_idx:,0][0] 
-#                finalPrice = segmented_prices[first_upper_barrier_idx:,0][0]
-#                finalLabel = 1
-#                finalTimestamp = segmented_timestamps[first_upper_barrier_idx:,0][0]
-                
+            #definition of horizontal upper barrier
+            
+            if segmented_timestamps[first_upper_barrier_idx:,0][0] < 0:
+                print("       ::::::: >> Warning! Timestamp selected is negative!! \
+                      Upper barrier Case | Check array: ")
+                print(segmented_timestamps[first_upper_barrier_idx:,0])
+            print(" ")
+            print("***"*10)
+            
+            return segmented_prices[first_upper_barrier_idx:,0][0], 1 , segmented_timestamps[first_upper_barrier_idx:,0][0] 
 
-            #lower barrier happens first (or it's unique) than upper barrier
         else:
-                #definition of horizontal lower barrier
-                return segmented_prices[first_lower_barrier_idx:,0][0],-1 , segmented_timestamps[first_lower_barrier_idx:,0][0]
+            
+            if segmented_timestamps[first_lower_barrier_idx:,0][0] < 0:
+                print("       ::::::: >> Warning! Timestamp selected is negative!! \
+                      Lower barrier Case | Check array: ")
+                print(segmented_timestamps[first_lower_barrier_idx:,0])
+            
+            #definition of horizontal lower barrier
+            return segmented_prices[first_lower_barrier_idx:,0][0],-1 , segmented_timestamps[first_lower_barrier_idx:,0][0]
 
-#                finalPrice = segmented_prices[first_lower_barrier_idx:,0][0]
-#                finalLabel = -1
-#                finalTimestamp = segmented_timestamps[first_lower_barrier_idx:,0][0]
   
 
 def vectorizedTripleBarrier(arr,arr2,path, init, init_ts, last, last_ts, upper_bound, 
@@ -2416,6 +2420,8 @@ def vectorizedTripleBarrier(arr,arr2,path, init, init_ts, last, last_ts, upper_b
         #    ts_timeframe = np.hstack([ts_timeframe,arr[i+1]])
         prices_timeframe = prices_timeframe.reshape(-1,1)
         ts_timeframe = ts_timeframe.reshape(-1,1)
+        
+        
         finalPrice, finalLabel, finalTimestamp = barrier_inside_computation(
                                                                         ts_timeframe,
                                                                         prices_timeframe,
@@ -2793,3 +2799,10 @@ def kendall_evaluation(importance_series, pca_series, threshold = 0.5):
     dfMatrix = pd.concat([pca_join_features, importance_selection],axis=1)
     
     return dfMatrix
+
+################## CLUSTERING FEAT IMPORTANCE USEFUL FUNCTIONS ###############
+# def __splitStringArray__(string):
+#     return string.split("_")[-1] 
+# splitStringArray = np.frompyfunc(
+#     __splitStringArray__, 1, 1
+# ) 

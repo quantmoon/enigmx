@@ -4,19 +4,128 @@ webpage: https://www.quantmoon.tech//
 """
 import sys
 import ray
-import pandas as pd
 import random
-from enigmx.utils import enigmxSplit, kendall_evaluation
-from enigmx.features_algorithms import FeatureImportance
+import pandas as pd
+from time import time
 from scipy.stats import kendalltau
 from itertools import combinations
+from enigmx.features_algorithms import FeatureImportance
 from enigmx.purgedkfold_features import plotFeatImportance
-from time import time
+from enigmx.featuresclustering import ClusteredFeatureImportance
+from enigmx.utils import enigmxSplit, kendall_evaluation
 
+
+##############################################################################
+########################## COMPLEMENTARY FUNCTIONS ###########################
+##############################################################################
+
+@ray.remote
+def __iterativeFeatImpBySample__(sample, 
+                         itterIdx, 
+                         featStandarizedMatrix, 
+                         instance, 
+                         labelsDataframe, 
+                         pictures_pathout,
+                         method, 
+                         model):
+
+    print(f'Running combination        : {itterIdx}')
+
+    t1 = time()
+    featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = \
+        instance.get_feature_importance(
+                    featStandarizedMatrix[sample], labelsDataframe,
+                    pictures_pathout, method, model, itterIdx
+                )
+
+     # si no pasa el score_constraint del 'scorePurged', no se emplea el sample
+
+    kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
+
+    print(f'Temporal Kendall Correlation             : {kendallCorrelation}')
+    print(f'Temporal Kendall p-value                 : {pValKendall}')
+    print(f'Lenght of features tested at Kendall     : {len(sample)}\n')
+
+    print(f"Tiempo para el featImportance de IDX '{itterIdx}':",time()-t1)
+    print("***"*30)
+
+    return  [sample, kendallCorrelation, pValKendall]
+
+def __getSubsamples__(standardMatrix, k_min, n_samples):
+    total_samples = [] 
+    for i in range(k_min, len(standardMatrix.columns) + 1): 
+        for j in range(n_samples): 
+            samples = random.sample(list(standardMatrix.columns.values),i)
+            total_samples.append(tuple(samples))
+            
+    total_samples = [list(tup) for tup in total_samples]
+    listSamples1 = [sorts(i) for i in total_samples]
+    listSamples2 = [list(tupl) for tupl in {tuple(item) for item in listSamples1}]
+    
+    return listSamples2
+
+
+def mainClusteringCombinatorialFeatImp(standarized_features_matrix, 
+                                       df_labels,
+                                       cluster, 
+                                       featimp_instance,
+                                       cluster_idx, 
+                                       n_samples, 
+                                       k_min,
+                                       picturesPathout,
+                                       method_featimp,
+                                       model_featimp):
+    
+    # redefiniendo n_samples en caso sea menor a 1 
+    if n_samples < 2:
+        n_samples = 2
+    
+    # particiona el dataframe solo con los features del cluster
+    featClusteringSelection = standarized_features_matrix[cluster]
+    
+    
+    # obtiene una lista combinatorias por cluster 
+    samplesInnerCluster = __getSubsamples__(
+        standardMatrix=featClusteringSelection,
+        k_min=k_min,
+        n_samples=n_samples
+        )
+    
+    
+    # define un código C_S, que itendifica cada Cluster (C) y cada Sample (S)
+    itterIdxBySample = [
+        str(cluster_idx) + '_' + str(sampleIdx) 
+        for sampleIdx in list(range(len(samplesInnerCluster)))
+        ]
+    
+    # iteración paralelizada por sample del cluster
+    ray_featImp_by_cluster = [
+            __iterativeFeatImpBySample__.remote(
+                    sample, # lista de nombres de los features
+                    idx, # idx del cluster
+                    featClusteringSelection, # features-matrizx stand & statio.
+                    featimp_instance, # instancia del featImp no clusterizado (base)
+                    df_labels, # labels-information dataframe 
+                    picturesPathout, 
+                    method_featimp, 
+                    model_featimp
+                )            
+            for sample, idx in zip(samplesInnerCluster, itterIdxBySample)
+            ]
+    
+    # checking 
+    resultado_final_temp = ray.get(ray_featImp_by_cluster)
+    
+    return resultado_final_temp
 
 def sorts(i):
     i.sort()
     return i
+
+
+##############################################################################
+######################### BASE FEAT IMPORTANCE CLASS #########################
+##############################################################################
 
 class featureImportance(object):
     
@@ -94,7 +203,7 @@ class featureImportance(object):
                  pca_min_var_expected = 0.05,
                  select_sample = True,
                  n_samples = 10,
-                 clustered_features = False,
+                 clustered_features = True,
                  k_min = 5
                  ):
         
@@ -138,21 +247,7 @@ class featureImportance(object):
         
         self.ErrorKendallMessage = 'Any valid kendall value exists in the set of trials'
         
-    def __getSubsamples__(self, standardMatrix):
-        total_samples = [] 
-        for i in range(self.k_min,len(standardMatrix.columns) + 1): 
-            for j in range(self.n_samples): 
-                samples = random.sample(list(standardMatrix.columns.values),i)
-                total_samples.append(tuple(samples))
-                total_samples = [list(tup) for tup in total_samples]
 
-        listSamples1 = [sorts(i) for i in total_samples]
-        listSamples2 = [list(tupl) for tupl in {tuple(item) for item in listSamples1}]
-        
-        return listSamples2
-    
-
-  
     def __instanceOverture__(self):
         
         # instancia feature importance base
@@ -179,51 +274,118 @@ class featureImportance(object):
         print("----------Process {} started---------- \n".format(self.method))
 
         # extrae la matriz de features estacionaria y estandarizada, el vector de labels y el df stacked
-        featStandarizedMatrix, labelsDataframe, original_stacked = instance.__checkingStationary__(
-            self.pictures_pathout
+        featStandarizedMatrix, labelsDataframe, original_stacked = \
+            instance.__checkingStationary__(
+                self.pictures_pathout
             ) 
-        print("         :::: >>> Running Iteration over samples for Kendall Test...")
-            
-        samples = self.__getSubsamples__(featStandarizedMatrix)
-
-        itterIdx = range(len(samples))
         
-        ray_object_list = [
-                     __subsampleProcess__.remote(
-                                          self,sample, idx,featStandarizedMatrix,instance,labelsDataframe)
+        print("         :::: >>> \
+              Running Iteration over samples for Kendall Test...")
+        
+        
+        if self.clustered_features: 
+            
+            print("      :::>>>> Clustering Feature Importance Initialized...")
+            
+            # creamos instancia de featImportance clusterizado
+            instance_clustered_featimp = ClusteredFeatureImportance(
+                                        # parámetros obligatorios
+                                        feature_matrix = featStandarizedMatrix, 
+                                        model = self.model, 
+                                        method = self.method,
+                                        # parámetros optativos (valores predef.)
+                                        max_number_clusters = None,
+                                        number_initial_iterations = 10
+                                    )
+            
+            # obtenemos el featImportance clusterizado y los clusters
+            clusteredFeatImpRank, clusters = \
+                instance_clustered_featimp.get_clustering_feature_importance(
+                                        labels = labelsDataframe["labels"]
+                                    )
+            
+            # obtiene numeral 'C_#' de c/cluster manteniendo el importance-order
+            clustersIdx_sorted_by_importance = [
+                int(string.split("_")[-1]) 
+                for string in clusteredFeatImpRank.index.values
+                ]
+            
+            print("----->> Clusters Rank:")
+            print(clusteredFeatImpRank)
+            print(" ")
+            
+            # diccionario vacío para guardar resultados de featImp por cluster
+            clusterDict = {}
+            
+            
+            print("              :::::::: Starting FeatImp Cluster Iteration")
+            # iteración por cluster para cómputo de featImp muestras aleatorias
+            for idxCluster in clustersIdx_sorted_by_importance:
+                
+                samplesByCluster = int(len(clusters[int(idxCluster)]) * 0.75)
+                
+                print("     ||>> Samples to analize by cluster:", 
+                      samplesByCluster) 
+                
+                # feature importance inner cluster
+                featImp_by_cluster = mainClusteringCombinatorialFeatImp(
+                            # matriz de features general
+                            standarized_features_matrix = featStandarizedMatrix,
+                            # vector de labels más info de weights
+                            df_labels = labelsDataframe,
+                            # cluster elegido según Idx
+                            cluster = clusters[int(idxCluster)],
+                            # instancia de la clase featImp base-genérica 
+                            featimp_instance = instance,
+                            # index del cluster (valor referencial)
+                            cluster_idx = idxCluster,
+                            # num samples a computar por cluster 
+                            n_samples = samplesByCluster,
+                            # min. factor de agrupación de features por cluster
+                            k_min = 2,
+                            # path donde guardar las imágenes
+                            picturesPathout = self.pictures_pathout,
+                            # método de feat importance seleccionado
+                            method_featimp = self.method,
+                            # modelo de feat importance 
+                            model_featimp = self.model
+                        )
+                
+                # almacenamiento de resultados en diccionario featImportance
+                clusterDict[str(idxCluster)] = featImp_by_cluster 
+            
+        
+            print(" SEE RESSULTS.................")
+            print(clusterDict)
+            print(gaaaa)
+        
+        else: 
+            samples = __getSubsamples__(featStandarizedMatrix, self.k_min, self.n_samples)
+
+            itterIdx = range(len(samples))
+        
+            ray_object_list = [
+                     __iterativeFeatImpBySample__.remote(
+                                          sample, 
+                                          idx,
+                                          featStandarizedMatrix,
+                                          instance,
+                                          labelsDataframe,
+                                          self.pictures_pathout,
+                                          self.method,
+                                          self.model
+                                          )
                      for sample,idx in zip(samples,itterIdx)
                      ]
- 
-        list_correlations = ray.get(ray_object_list)
-        print(list_correlations)
+        
+            # list kendalls correlation
+            list_correlations = ray.get(ray_object_list)
+            print(list_correlations)
 
         kendalls = {}
 
         for idx, i in enumerate(list_correlations):
             kendalls[idx] = i
-
-#        for sample in samples:
-#            itterIdx += 1             
-#            print(f'Running combination        : {itterIdx}')
-#           
-#            t1 = time()
-#            featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = instance.get_feature_importance(
-#                featStandarizedMatrix[sample], labelsDataframe, 
-#                self.pictures_pathout, self.method, self.model, itterIdx
-#                )
-
-             # si no pasa el score_constraint del 'scorePurged', no usas ese sample
-            
-#            kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
-
-#            print(f'Temporal Kendall Correlation             : {kendallCorrelation}')                
-#            print(f'Temporal Kendall p-value                 : {pValKendall}')
-#            print(f'Lenght of features tested at Kendall     : {len(sample)}\n')
-            
-#            kendalls[itterIdx] = [sample, kendallCorrelation, pValKendall]
-                
-#            print("Tiempo para hacer el árbol:",time()-t1)
-        
         
         kendalls = pd.DataFrame.from_dict(kendalls, orient='index')
         
@@ -416,32 +578,3 @@ class featureImportance(object):
         # caso contrario, retorna los nombres de features seleccionados
         else:
             return list(list_features_tested) 
-
-
-@ray.remote
-def __subsampleProcess__(self,sample,itterIdx,featStandarizedMatrix,instance,labelsDataframe):
-
-    print(f'Running combination        : {itterIdx}')
-
-    t1 = time()
-    featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = instance.get_feature_importance(
-                featStandarizedMatrix[sample], labelsDataframe,
-                self.pictures_pathout, self.method, self.model, itterIdx
-                )
-
-     # si no pasa el score_constraint del 'scorePurged', no usas ese sample
-
-    kendallCorrelation, pValKendall = kendalltau(featImpRank,featPcaRank)
-
-    print(f'Temporal Kendall Correlation             : {kendallCorrelation}')
-    print(f'Temporal Kendall p-value                 : {pValKendall}')
-    print(f'Lenght of features tested at Kendall     : {len(sample)}\n')
-
-    print("Tiempo para hacer el árbol:",time()-t1)
-
-    return  [sample, kendallCorrelation, pValKendall]
-
-
-
-
-

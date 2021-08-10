@@ -213,64 +213,29 @@ class FeatureImportance(object):
         # generamos copia del dataset
         xMatrixDf = df_base_matrix.copy()
         
-        # contador de features no estacionarios transformados
-#        featuresTransformed = 0        
+        # Procesos en R, primero conversión de formato
         df = convert_pandas_to_df(xMatrixDf)
 
+        # Prueba de estacionariedad
         features = adf_test(df)
-        print("Features",features)
+
+        print("Features a estacionarizar",features)
+
+        # Estacionarización:
         for feature in features:
-            print('Estoy estandarizando')
-            t = time()
+            print('Estoy estacionarizando', feature)
             newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
             xMatrixDf[feature] = newTemporalFeatArray
-            print(time()-t)
 
-#        for featuresName, featuresData in xMatrixDf.iteritems():
-            
-#            # extrae el vector de la caracteristica sobre la que se itera
-#            temporalFeatArray = featuresData.values
-#            print('ADF')
-#            t1 = time()
-#            # calcula el Dickey-Fuller
-#            critical_values_adf = adfuller(temporalFeatArray)
-#            print("ADF",time()-t1)
-#            # desagregando estadistico y valor critico del dickey-fuller
-#            statVal, criticalVal = critical_values_adf[0], critical_values_adf[4][pval_adf]
-#                        
-#            # si el valor del estadistico no es menor al del valor critico 
-#            if not (statVal < criticalVal): 
-#                print("-----> Warning! '{}' is not stationary... ".format(
-#                        featuresName
-#                        )
-#                    )
-#                print(":::: Stationary Transformation Initialized >>>")
-#                t1 = time()
-#                # aplica transformacion estacionaria con diferenciacion fraccional
-#                newTemporalFeatArray = simpleFracdiff(
-#                    temporalFeatArray
-#                    )
-#                print("Fracdiff:",time()-t1)
-#                # reasigna la informacion estacionarizada al dataframe
-#                xMatrixDf[featuresName] = newTemporalFeatArray
-#                
-#                # agrega un valor al contador de features modificacods
-#                featuresTransformed+=1
-#        
-#       print(':::::::::::::'*5)
-#        print(f'\n::: >>> Stationary Process Checked!\
-#              Features Transformed {featuresTransformed} over {xMatrixDf.shape[1]}')
-#        print(':::::::::::::'*5)            
-#              
-#        # estandarizacion Mean/Std de los valores de la matriz de features
+        # Estandarización de la matriz                 
         dfStandarized = xMatrixDf.sub(
             xMatrixDf.mean(), axis=1
             ).div(xMatrixDf.std(),axis=1)
-        t = time()
-        print('Ahora procedo a hacer la guardación')
+
+
+        # Sí se quiere guardar el csv con todos los features, descomentar esta fila 
         dfStandarized.to_csv('/var/data/csvs/final.csv') 
-        print(time()-t)
-        print('ya está')
+
         nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
         
         print('        >>> Saving Scaler Object... at ', pathOut)
@@ -291,7 +256,7 @@ class FeatureImportance(object):
                                oob=False, 
                                variance_explained = 0.95):
         """
-        Método central para el proceso de feature importance.
+        Método central para el proceso de feature importance NO clusterizado.
         """
         
         

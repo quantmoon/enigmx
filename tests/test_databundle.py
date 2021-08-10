@@ -11,17 +11,18 @@ from enigmx.tests.telegram import send_message
 from enigmx.tests.stocks import stocks
 
 
+
 server_name = "104.154.250.197" 
 referential_base_database = 'TSQL'
-pathzarr = '/var/data/data/'
-list_stocks = stocks
-start_date = "2020-12-01" 
-end_date = "2021-07-21" 
+pathzarr = 'C:/Users/FRANK/'
+list_stocks = ['VTOL', 'ZNGA']
+start_date = "2021-01-25" 
+end_date = "2021-03-25" 
 desired_bars = 10
 bartype = 'volume'
-driver = ("{ODBC DRIVER 17 for SQL Server}")
-uid = "sqlserver"
-pwd = "quantmoon2021"
+driver = "{SQL Server}"
+uid = ""
+pwd = ""
 
 print("inicializando clase")
 enigmxsql = SQLEnigmXinterface(
