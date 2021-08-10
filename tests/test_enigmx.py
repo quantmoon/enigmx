@@ -111,7 +111,7 @@ instance.get_feature_importance(
                       model = RandomForestClassifier(max_features=1, random_state=0), 
                       list_stocks = stocks, 
                       score_constraint = 0.3, #activar 
-                      server_name = "34.123.66.16",
+                      server_name = "104.154.250.197",
                       database = "BARS_FEATURES",
                       uid = 'sqlserver',
                       pwd = 'quantmoon2021',

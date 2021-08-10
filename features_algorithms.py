@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler
 from enigmx.dbgenerator import databundle_instance 
 from sklearn.model_selection import train_test_split
 from enigmx.purgedkfold_features import featImportances
-
+from enigmx.rscripts import adf_test, convert_pandas_to_df
 
 # PCA computation Snippet (8.5 page 119)
 def get_eVec(dot,varThres):
@@ -214,8 +214,18 @@ class FeatureImportance(object):
         xMatrixDf = df_base_matrix.copy()
         
         # contador de features no estacionarios transformados
-        featuresTransformed = 0        
-        #xMatrixDf.to_csv('/var/data/df.csv')
+#        featuresTransformed = 0        
+        df = convert_pandas_to_df(xMatrixDf)
+
+        features = adf_test(df)
+        print("Features",features)
+        for feature in features:
+            print('Estoy estandarizando')
+            t = time()
+            newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
+            xMatrixDf[feature] = newTemporalFeatArray
+            print(time()-t)
+
 #        for featuresName, featuresData in xMatrixDf.iteritems():
             
 #            # extrae el vector de la caracteristica sobre la que se itera
@@ -255,8 +265,12 @@ class FeatureImportance(object):
 #        # estandarizacion Mean/Std de los valores de la matriz de features
         dfStandarized = xMatrixDf.sub(
             xMatrixDf.mean(), axis=1
-            ).div(xMatrixDf.std(),axis=1)   
-        
+            ).div(xMatrixDf.std(),axis=1)
+        t = time()
+        print('Ahora procedo a hacer la guardación')
+        dfStandarized.to_csv('/var/data/csvs/final.csv') 
+        print(time()-t)
+        print('ya está')
         nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
         
         print('        >>> Saving Scaler Object... at ', pathOut)
