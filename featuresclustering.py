@@ -39,7 +39,9 @@ def clusterKMeansBase(corr0,maxNumClusters=None,n_init=10,val_abs=False):
     else:
         dist,silh=(1-np.abs(corr0.fillna(0)))**.5,pd.Series()# distance matrix
         
-    if maxNumClusters is None: maxNumClusters = int(corr0.shape[0]/2)
+    if maxNumClusters is None: 
+        maxNumClusters = int(corr0.shape[0]/2)
+
     for init in range(n_init):
         for i in range(2,maxNumClusters+1): # find optimal num clusters
             kmeans_=KMeans(n_clusters=i,n_jobs=1,n_init=1)
@@ -48,6 +50,7 @@ def clusterKMeansBase(corr0,maxNumClusters=None,n_init=10,val_abs=False):
             stat=(silh_.mean()/silh_.std(),silh.mean()/silh.std())
             if np.isnan(stat[1]) or stat[0]>stat[1]:
                 silh,kmeans=silh_,kmeans_ #silhouette score
+
     newIdx=np.argsort(kmeans.labels_)
     corr1=corr0.iloc[newIdx] # reorder rows
     corr1=corr1.iloc[:,newIdx] # reorder columns

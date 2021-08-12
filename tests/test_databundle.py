@@ -14,15 +14,15 @@ from enigmx.tests.stocks import stocks
 
 server_name = "104.154.250.197" 
 referential_base_database = 'TSQL'
-pathzarr = 'C:/Users/FRANK/'
-list_stocks = ['VTOL', 'ZNGA']
+pathzarr = '/var/data/data/'
+list_stocks = stocks
 start_date = "2021-01-25" 
 end_date = "2021-03-25" 
 desired_bars = 10
 bartype = 'volume'
-driver = "{SQL Server}"
-uid = ""
-pwd = ""
+driver = ("{ODBC DRIVER 17 for SQL Server}"),
+uid = "sqlserver"
+pwd = "quantmoon2021"
 
 print("inicializando clase")
 enigmxsql = SQLEnigmXinterface(

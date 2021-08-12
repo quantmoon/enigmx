@@ -13,7 +13,7 @@ from enigmx.features_algorithms import FeatureImportance
 from enigmx.purgedkfold_features import plotFeatImportance
 from enigmx.featuresclustering import ClusteredFeatureImportance
 from enigmx.utils import enigmxSplit, kendall_evaluation
-
+from enigmx.rscripts import get_residual_matrix,convert_pandas_to_df
 
 ##############################################################################
 ########################## COMPLEMENTARY FUNCTIONS ###########################
@@ -204,7 +204,10 @@ class featureImportance(object):
                  select_sample = True,
                  n_samples = 10,
                  clustered_features = True,
-                 k_min = 5
+                 k_min = 5,
+                 residuals = True,
+                 one_vs_all = False,
+                 silh_thres = 0.65
                  ):
         
         # ingesta de parámetros
@@ -244,6 +247,10 @@ class featureImportance(object):
         
         self.k_min = k_min
         self.kendalls = {}
+
+        self.residuals = residuals
+        self.ova = one_vs_all
+        self.silh_thres = silh_thres
         
         self.ErrorKendallMessage = 'Any valid kendall value exists in the set of trials'
         
@@ -317,8 +324,25 @@ class featureImportance(object):
             # diccionario vacío para guardar resultados de featImp por cluster
             clusterDict = {}
             
+            features_and_silh = instance_clustered_featimp.silh.where(instance_clustered_featimp.silh < self.silh_thres).dropna()
             
+            features_to_transform =[]
+
+
+            for features in clusters.values():
+                features_to_transform.append([feature for feature in features if feature in features_and_silh.index])
+
+            featuresMatrix = convert_pandas_to_df(featStandarizedMatrix)
+
+            if self.residuals:
+                t = time()
+                featStandarizedMatrix = get_residual_matrix(featuresMatrix,features_to_transform,features_and_silh,list(clusters.values()),self.ova)
+                print(time()-t)
+            sys.exit()
+
+
             print("              :::::::: Starting FeatImp Cluster Iteration")
+
             # iteración por cluster para cómputo de featImp muestras aleatorias
             for idxCluster in clustersIdx_sorted_by_importance:
                 

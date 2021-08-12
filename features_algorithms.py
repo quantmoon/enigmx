@@ -209,17 +209,19 @@ class FeatureImportance(object):
         
         # extrae matriz de features, vector de labels del split stacked, y el global stacked
         df_base_matrix, yVectorArray, df_global_stacked = self.__organizationDataProcess__()
-        
+
         # generamos copia del dataset
         xMatrixDf = df_base_matrix.copy()
-        
+
+        xMatrixDf = xMatrixDf.iloc[:,:8]
+
         # Procesos en R, primero conversión de formato
         df = convert_pandas_to_df(xMatrixDf)
 
         # Prueba de estacionariedad
         features = adf_test(df)
 
-        print("Features a estacionarizar",features)
+        print("Features a estacionarizar: ",features)
 
         # Estacionarización:
         for feature in features:
@@ -234,7 +236,7 @@ class FeatureImportance(object):
 
 
         # Sí se quiere guardar el csv con todos los features, descomentar esta fila 
-        dfStandarized.to_csv('/var/data/csvs/final.csv') 
+        #dfStandarized.to_csv('/var/data/csvs/final.csv') 
 
         nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
         
