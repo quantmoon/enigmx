@@ -206,7 +206,6 @@ class featureImportance(object):
                  clustered_features = True,
                  k_min = 5,
                  residuals = True,
-                 one_vs_all = False,
                  silh_thres = 0.65
                  ):
         
@@ -249,7 +248,6 @@ class featureImportance(object):
         self.kendalls = {}
 
         self.residuals = residuals
-        self.ova = one_vs_all
         self.silh_thres = silh_thres
         
         self.ErrorKendallMessage = 'Any valid kendall value exists in the set of trials'
@@ -336,7 +334,7 @@ class featureImportance(object):
 
             if self.residuals:
                 t = time()
-                featStandarizedMatrix = get_residual_matrix(featuresMatrix,features_to_transform,features_and_silh,list(clusters.values()),self.ova)
+                featStandarizedMatrix = get_residual_matrix(featuresMatrix,features_to_transform,features_and_silh,list(clusters.values()))
                 print(time()-t)
             sys.exit()
 

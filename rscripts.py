@@ -5,7 +5,7 @@ from rpy2.robjects.conversion import localconverter
 import pandas as pd
 import sys
 
-
+importr("dplyr")
 robjects.r("options(warn=-1)")
 
 
@@ -55,19 +55,15 @@ def adf_test(datos):
     return features
 
 
-def get_residual_matrix(matrix,features_to_transform,silhouettes,clusters,one_vs_all=False):
+def regression_intracluster(matrix,clusters):
 
-    importr("dplyr")
 
    
-    if one_vs_all:
-
-        robjects.r("""
-        get_residuals_values <- function(matriz,cluster,y,features_to_transform){
-        cluster_matriz <- select(matriz,c(cluster,y))
+    robjects.r("""
+        get_residuals_values <- function(matriz,cluster,features_to_transform){
         coefficients = NULL
         for (var in features_to_transform){
-          fit <- lm(cluster_matriz[,var]~ cluster_matriz[,y],data = cluster_matriz)
+          fit <- lm(matriz[,var]~ matriz[,-var],data = matriz)
           cluster_matriz[var] <- residuals(fit)
           coefficients <- rbind(coefficients,fit$coefficients)
            }
@@ -76,61 +72,57 @@ def get_residual_matrix(matrix,features_to_transform,silhouettes,clusters,one_vs
         return (list(cluster_matriz,coefficients))
         }
         """)
-        get_residuals = robjects.globalenv['get_residuals_values']
-        df = pd.DataFrame()
+    get_residuals = robjects.globalenv['get_residuals_values']
+    df = pd.DataFrame()
         
-        for idx,cluster in enumerate(clusters):
-            features = [feature for feature in cluster if feature in features_to_transform[idx]]
-            if len(features) == 0 : continue
-            referent = silhouettes.loc[features].sort_values(ascending=False).index[0]
-            cluster = [x for x in cluster if x != referent]
-            res = robjects.vectors.StrVector(cluster)
-            feat_to_trans = robjects.vectors.StrVector(features_to_transform[idx])
-            residual_matrix,coefficients = get_residuals(matrix,res,referent,feat_to_trans)
-            residual_matrix = convert_df_to_pandas(residual_matrix)
-            coefficients = convert_df_to_pandas(coefficients)
-            coefficients.index = features_to_transform[idx]
-            print(coefficients)
-            coefficients.to_csv(f'/var/data/csvs/cluster_{idx}_coefficients.csv')
-            df = pd.concat([df,residual_matrix], axis = 1)
+    for idx,cluster in enumerate(clusters):
+        #features = [feature for feature in cluster if feature in features_to_transform[idx]]
+        #if len(features) == 0 : continue
+        #referent = silhouettes.loc[features].sort_values(ascending=False).index[0]
+        #cluster = [x for x in cluster if x != referent]
+
+        res = robjects.vectors.StrVector(cluster)
+        #feat_to_trans = robjects.vectors.StrVector(features_to_transform[idx])
+        residual_matrix,coefficients = get_residuals(matrix,res)
+        residual_matrix = convert_df_to_pandas(residual_matrix)
+        coefficients = convert_df_to_pandas(coefficients)
+        coefficients.index = features_to_transform[idx]
+        print(coefficients)
+        coefficients.to_csv(f'/var/data/csvs/cluster_{idx}_coefficients.csv')
+        df = pd.concat([df,residual_matrix], axis = 1)
 
         return df
 
 
-    else:
-        robjects.r("""
-        get_residuals_values <- function(matriz,cluster,features_to_transform){
-        cluster_matriz <- select(matriz,cluster)
+def regression_intercluster(matrix,features_to_transform,clusters):
+
+    robjects.r("""
+     get_residuals_values <- function(matriz,cluster,features_to_transform){
         coefficients = NULL
         for (var in features_to_transform){
-          fit <- lm(cluster_matriz[,var]~ .,data=cluster_matriz)
-          cluster_matriz[var] <- residuals(fit)
+          fit <- lm(matriz[,var]~ .,data=select(matriz,-cluster))
+          matriz[var] <- residuals(fit)
            coefficients <- rbind(coefficients,fit$coefficients)
            }
         coefficients <- data.frame(coefficients)
    
-        return (list(cluster_matriz,coefficients))
+        return (list(matriz,coefficients))
         }
         """)
 
-        get_residuals = robjects.globalenv['get_residuals_values']
-        df = pd.DataFrame()
+    get_residuals = robjects.globalenv['get_residuals_values']
+    df = pd.DataFrame()
 
-        idx = 0
+    for idx,cluster in enumerate(clusters):
 
-        for cluster in clusters:
+        res = robjects.vectors.StrVector(cluster)
+        feat_to_trans = robjects.vectors.StrVector(features_to_transform[idx])
+        residual_matrix,coefficients = get_residuals(matrix,res,feat_to_trans)
+        residual_matrix = convert_df_to_pandas(residual_matrix)
+        coefficients = convert_df_to_pandas(coefficients)
+        coefficients.index = features_to_transform[idx]
+        print(coefficients)
+        coefficients.to_csv(f'/var/data/csvs/clust,er_{idx}_coefficients.csv')
+        df = pd.concat([df,residual_matrix], axis = 1)
 
-            res = robjects.vectors.StrVector(cluster)
-            feat_to_trans = robjects.vectors.StrVector(features_to_transform[idx])
-            residual_matrix,coefficients = get_residuals(matrix,res,feat_to_trans)
-            residual_matrix = convert_df_to_pandas(residual_matrix)
-            coefficients = convert_df_to_pandas(coefficients)
-            coefficients.index = features_to_transform[idx]
-            print(coefficients)
-            coefficients.to_csv(f'/var/data/csvs/cluster_{idx}_coefficients.csv')
-            df = pd.concat([df,residual_matrix], axis = 1)
-            idx += 1
-
-        return df
-
-
+    return df
