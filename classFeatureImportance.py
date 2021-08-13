@@ -13,7 +13,7 @@ from enigmx.features_algorithms import FeatureImportance
 from enigmx.purgedkfold_features import plotFeatImportance
 from enigmx.featuresclustering import ClusteredFeatureImportance
 from enigmx.utils import enigmxSplit, kendall_evaluation
-from enigmx.rscripts import get_residual_matrix,convert_pandas_to_df
+from enigmx.rscripts import regression_intracluster, regression_intercluster,convert_pandas_to_df
 
 ##############################################################################
 ########################## COMPLEMENTARY FUNCTIONS ###########################
@@ -250,6 +250,7 @@ class featureImportance(object):
         self.residuals = residuals
         self.silh_thres = silh_thres
         
+        
         self.ErrorKendallMessage = 'Any valid kendall value exists in the set of trials'
         
 
@@ -330,11 +331,12 @@ class featureImportance(object):
             for features in clusters.values():
                 features_to_transform.append([feature for feature in features if feature in features_and_silh.index])
 
-            featuresMatrix = convert_pandas_to_df(featStandarizedMatrix)
+            clusters_values = list(clusters.values())
 
             if self.residuals:
                 t = time()
-                featStandarizedMatrix = get_residual_matrix(featuresMatrix,features_to_transform,features_and_silh,list(clusters.values()))
+                featStandarizedMatrix = regression_intercluster(featStandarizedMatrix,features_to_transform,clusters_values)
+                featStandarizedMatrix = regression_intracluster(featStandarizedMatrix,clusters_values)
                 print(time()-t)
             sys.exit()
 

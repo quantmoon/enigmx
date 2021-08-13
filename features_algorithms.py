@@ -213,7 +213,7 @@ class FeatureImportance(object):
         # generamos copia del dataset
         xMatrixDf = df_base_matrix.copy()
 
-        xMatrixDf = xMatrixDf.iloc[:,:8]
+#        xMatrixDf = xMatrixDf.iloc[:,:8]
 
         # Procesos en R, primero conversión de formato
         df = convert_pandas_to_df(xMatrixDf)
