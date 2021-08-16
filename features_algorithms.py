@@ -7,9 +7,9 @@ import pickle
 import datetime
 import numpy as np
 import pandas as pd
-from time import time
+#from time import time
 from enigmx.utils import simpleFracdiff
-from statsmodels.tsa.stattools import adfuller
+#from statsmodels.tsa.stattools import adfuller
 from sklearn.preprocessing import StandardScaler
 from enigmx.dbgenerator import databundle_instance 
 from sklearn.model_selection import train_test_split
@@ -213,7 +213,7 @@ class FeatureImportance(object):
         # generamos copia del dataset
         xMatrixDf = df_base_matrix.copy()
 
-#        xMatrixDf = xMatrixDf.iloc[:,:8]
+        # xMatrixDf = xMatrixDf.iloc[:,:8]
 
         # Procesos en R, primero conversión de formato
         df = convert_pandas_to_df(xMatrixDf)
@@ -221,11 +221,12 @@ class FeatureImportance(object):
         # Prueba de estacionariedad
         features = adf_test(df)
 
-        print("Features a estacionarizar: ",features)
+        print("WARNING! >>>>> Features to transform as stationary: ", 
+              len(features), "/", df_base_matrix.shape[1])
 
         # Estacionarización:
         for feature in features:
-            print('Estoy estacionarizando', feature)
+            print('            Stationarization over:', feature)
             newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
             xMatrixDf[feature] = newTemporalFeatArray
 

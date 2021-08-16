@@ -55,7 +55,7 @@ def adf_test(datos):
     return features
 
 
-def regression_intracluster(matrix,clusters):
+def regression_intracluster(matrix,clusters, path = 'D:/data_enigmx/'):
 
     matrix = convert_pandas_to_df(matrix)
 
@@ -96,14 +96,13 @@ def regression_intracluster(matrix,clusters):
         coefficients.index = cluster
         cluster.insert(0,'Intercepto')
         coefficients.columns = cluster
-        print(coefficients)
-        coefficients.to_csv(f'/var/data/csvs/cluster_{idx}_coefficients_intra.csv')
+        coefficients.to_csv(f'{path}cluster_{idx}_coefficients_intra.csv')
         df = pd.concat([df,residual_matrix], axis = 1)
 
     return df
 
 
-def regression_intercluster(matrix,features_to_transform,clusters):
+def regression_intercluster(matrix,features_to_transform,clusters, path = 'D:/data_enigmx/'):
 
     matrix = convert_pandas_to_df(matrix)
 
@@ -131,8 +130,7 @@ def regression_intercluster(matrix,features_to_transform,clusters):
         residual_matrix = convert_df_to_pandas(residual_matrix)
         coefficients = convert_df_to_pandas(coefficients)
         coefficients.index = features_to_transform[idx]
-        print(coefficients)
-        coefficients.to_csv(f'/var/data/csvs/cluster_{idx}_coefficients.csv')
+        coefficients.to_csv(f'{path}cluster_{idx}_coefficients.csv')
         df = pd.concat([df,residual_matrix], axis = 1)
 
     return df

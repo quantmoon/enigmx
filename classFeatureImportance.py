@@ -4,16 +4,16 @@ webpage: https://www.quantmoon.tech//
 """
 import sys
 import ray
+import click
 import random
 import pandas as pd
 from time import time
 from scipy.stats import kendalltau
-from itertools import combinations
 from enigmx.features_algorithms import FeatureImportance
 from enigmx.purgedkfold_features import plotFeatImportance
 from enigmx.featuresclustering import ClusteredFeatureImportance
-from enigmx.utils import enigmxSplit, kendall_evaluation
-from enigmx.rscripts import regression_intracluster, regression_intercluster,convert_pandas_to_df
+from enigmx.utils import enigmxSplit, baseFeatImportance, clickMessage1 #,kendall_evaluation
+from enigmx.rscripts import regression_intracluster, regression_intercluster #,convert_pandas_to_df
 
 ##############################################################################
 ########################## COMPLEMENTARY FUNCTIONS ###########################
@@ -205,8 +205,10 @@ class featureImportance(object):
                  n_samples = 10,
                  clustered_features = True,
                  k_min = 5,
-                 residuals = True,
-                 silh_thres = 0.65
+                 residuals = True, #add out
+                 silh_thres = 0.65, #add out 
+                 n_best_features = 7, #add out
+                 global_featImp = True, #add out
                  ):
         
         # ingesta de parámetros
@@ -250,6 +252,8 @@ class featureImportance(object):
         self.residuals = residuals
         self.silh_thres = silh_thres
         
+        self.n_best_features = n_best_features
+        self.global_featImp = global_featImp 
         
         self.ErrorKendallMessage = 'Any valid kendall value exists in the set of trials'
         
@@ -279,7 +283,7 @@ class featureImportance(object):
         
         print("----------Process {} started---------- \n".format(self.method))
 
-        # extrae la matriz de features estacionaria y estandarizada, el vector de labels y el df stacked
+        # extrae matriz de features estacionaria-estandarizada, labelsDf y df stacked
         featStandarizedMatrix, labelsDataframe, original_stacked = \
             instance.__checkingStationary__(
                 self.pictures_pathout
@@ -287,8 +291,10 @@ class featureImportance(object):
         
         print("         :::: >>> \
               Running Iteration over samples for Kendall Test...")
+              
         
         
+        # si se utiliza el clustering featImp 
         if self.clustered_features: 
             
             print("      :::>>>> Clustering Feature Importance Initialized...")
@@ -316,78 +322,200 @@ class featureImportance(object):
                 for string in clusteredFeatImpRank.index.values
                 ]
             
-            print("----->> Clusters Rank:")
-            print(clusteredFeatImpRank)
-            print(" ")
             
-            # diccionario vacío para guardar resultados de featImp por cluster
-            clusterDict = {}
+            # filtración de los features que pasen det. silhouette score
+            features_and_silh = instance_clustered_featimp.silh.where(
+                instance_clustered_featimp.silh < self.silh_thres
+                ).dropna()
             
-            features_and_silh = instance_clustered_featimp.silh.where(instance_clustered_featimp.silh < self.silh_thres).dropna()
-            
+            # lista vacía para almacenar los features a transformar
             features_to_transform =[]
-
-
-            for features in clusters.values():
-                features_to_transform.append([feature for feature in features if feature in features_and_silh.index])
-
-            clusters_values = list(clusters.values())
-
-            if self.residuals:
-                t = time()
-                featStandarizedMatrix = regression_intercluster(featStandarizedMatrix,features_to_transform,clusters_values)
-                featStandarizedMatrix = regression_intracluster(featStandarizedMatrix,clusters_values)
-                print(time()-t)
-            sys.exit()
-
-
-            print("              :::::::: Starting FeatImp Cluster Iteration")
-
-            # iteración por cluster para cómputo de featImp muestras aleatorias
-            for idxCluster in clustersIdx_sorted_by_importance:
-                
-                samplesByCluster = int(len(clusters[int(idxCluster)]) * 0.75)
-                
-                print("     ||>> Samples to analize by cluster:", 
-                      samplesByCluster) 
-                
-                # feature importance inner cluster
-                featImp_by_cluster = mainClusteringCombinatorialFeatImp(
-                            # matriz de features general
-                            standarized_features_matrix = featStandarizedMatrix,
-                            # vector de labels más info de weights
-                            df_labels = labelsDataframe,
-                            # cluster elegido según Idx
-                            cluster = clusters[int(idxCluster)],
-                            # instancia de la clase featImp base-genérica 
-                            featimp_instance = instance,
-                            # index del cluster (valor referencial)
-                            cluster_idx = idxCluster,
-                            # num samples a computar por cluster 
-                            n_samples = samplesByCluster,
-                            # min. factor de agrupación de features por cluster
-                            k_min = 2,
-                            # path donde guardar las imágenes
-                            picturesPathout = self.pictures_pathout,
-                            # método de feat importance seleccionado
-                            method_featimp = self.method,
-                            # modelo de feat importance 
-                            model_featimp = self.model
-                        )
-                
-                # almacenamiento de resultados en diccionario featImportance
-                clusterDict[str(idxCluster)] = featImp_by_cluster 
             
-        
-            print(" SEE RESSULTS.................")
-            print(clusterDict)
-            print(gaaaa)
-        
-        else: 
-            samples = __getSubsamples__(featStandarizedMatrix, self.k_min, self.n_samples)
+            # búsqueda de features a transformar por cada cluster
+            for features in clusters.values():
+                features_to_transform.append(
+                    [
+                        feature for feature in features 
+                        if feature in features_and_silh.index
+                        ]
+                    )
+            
+            # lista de lista con los features de c/ cluster
+            clusters_values = list(clusters.values())
+            
+            print("          ------------------>>>> Computing residuals... ")
+            
+            # si se selecciona la transformación por residuos
+            if self.residuals:
+                
+                # computa las regresiones intercluster (enfoque MDLP)
+                # featStandarizedMatrix = regression_intercluster(
+                #     featStandarizedMatrix, 
+                #     features_to_transform, 
+                #     clusters_values
+                #     )
+                
+                # computa las regresiones intracluster
+                featStandarizedMatrix = regression_intracluster(
+                    featStandarizedMatrix, 
+                    clusters_values
+                    )
+                
+                # inserting same IDX in features matrix as labelsDF
+                featStandarizedMatrix.index = labelsDataframe.index
+                
+                # si ejecutar el featImp sobre toda la matriz de feat
+                if self.global_featImp: 
+                    
+                    # func. featImp estandar | puede reemp. anteriores (sin PCA)
+                    importanceRank, scoreNoPurged, scorePurged, stackedImp = \
+                        baseFeatImportance(
+                            features_matrix = featStandarizedMatrix,
+                            labels_dataframe = labelsDataframe,
+                            random_state = 42,
+                            method = self.method,
+                            model_selected = self.model,
+                            pct_embargo = 0.01, #agregar como variable para llamar desde fuera
+                            cv = 5, #agregar como variable para llamar desde fuera
+                            oob = False,
+                        )
+                        
+                    # reordenamiento featImpRank | de mayor a menor rank-val
+                    importanceRankSorted = importanceRank.sort_values(
+                        ascending=False
+                        )
+                    
+                    # selección de top n best features según importance Rank
+                    featureSelected = importanceRankSorted[
+                        :self.n_best_features
+                        ].index.values 
+                    
+                    # definimos variables para el return general de la clase
+                    imp, combFeaturesSelected = stackedImp, featureSelected
 
+                # ejecutar featImp x cluster para elegir al mejor feat de c/u
+                else:
+                    
+                    # lista vacía para almacenar el mejor features de c/ cluster
+                    list_features_selected = []
+                    
+                    # iteración por grupo de features de cada cluster
+                    for idxClust, clusterFeatures in enumerate(clusters_values):
+                        
+                        # anula 1er elemento denominado 'intercepto' (no es feature)
+                        clusterFeatures = clusterFeatures[1:]
+
+                        # matriz temporal de features
+                        tempClusterFeatMatrix = featStandarizedMatrix[clusterFeatures]
+                        
+                        # proceso temporal de featImp inner cluster... (sin PCA)
+                        importanceRankTemp, scoreNoPurgedTemp, scorePurgedTemp, stackedImpTemp = \
+                            baseFeatImportance(
+                                features_matrix = tempClusterFeatMatrix,
+                                labels_dataframe = labelsDataframe,
+                                random_state = 42,
+                                method = self.method,
+                                model_selected = self.model,
+                                pct_embargo = 0.01, #agregar como variable para llamar desde fuera
+                                cv = 5, #agregar como variable para llamar desde fuera
+                                oob = False,
+                            )
+                        
+                        # reordenamiento featImpRank | de mayor a menor rank-val
+                        importanceRankSortedTemp = importanceRankTemp.sort_values(
+                            ascending=False
+                            ) 
+                        
+                        # selección de top n best features según importance Rank
+                        featureSelectedTemp = importanceRankSortedTemp[
+                            :self.n_best_features
+                            ].index.values 
+                        
+                        # almacenamos features elegidos del cluster
+                        list_features_selected.extend(featureSelectedTemp)        
+                        
+                        # guardado de imágenes del featImp rank temporal
+                        plotFeatImportance(
+                                self.pictures_pathout,    
+                                stackedImpTemp,
+                                0,
+                                scorePurgedTemp,
+                                method=self.method, 
+                                tag='First try',
+                                simNum= self.method + '_' + type(self.model).__name__ + 
+                                'cluster' + str(idxClust),
+                                model=type(self.model).__name__
+                                )                        
+                    
+                    # definimos variables para el return general de la clase
+                    imp, combFeaturesSelected = None, list_features_selected 
+            
+            # si no se utiliza la transformación por residuos en el clusterizado
+            else:
+                
+                # convenant | AVISO! Si desea continuar o no con el proceso
+                if click.confirm(clickMessage1, default=True):
+                    print("  ::::::>> OK! Starting Simple FeatImp Cluster Iteration")
+                
+                    # diccionario vacío para guardar resultados de featImp por cluster
+                    clusterDict = {}
+                    
+                    # iteración por cluster para cómputo de featImp muestras aleatorias
+                    for idxCluster in clustersIdx_sorted_by_importance:
+                        
+                        samplesByCluster = int(len(clusters[int(idxCluster)]) * 0.75)
+                        
+                        print("     ||>> Samples to analize by cluster:", 
+                              samplesByCluster) 
+                        
+                        # feature importance inner cluster
+                        featImp_by_cluster = mainClusteringCombinatorialFeatImp(
+                                    # matriz de features general
+                                    standarized_features_matrix = featStandarizedMatrix,
+                                    # vector de labels más info de weights
+                                    df_labels = labelsDataframe,
+                                    # cluster elegido según Idx
+                                    cluster = clusters[int(idxCluster)],
+                                    # instancia de la clase featImp base-genérica 
+                                    featimp_instance = instance,
+                                    # index del cluster (valor referencial)
+                                    cluster_idx = idxCluster,
+                                    # num samples a computar por cluster 
+                                    n_samples = samplesByCluster,
+                                    # min. factor de agrupación de features por cluster
+                                    k_min = 2,
+                                    # path donde guardar las imágenes
+                                    picturesPathout = self.pictures_pathout,
+                                    # método de feat importance seleccionado
+                                    method_featimp = self.method,
+                                    # modelo de feat importance 
+                                    model_featimp = self.model
+                                )
+                        
+                        # almacenamiento de resultados en diccionario featImportance
+                        clusterDict[str(idxCluster)] = featImp_by_cluster 
+                        
+                    print(" ......... Checking General Cluster dictionary >>>")
+                    print(clusterDict)
+                    sys.exit("Execution Stopped.| No output generated yet!")
+                    
+                else:
+                    sys.exit("ProcessStoppedReq.| Feat Importance Finished!")
+        
+        # si no se utiliza el clustering featImp (featImp con Kendall Tau Corr)
+        else: 
+            
+            # obtiene combinatorias según un min de feat y n samples
+            samples = __getSubsamples__(
+                featStandarizedMatrix, 
+                self.k_min, 
+                self.n_samples
+                )
+            
+            # estima los valores de iteración según el total de samples
             itterIdx = range(len(samples))
         
+            # computa el featImp iterativo por sample
             ray_object_list = [
                      __iterativeFeatImpBySample__.remote(
                                           sample, 
@@ -402,50 +530,72 @@ class featureImportance(object):
                      for sample,idx in zip(samples,itterIdx)
                      ]
         
-            # list kendalls correlation
+            print("     :::>>>> Getting Kendall Tau List Corr by Sample...")
+            # lista de correlaciones por sample
             list_correlations = ray.get(ray_object_list)
-            print(list_correlations)
-
-        kendalls = {}
-
-        for idx, i in enumerate(list_correlations):
-            kendalls[idx] = i
-        
-        kendalls = pd.DataFrame.from_dict(kendalls, orient='index')
-        
-        print("Kendalls",kendalls)
-
-        kendalls.columns = ['best_feature_combination', 'kendall_correlation', 'kendall_pval']
-       
-        kendalls.to_csv(self.pictures_pathout+'kendall_values.csv', index = False)
-       
-        groupedPvalCond = kendalls.loc[kendalls.kendall_pval < self.pval_kendall]
-       
-        if groupedPvalCond.shape[0] == 0:
-            sys.exit("{}".format(self.ErrorKendallMessage))
-       
-        else:
-            bestSetFeatures = groupedPvalCond.loc[groupedPvalCond.kendall_correlation.idxmax()]            
-       
-            kendallCorrSelected, pvalKendallSelected, combFeaturesSelected =  (
-                                        bestSetFeatures.loc['kendall_correlation'], 
-                                        bestSetFeatures.loc['kendall_pval'], 
-                                        bestSetFeatures.loc['best_feature_combination']
-                                    )
             
-        print(':::::: >>> Kendall Test :')
-        print(f'     Best Kendall Correlation calculated is     : {kendallCorrSelected}')
-        print(f'     Best Kendall PValue calculated is          : {pvalKendallSelected}')
-        print(f'     Lenght of Best Useful Features Combination : {len(combFeaturesSelected)}')
+            # definición de diccionario 'kendall' para guardar val. corr por idx
+            kendalls = {}
+    
+            # itera por c/ kendall tau corr en la lista de corr para asignar idx
+            for idx, i in enumerate(list_correlations):
+                kendalls[idx] = i
             
-
-        featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = instance.get_feature_importance(
-                featStandarizedMatrix[combFeaturesSelected], labelsDataframe,
-                self.pictures_pathout, self.method, self.model, itterIdx
+            # define un dataframe con los valores de corr
+            kendalls = pd.DataFrame.from_dict(kendalls, orient='index')
+            
+            print("  ----- >>> Building & Saving KendallTau dataframe...")
+            
+            # defining kendalls df columns
+            kendalls.columns = [
+                'best_feature_combination', 'kendall_correlation', 'kendall_pval'
+                ]
+           
+            # saving kendalls to csv
+            kendalls.to_csv(
+                self.pictures_pathout+'kendall_values.csv', index = False
                 )
+           
+            # select only combinations that pass pval kendall threshold
+            groupedPvalCond = kendalls.loc[
+                kendalls.kendall_pval < self.pval_kendall
+                ]
+           
+            # si no existe una combinación con un kendallTau aceptable
+            if groupedPvalCond.shape[0] == 0:
+                sys.exit("{}".format(self.ErrorKendallMessage))
+           
+            # caso contrario, selecciona los index de las combinaciones aceptables
+            else:
+                # obtiene el mejor conjunto de features con un 'loc'
+                bestSetFeatures = groupedPvalCond.loc[
+                    groupedPvalCond.kendall_correlation.idxmax()
+                    ]            
+                
+                # obtiene valores finales: correlación, pval y mejor comb de features
+                kendallCorrSelected, pvalKendallSelected, combFeaturesSelected =  (
+                                            bestSetFeatures.loc['kendall_correlation'], 
+                                            bestSetFeatures.loc['kendall_pval'], 
+                                            bestSetFeatures.loc['best_feature_combination']
+                                        )
+                
+            print(':::::: >>> Kendall Test :')
+            print(f'     Best Kendall Correlation calculated is     : {kendallCorrSelected}')
+            print(f'     Best Kendall PValue calculated is          : {pvalKendallSelected}')
+            print(f'     Lenght of Best Useful Features Combination : {len(combFeaturesSelected)}')
+                
+            # ejecuta el featImp con la mejor comb. de features
+            featImpRank, featPcaRank, scoreNoPurged, scorePurged, imp = \
+                instance.get_feature_importance(
+                    featStandarizedMatrix[combFeaturesSelected], labelsDataframe,
+                    self.pictures_pathout, self.method, self.model, itterIdx
+                    )
+            
+        print("************** Returning to General Stage | FeatImp Class >>>")
 
-
-        plotFeatImportance(
+        # guardado de imágenes
+        if imp is not None:
+            plotFeatImportance(
                 self.pictures_pathout,    
                 imp,
                 0,
@@ -456,10 +606,14 @@ class featureImportance(object):
                 model=type(self.model).__name__
                 )
                 
-        print("Feature Importance picture Saved in {}".format(
+            print("Saving Picture!!!! ---> Feature Importance picture Saved in {}".format(
                 self.pictures_pathout)
-                    )
-        # retorna el dataframe stacked (roleado original) y los nombres de los features
+                )
+        
+        print("Final Return | FeatImp :::: >>> Useful features combination:")
+        print(combFeaturesSelected)
+        
+        # retorna el df stacked (roleado orig.) y los nombres de los features
         return original_stacked, combFeaturesSelected 
         
     def get_relevant_features(self, 
@@ -471,7 +625,7 @@ class featureImportance(object):
         # revisa que el pct_split no sea menor a 0.6
         assert pct_split >= 0.6, "Percentage of 'splits' should be 0.6 (60%) as min."
         
-        # retorna el dataframe stackeado de features (rolleado = escalado )
+        # df stackeado de feats (rolleado = escalado) + la comb. elegida de features
         stacked, list_features_tested = self.__instanceOverture__()
         
         # si se activa el proceso de filtrado

@@ -22,6 +22,8 @@ import pandas_market_calendars as mcal
 from fracdiff import StationaryFracdiff
 from sklearn.preprocessing import LabelEncoder
 from enigmx.protofeatures import protoFeatures
+from sklearn.model_selection import train_test_split
+from enigmx.purgedkfold_features import featImportances
 
 #general class to personalize ValueError Messages
 class UnAcceptedValueError(Exception):
@@ -2806,3 +2808,86 @@ def kendall_evaluation(importance_series, pca_series, threshold = 0.5):
 # splitStringArray = np.frompyfunc(
 #     __splitStringArray__, 1, 1
 # ) 
+
+
+# función genérica que permite resumir el proceso central del featImp
+def baseFeatImportance(**kwargs):
+    """
+    Parámetros permitidos:
+        - features_matrix (pd.dataframe)
+        - labels_dataframe (pd.dataframe)
+        - random_state (int)
+        - method (str)
+        - model_selected (sklearn package)
+        - pct_embargo (0 < float < 1)
+        - cv (int)
+        - oob (bool)
+    """
+    # extrae data de train/test desde la matriz ortogonalizada y el vector de etiquetas                
+    
+    print("      ::::: >>> Running Base FeatImp...")
+    
+    x_train, x_test, y_train, y_test = train_test_split(
+        kwargs['features_matrix'], 
+        kwargs['labels_dataframe'],
+        random_state = kwargs['random_state']
+        )
+    
+    # si el método seleccionado es 'MDA'
+    if kwargs['method'] == 'MDA':
+        # verificación de modelo utilizado
+        if type(kwargs['model_selected']).__name__=='RandomForestClassifier':
+            raise ValueError(
+                "{} model is not allowed to implement 'MDA'".format(
+                    'RandomForestClassifier'
+                    )
+                )      
+        
+    # si el método seleccionado es 'MDI
+    if kwargs['method'] == 'MDI': 
+        # verificación de modelo utilizado
+        if type(kwargs['model_selected']).__name__!='RandomForestClassifier':
+            raise ValueError(
+                "Only {} is allowed to implement 'MDI'".format(
+                    'RandomForestClassifier'
+                    )
+                )
+            
+    # importance values, score con cpkf, y mean val (NaN)
+    imp,oos,oob = featImportances(x_train, 
+                                  y_train, 
+                                  kwargs['model_selected'],
+                                  1, #nSample : no useful
+                                  method=kwargs['method'],
+                                  sample_weight = y_train['w'],
+                                  pctEmbargo=kwargs['pct_embargo'],
+                                  cv=kwargs['cv'],
+                                  oob=kwargs['oob'])
+        
+    # comp. importance rank: valor alto (importante) | valor bajo (no importante)
+    featureImportanceRank = imp['mean'].rank()
+        
+    # fit del modelo seleccionado para el featImp
+    kwargs['model_selected'].fit(x_train,y_train['labels'])
+        
+    # score sin combinatorial purged kfold (socre del modelo)
+    score_sin_cpkf = kwargs['model_selected'].score(x_test, y_test['labels'])
+        
+    print("FeatImportance Score without PurgedKFold :", score_sin_cpkf)
+    print("FeatImportance Score with PurgedKFold    :", oos)
+        
+    # retorna featuresRank (0), accuracy CPKF, accuracy con CPKF, y el stacked
+    return featureImportanceRank, score_sin_cpkf, oos, imp
+    
+    
+##############################################################################
+############################### CLICK MESSAGES ###############################
+##############################################################################
+
+
+M1 = "¿Desea continuar el featImp-clusterizado sin residuos? \
+    Este genera N combinatorias x cluster evaluadas por el Kendall-Tau Corr."
+M2 = "Puede generar MemoryProblems si el dispositivo no cuenta con capacidad. "
+M3 = "Asimismo, el featImpClusterizado no está conectado con el proceso post."
+M4 = ":::::::: >>>> Responda 'Y' si desea continuar o 'N' si desea detenerlo."
+clickMessage1 = M1 + M2 + M3 + M4

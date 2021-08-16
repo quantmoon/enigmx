@@ -267,7 +267,10 @@ class EnigmX:
             col_label_type = self.label_name,
             pca_min_var_expected = self.pca_min_var_expected,
             k_min = self.k_min,
-            n_samples = self.n_samples
+            n_samples = self.n_samples,
+            # clustered_features = True,
+            # residuals = True,
+            # silh_thres = 0.65
             )        
         print("Resultado de la creación de la instancia feature importance:",time()-t1)
         # resultado del feature importance (dataframe)
