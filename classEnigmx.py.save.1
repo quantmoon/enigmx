@@ -267,10 +267,7 @@ class EnigmX:
             col_label_type = self.label_name,
             pca_min_var_expected = self.pca_min_var_expected,
             k_min = self.k_min,
-            n_samples = self.n_samples,
-            # clustered_features = True,
-            # residuals = True,
-            # silh_thres = 0.65
+            n_samples = self.n_samples
             )        
         print("Resultado de la creación de la instancia feature importance:",time()-t1)
         # resultado del feature importance (dataframe)
@@ -443,18 +440,18 @@ class EnigmX:
         
         Unifica el proceso de parallelizacion que se realice por c/u modelos.
         
-        Ver method 'get_multi_process' para conocer mayores detalles.
+        Ver method 'wget_multi_process' para conocer mayores detalles.
         """
         
         # selecting model and params from tuple in iteration
         tempModel, paramsModel = tupleInfoModel[0], tupleInfoModel[1]
 
         # setting exogenous PickleFileName for lecture
-        exogenousPickleFileName = modelName + '_exo_model.pkl'
+        exogenousPickleFileName = modelName + '_exo_model'
             
         # setting endogenous PickleFileName for lecture
         endogenousPickleFileName = endogenous_model_sufix + '_joined_with_' \
-            + modelName + '_' + endogenous_pickle_file_name 
+            + modelName + '_' + endogenous_pickle_file_name
         
         # define statements for process model and data based on model type
         if 'keras' in modelName:

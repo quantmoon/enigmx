@@ -55,7 +55,7 @@ def adf_test(datos):
     return features
 
 
-def regression_intracluster(matrix,clusters, path = 'D:/data_enigmx/'):
+def regression_intracluster(matrix,clusters, path):
 
     matrix = convert_pandas_to_df(matrix)
 

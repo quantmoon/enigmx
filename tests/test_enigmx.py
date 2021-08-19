@@ -4,7 +4,7 @@ webpage: https://www.quantmoon.tech//
 """
 
 import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True))
+ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus=2)
 
 from enigmx.classEnigmx import EnigmX
 import numpy as np
@@ -41,21 +41,21 @@ def kerasModel(num_features):
 
 # dict with models, and params
 dict_models = {
-    'decisionTree': (
-        DecisionTreeClassifier(), 
-        {'max_leaf_nodes': list(range(2, 20)), 
-         'min_samples_split': [2, 3, 4],
-         'max_features' : [1]} 
-        ), 
-    'perceptron':(
-        MLPClassifier(),
-        {'activation' : ['logistic','relu','tanh'],
-         'early_stopping' : [True]}
-        ),
-    'svm' :(
-        SVC(),
-        {'C' : np.arange(0.5,0.9,0.1),
-         'kernel' : ['linear','poly','rbf','sigmoid']}),
+#    'decisionTree': (
+#        DecisionTreeClassifier(), 
+#        {'max_leaf_nodes': list(range(2, 20)), 
+#         'min_samples_split': [2, 3, 4],
+#         'max_features' : [1]} 
+#        ), 
+#    'perceptron':(
+#        MLPClassifier(),
+#        {'activation' : ['logistic','relu','tanh'],
+#         'early_stopping' : [True]}
+#        ),
+ #   'svm' :(
+ #       SVC(),
+ #       {'C' : np.arange(0.5,0.9,0.1),
+ #        'kernel' : ['linear','poly','rbf','sigmoid']}),
     'nu' : (
         NuSVC(),
         {'nu' : np.arange(0.1,0.5,0.1),
@@ -73,15 +73,16 @@ dict_models = {
          {'loss':['log', 'modified_huber'],
           'penalty':['l2', 'l1', 'elasticnet'],
           'max_iter':list(range(1,10))}),
-    'qda' : (QuadraticDiscriminantAnalysis(),
-             {}),
-    'gaussianNB' : 
-        (GaussianNB(), {}),
-    'Kneighbors' : 
-        (KNeighborsClassifier(), 
-            {'n_neighbors': list(range(1, 5)),
-             'weights':['uniform', 'distance'],
-             'algorithm':['auto', 'ball_tree', 'kd_tree', 'brute']}),
+ #   'qda' : (QuadraticDiscriminantAnalysis(),
+
+ #            {}),
+ #   'gaussianNB' : 
+ #       (GaussianNB(), {}),
+ #   'Kneighbors' : 
+ #       (KNeighborsClassifier(), 
+ #           {'n_neighbors': list(range(4, 7)),
+ #            'weights':['uniform', 'distance'],
+ #            'algorithm':['auto', 'ball_tree', 'kd_tree', 'brute']}),
     'XGBoost' : 
         (GradientBoostingClassifier(), 
          {'loss':['deviance', 'exponential'],
@@ -97,7 +98,8 @@ dict_models = {
 
 ##############################################################################
 
-main_path = 'D:/data_enigmx/'
+#main_path = 'D:/data_enigmx/'
+main_path = '/var/data/data/'
 
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
@@ -107,26 +109,26 @@ instance = EnigmX(bartype = 'VOLUME',
                   ) 
 
 # feature importance
-instance.get_feature_importance(    
-                      model = RandomForestClassifier(max_features=1, random_state=0), 
-                      list_stocks = ['VTOL','ZNGA'],
-                      score_constraint = 0.3, #activar 
-                      server_name = "DESKTOP-N8JUB39",
-                      database = "BARS_FEATURES",
-                      uid = '',
-                      pwd = '',
-                      driver = "{SQL Server}",
-                      pval_kendall = 0.1,
-                      k_min = 10,
-                      n_samples = 15
-                      )
+#instance.get_feature_importance(    
+#                      model = RandomForestClassifier(max_features=1, random_state=0), 
+#                      list_stocks = stocks,
+#                      score_constraint = 0.3, #activar 
+#                      server_name = "34.134.35.172",
+#                      database = "BARS_FEATURES",
+#                      uid = 'sqlserver',
+#                      pwd = 'quantmoon2021',
+#                      driver = ("{ODBC DRIVER 17 for SQL Server}"),
+#                      pval_kendall = 0.1,
+#                      k_min = 10,
+#                      n_samples = 15
+#                      )
     
 
 # get multi process for tunning and backtest
-#instance.get_multi_process(
-#    code_backtest = '001', 
-#    dict_exo_models = dict_models,
-#    endogenous_model_sufix= 'rf',    
-#    trials = 11, 
-#    partitions = 2, 
-#    )
+instance.get_multi_process(
+    code_backtest = '002', 
+    dict_exo_models = dict_models,
+    endogenous_model_sufix= 'rf',    
+    trials = 11, 
+    partitions = 2, 
+    )

@@ -267,10 +267,7 @@ class EnigmX:
             col_label_type = self.label_name,
             pca_min_var_expected = self.pca_min_var_expected,
             k_min = self.k_min,
-            n_samples = self.n_samples,
-            # clustered_features = True,
-            # residuals = True,
-            # silh_thres = 0.65
+            n_samples = self.n_samples
             )        
         print("Resultado de la creación de la instancia feature importance:",time()-t1)
         # resultado del feature importance (dataframe)
@@ -443,18 +440,18 @@ class EnigmX:
         
         Unifica el proceso de parallelizacion que se realice por c/u modelos.
         
-        Ver method 'get_multi_process' para conocer mayores detalles.
+        Ver method 'wget_multi_process' para conocer mayores detalles.
         """
         
         # selecting model and params from tuple in iteration
         tempModel, paramsModel = tupleInfoModel[0], tupleInfoModel[1]
 
         # setting exogenous PickleFileName for lecture
-        exogenousPickleFileName = modelName + '_exo_model.pkl'
+        exogenousPickleFileName = modelName + '_exo_model'
             
         # setting endogenous PickleFileName for lecture
         endogenousPickleFileName = endogenous_model_sufix + '_joined_with_' \
-            + modelName + '_' + endogenous_pickle_file_name 
+            + modelName + '_' + endogenous_pickle_file_name
         
         # define statements for process model and data based on model type
         if 'keras' in modelName:
@@ -467,177 +464,96 @@ class EnigmX:
         self.get_model_tunning(
                 datetimeAsIndex = datetimeAsIndex,
                 ############# Constant Method Exogenous Model Params #############
-                exo_model = tempModel,
-                exo_dic_params = paramsModel,
-                save_exo_as_pickle = save_exo_as_pickle,
-                exogenous_pickle_file_name = exogenousPickleFileName,
-                ############# Constant Method Endogenous Model Params #############
-                endogenous_model_sufix = endogenous_model_sufix,
-                save_endo_as_pickle =  save_endo_as_pickle,
-                rebalance = rebalance, 
-                test_size = test_size,
-                balance_method = balance_method,
-                data_explorer = data_explorer,
-                confusion_matrix = confusion_matrix,
-                dollar_capital = dollar_capital,
-                update_training_exomodel = update_training_exomodel,
-                endogenous_pickle_file_name = endogenousPickleFileName,
-                ##################### Params that can't be changed #####################
-                exo_process = True, 
-                endo_process = True,
-                #################### Params for Model Understanding ####################
-                exo_openning_method_as_h5 =  self.exo_openning_method_as_h5,
-                heuristic_model = self.heuristic_model
-            )
-            
-        # initializing combinatorial backtest
-        dfMetrics, dfBacktest = self.get_combinatorial_backtest(
-                ############# Constant Combinatorial Backtest Params #############
-                features_sufix = features_sufix,
-                label_name = label_name,
-                exogenous_pickle_file_name = exogenousPickleFileName,
-                endogenous_pickle_file_name = endogenousPickleFileName,
-                y_true = y_true,
-                ############# Constant Method Combinatorial Backtest Params #############                
-                embargo_level = embargo_level,
-                max_leverage = max_leverage,
-                df_format = df_format, 
-                save_combinatorial = False, # don't save combinatorial, only return
-                dict_critics_for_metrics = dict_critics_for_metrics,
-                ############## Params ingested in the recent function #################
-                trials= trials,
-                partitions= partitions,
-                exo_openning_method_as_h5 =  self.exo_openning_method_as_h5,
-                heuristic_model = self.heuristic_model
+                exo_modeprint(":::> Computing Backtest Statistics... ")
+        
+        # retorna el df con la prediccion del backtest y el codigo serial para identf.
+        combinatorialDataframe, backtestCode = resultValueCombinatorial 
+        
+        # transforma el label index name a formato string
+        combinatorialDataframe[self.time_label_index_name] \
+                = combinatorialDataframe[self.time_label_index_name].astype(str)  
+        
+        # transforma el df combinatorial base a un df de statistical metrics
+        dfMetrics = metricsByPath(
+                combinatorialDataframe, 
+                crits = self.dict_critics_for_metrics
                 )
+        
+        # si se activa la opcion de guardado en local
+        if self.save_combinatorial:
             
-        # setting name of models
-        dfMetrics['model_name'] = modelName
-        dfBacktest['model_name'] = modelName
-        
-        return dfMetrics, dfBacktest
-    
-    
-    def get_multi_process(self, 
-                          code_backtest,
-                          dict_exo_models, 
-                          endogenous_model_sufix,
-                          trials, 
-                          partitions, 
-                          **kwargs):
-        """
-        Descripción General:
-        
-        El presente método reúne los procesos de Tunning y Backtest en uno solo.
-        Esto permite generar un proceso iterativo para muchos modelos.
-        
-        Por tanto, el presente método es una combinación de los sig. sub métodos:
-            - 'get_model_tunning'
-            - 'get_combinatorial_backtest'
+            print(":::> Saving Metrics csv...")
             
-        La aplicacion de estos se encuentra paralelizada a traves de Ray.
-       
-        El proceso de los mismos permitirá que se guarden los pasos intermedios.
-        Estos pasos intermedios son:
-            - 'get_model_tunning' -> guarda dos modelos en formato 'pkl'.
-            - 'get_combinatorial_backtest' -> guarda CSV resultante de 
-                                              cada meta-modelo 
-                                              ('pkl' exógeno y 'pkl' endógeno)
-        
-        C/u de estos sub-métodos toma el 'CSV' respectivo de su dataset
-        almacenados en espacio local/cloud para computar sus procesos req.
-        
-        Finalmente, el presente metodo guardara 2 cvs:
-            1. CSV de las metricas por modelo
-            2. CSV de los resultados del backtest por modelo
+            dfMetrics.to_csv(
+                        "{}BACKTEST_METRICS_{}.csv".format(
+                            self.base_path, backtestCode
+                            ), 
+                        index=False
+                        ) 
             
-        Estos archivos se guardaran en el 'base_path' definido.
+            print("||| :::: EnigmX Process Ended :::: |||")
         
-        La iteración de esta etapa será ejecutada con RAY para una optimización
-        en el tunning, almacenado y predicción que puedan realizar los modelos.
+        # si no se elige guardar, retorna la tupla de información
+        else:
+            return dfMetrics, combinatorialDataframe
         
-        Inputs:
-            - 'dict_exo_models': diccionario para tunning conteniendo la sig.info,
-                ... = {
-                    'NOMBRE DE MODELO 1': (modelObject1, paramsTunningDict1)
-                    'NOMBRE DE MODELO 2': (modelObject2, paramsTunningDict2)
-                    ...
-                    'NOMBRE DE MODELO N': (modelObjectN, paramsTunningDictN)
-                    }
-            - 'endogenous_model_sufix': sufijo del modelo endógeno seleccionado
-            - 'trials': valor 'n' para el Combinatorial Backtest
-            - 'partitions': valor 'K' para el Combinatorial Backtest
-
-        Output:
-            - 'csv' jerárquico en path local/cloud para metrics.
-            - 'csv' jerárquico en path local/cloud para backtest.
-        """        
-        
-        print('\n      ::::: >>>> MultiProcess for CPKF as Backtesting started...')
-        
-        # ingesting ModelTunning Params + BacktestParams
-        for (prop, default) in self.multiTuningParams.items():
-            setattr(self, prop, kwargs.get(prop, default))
-        
-        # compute parallelized multiProcess for many models: get dfBacktest & dfMetrics
-        listModelBacktestMetrics = [
-            self.__combinedGeneralMultiModel__.remote(self, 
+    @ray.remote
+    def __combinedGeneralMultiModel__(self, 
                                  ############## Ray value Objects #############
-                                 modelName = model_name, 
-                                 tupleInfoModel = tuple_info_model, 
+                                 modelName, 
+                                 tupleInfoModel, 
                                  ##############################################
-                                 endogenous_model_sufix = endogenous_model_sufix,
-                                 endogenous_pickle_file_name = self.endogenous_pickle_file_name,
-                                 trials = trials,
-                                 partitions = partitions, 
+                                 endogenous_model_sufix,
+                                 endogenous_pickle_file_name,
+                                 trials,
+                                 partitions, 
                                  ############ hyperparams for tunning #########
-                                 datetimeAsIndex = self.datetimeAsIndex,
-                                 save_exo_as_pickle = self.save_exo_as_pickle,
-                                 save_endo_as_pickle = self.save_endo_as_pickle,
-                                 rebalance = self.rebalance,
-                                 test_size = self.test_size,
-                                 balance_method = self.balance_method,
-                                 data_explorer = self.data_explorer,
-                                 confusion_matrix = self.confusion_matrix,
-                                 dollar_capital = self.dollar_capital,
-                                 update_training_exomodel = self.update_training_exomodel,
+                                 datetimeAsIndex,
+                                 save_exo_as_pickle,
+                                 save_endo_as_pickle,
+                                 rebalance,
+                                 test_size,
+                                 balance_method,
+                                 data_explorer,
+                                 confusion_matrix,
+                                 dollar_capital,
+                                 update_training_exomodel,
                                  ############ hyperparams for backtest ########
-                                 features_sufix = self.features_sufix,
-                                 label_name = self.label_name,
-                                 y_true = self.y_true,              
-                                 embargo_level = self.embargo_level,
-                                 max_leverage = self.max_leverage,
-                                 df_format = self.df_format, 
-                                 dict_critics_for_metrics = self.dict_critics_for_metrics
-                                 ) 
-        for model_name, tuple_info_model in dict_exo_models.items()
-        ]
+                                 features_sufix,
+                                 label_name,
+                                 y_true,              
+                                 embargo_level,
+                                 max_leverage,
+                                 df_format, 
+                                 dict_critics_for_metrics
+                                 ):
+        """
+        Function intermediadora que reune los prorcesos de Tunning + Backtest.
         
-        # get datasets from ray objects: tuple info for each Obj
-        list_datasets =  ray.get(listModelBacktestMetrics)
+        Unifica el proceso de parallelizacion que se realice por c/u modelos.
         
-        # concadenation of metrics results
-        dataset_metrics = pd.concat([
-            infoTupleModels[0] for infoTupleModels in list_datasets
-            ]).reset_index(drop=True)
+        Ver method 'wget_multi_process' para conocer mayores detalles.
+        """
         
-        # concadenation of backtest results
-        dataset_backtests = pd.concat([
-            infoTupleModels[1] for infoTupleModels in list_datasets
-            ]).reset_index(drop=True)
+        # selecting model and params from tuple in iteration
+        tempModel, paramsModel = tupleInfoModel[0], tupleInfoModel[1]
+
+        # setting exogenous PickleFileName for lecture
+        exogenousPickleFileName = modelName + '_exo_model'
+            
+        # setting endogenous PickleFileName for lecture
+        endogenousPickleFileName = endogenous_model_sufix + '_joined_with_' \
+            + modelName + '_' + endogenous_pickle_file_name
         
-        # setting time as string to preserve millisecond information
-        dataset_backtests[self.time_label_index_name] \
-                = dataset_backtests [self.time_label_index_name].astype(str)          
-        
-        # saving metrics csv's 
-        dataset_metrics.to_csv(
-            '{}METRICS_TRIAL_{}.csv'.format(self.base_path, code_backtest), 
-            index=False
-            ) 
-        
-        # saving backtests results csv's
-        dataset_backtests.to_csv(
-            '{}BACKTEST_TRIAL_{}.csv'.format(self.base_path, code_backtest), 
-            index=False
-            )        
+        # define statements for process model and data based on model type
+        if 'keras' in modelName:
+            self.exo_openning_method_as_h5 = True
+            
+        if 'heuristic' in modelName:
+            self.heuristic_model = True
+            
+        # initializing model tuning
+        self.get_model_tunning(
+                datetimeAsIndex = datetimeAsIndex,
+                ############# Constant Method Exogenous Model Params #############
+                exo_mode

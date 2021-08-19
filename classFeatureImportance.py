@@ -358,7 +358,8 @@ class featureImportance(object):
                 # computa las regresiones intracluster
                 featStandarizedMatrix = regression_intracluster(
                     featStandarizedMatrix, 
-                    clusters_values
+                    clusters_values,
+                    path = '/var/data/data/'
                     )
                 
                 # inserting same IDX in features matrix as labelsDF
