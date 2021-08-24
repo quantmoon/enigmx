@@ -56,10 +56,10 @@ dict_models = {
  #       SVC(),
  #       {'C' : np.arange(0.5,0.9,0.1),
  #        'kernel' : ['linear','poly','rbf','sigmoid']}),
-    'nu' : (
-        NuSVC(),
-        {'nu' : np.arange(0.1,0.5,0.1),
-         'kernel' : ['linear','poly','rbf','sigmoid']}),
+#    'nu' : (
+#        NuSVC(),
+#        {'nu' : np.arange(0.1,0.5,0.1),
+#         'kernel' : ['linear','poly','rbf','sigmoid']}),
     'randomForest' :(
         RandomForestClassifier(),
         {'max_leaf_nodes': list(range(2, 20)), 
@@ -83,17 +83,17 @@ dict_models = {
  #           {'n_neighbors': list(range(4, 7)),
  #            'weights':['uniform', 'distance'],
  #            'algorithm':['auto', 'ball_tree', 'kd_tree', 'brute']}),
-    'XGBoost' : 
-        (GradientBoostingClassifier(), 
-         {'loss':['deviance', 'exponential'],
-          'min_samples_split': [2, 3, 4]}),
-    'keras': (
-        kerasModel, 
-        dict(
-            batch_size = [10, 20, 40, 60, 80, 100], 
-            epochs = [10, 50, 100]
-            ) 
-        )
+#    'XGBoost' : 
+#        (GradientBoostingClassifier(), 
+#         {'loss':['deviance', 'exponential'],
+#          'min_samples_split': [2, 3, 4]}),
+#    'keras': (
+#        kerasModel, 
+#        dict(
+#            batch_size = [10, 20, 40, 60, 80, 100], 
+#            epochs = [10, 50, 100]
+#            ) 
+#        )
      }
 
 ##############################################################################
@@ -126,9 +126,9 @@ instance = EnigmX(bartype = 'VOLUME',
 
 # get multi process for tunning and backtest
 instance.get_multi_process(
-    code_backtest = '002', 
+    code_backtest = '003', 
     dict_exo_models = dict_models,
     endogenous_model_sufix= 'rf',    
-    trials = 11, 
+    trials = 8, 
     partitions = 2, 
     )

@@ -1,222 +1,417 @@
 /usr/local/lib/python3.8/dist-packages/ray/autoscaler/_private/cli_logger.py:57: FutureWarning: Not all Ray CLI dependencies were found. In Ray 1.4+, the Ray CLI, autoscaler, and dashboard will only be usable via `pip install 'ray[default]'`. Please update your install command.
   warnings.warn(
-2021-08-18 02:04:16.070070: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-2021-08-18 02:04:16.070128: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-Resultado de la creación de la instancia feature importance: 4.38690185546875e-05
-----------Process MDI started---------- 
-
- 
-Accessing SQL Info --->>>
-|----- Local Process Detected -----|
-:::::::::>> SQL Connection Path...
-Driver={ODBC DRIVER 17 for SQL Server};Server=34.134.35.172;Database=BARS_FEATURES;Uid=sqlserver;Pwd=quantmoon2021;
- 
-16.954   feature_kama   0.01 
-11.375   feature_ema   0.01 
-11.919   feature_aroonosc   0.01 
-11.717   feature_mfi   0.01 
-10.929   feature_rsi   0.01 
-10.466   feature_ultosk   0.01 
-10.443   feature_willr   0.01 
-10.42   feature_atr   0.01 
-10.377   feature_bop   0.01 
-10.621   feature_disparity   0.01 
-10.298   feature_choppiness   0.01 
-10.439   feature_fisher   0.01 
-10.624   feature_countdown_ind   0.01 
-10.484   feature_absolute_sum_of_changes   0.01 
-10.601   feature_abs_energy   0.01 
-10.735   feature_benford_correlation   0.01 
-10.422   feature_count_above_mean   0.01 
-10.433   feature_count_below_mean   0.01 
-10.484   feature_first_location_of_maximum   0.01 
-10.53   feature_first_location_of_minimum   0.01 
-10.642   feature_longest_strike_above_mean   0.01 
-10.223   feature_longest_strike_below_mean   0.01 
-11.075   feature_mean_second_derivative_central   0.01 
-10.913   feature_percentage_of_reoccurring_datapoints_to_all_datapoints   0.01 
-10.702   feature_percentage_of_reoccurring_values_to_all_values   0.01 
-11.042   feature_sample_entropy   0.01 
-10.721   feature_sum_of_reoccurring_data_points   0.01 
-10.835   feature_sum_of_reoccurring_values   0.01 
-10.561   feature_sum_values   0.01 
-10.472   feature_variance_larger_than_standard_deviation   0.01 
-10.461   feature_variation_coefficient   0.01 
-10.543   feature_z_score   0.01 
-10.192   feature_pct   0.01 
-10.351   feature_rolling_zscore   0.01 
-10.329   feature_minmax   0.01 
-10.331   feature_roll   0.01 
-10.561   feature_corwinschultz   0.01 
-10.513   feature_kyle   0.01 
-10.87   feature_amihud   0.01 
-10.644   feature_hasbrouck   0.01 
-10.522   feature_vpin   0.01 
-10.24   feature_alpha2   0.01 
-10.368   feature_alpha3   0.01 
-10.321   feature_alpha5   0.01 
-10.304   feature_alpha9   0.01 
-10.222   feature_alpha12   0.01 
-11.019   feature_alpha14   0.01 
-10.608   feature_alpha20   0.01 
-10.92   feature_alpha23   0.01 
-WARNING! >>>>> Features to transform as stationary:  0 / 50
-        >>> Saving Scaler Object... at  /var/data/data/
-         :::: >>>               Running Iteration over samples for Kendall Test...
-      :::>>>> Clustering Feature Importance Initialized...
-    ::::>> Initializing Clustering Feat Importance Process...
-          ------------------>>>> Computing residuals... 
-Note: Using an external vector in selections is ambiguous.
-ℹ Use `all_of(var)` instead of `var` to silence this message.
-ℹ See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
-This message is displayed once per session.
-      ::::: >>> Running Base FeatImp...
-Tiempo de SOLO fiteo con todos los datos 143.16841053962708
-cvScore: 880.0016379356384
-FeatImportance Score without PurgedKFold : 0.7857451937936577
-FeatImportance Score with PurgedKFold    : 0.35937643934430896
-************** Returning to General Stage | FeatImp Class >>>
-Saving Picture!!!! ---> Feature Importance picture Saved in /var/data/data/
-Final Return | FeatImp :::: >>> Useful features combination:
-['feature_alpha9' 'feature_bop' 'feature_mean_second_derivative_central'
- 'feature_willr' 'feature_fisher' 'feature_disparity' 'feature_rsi']
-Process finished! 'exo', 'endo' & 'backtest' df saved at /var/data/data/...
-Get relevant features: 2538.5677926540375
+2021-08-24 00:03:17.161490: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2021-08-24 00:03:17.161535: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       ::::: >>>> MultiProcess for CPKF as Backtesting started...
-[2m[36m(pid=76847)[0m ::::: >> Sklearn Model Detected...
-[2m[36m(pid=76847)[0m 
-[2m[36m(pid=76847)[0m ::::: >> No KerasClassifier Object Created...
-[2m[36m(pid=76847)[0m 
-[2m[36m(pid=76848)[0m ::::: >> Sklearn Model Detected...
-[2m[36m(pid=76848)[0m 
-[2m[36m(pid=76848)[0m ::::: >> No KerasClassifier Object Created...
-[2m[36m(pid=76848)[0m 
-[2m[36m(pid=76850)[0m ::::: >> Sklearn Model Detected...
-[2m[36m(pid=76850)[0m 
-[2m[36m(pid=76850)[0m ::::: >> No KerasClassifier Object Created...
-[2m[36m(pid=76850)[0m 
-[2m[36m(pid=76851)[0m ::::: >> Sklearn Model Detected...
-[2m[36m(pid=76851)[0m 
-[2m[36m(pid=76851)[0m ::::: >> No KerasClassifier Object Created...
-[2m[36m(pid=76851)[0m 
-[2m[36m(pid=76846)[0m ::::: >> Sklearn Model Detected...
-[2m[36m(pid=76846)[0m 
-[2m[36m(pid=76846)[0m ::::: >> No KerasClassifier Object Created...
-[2m[36m(pid=76846)[0m 
-[2m[36m(pid=76849)[0m ::::: >> Sklearn Model Detected...
-[2m[36m(pid=76849)[0m 
-[2m[36m(pid=76849)[0m ::::: >> No KerasClassifier Object Created...
-[2m[36m(pid=76849)[0m 
-[2m[36m(pid=76845)[0m ::::: >> Sklearn Model Detected...
-[2m[36m(pid=76845)[0m 
-[2m[36m(pid=76845)[0m ::::: >> No KerasClassifier Object Created...
-[2m[36m(pid=76845)[0m 
-[2m[36m(pid=76852)[0m ::::: >> Sklearn Model Detected...
-[2m[36m(pid=76852)[0m 
-[2m[36m(pid=76852)[0m ::::: >> No KerasClassifier Object Created...
-[2m[36m(pid=76852)[0m 
-[2m[36m(pid=76847)[0m ---Process Finished! 'qda_exo_model' file was saved in '/var/data/data/'.
-[2m[36m(pid=76847)[0m 
-[2m[36m(pid=76845)[0m ---Process Finished! 'gaussianNB_exo_model' file was saved in '/var/data/data/'.
-[2m[36m(pid=76845)[0m 
-[2m[36m(pid=76845)[0m ::>> BetSize computation... 
-[2m[36m(pid=76847)[0m ::>> BetSize computation... 
-[2m[36m(pid=76845)[0m Fitting 3 folds for each of 50 candidates, totalling 150 fits
-[2m[36m(pid=76847)[0m Fitting 3 folds for each of 50 candidates, totalling 150 fits
-[2m[36m(pid=76850)[0m ---Process Finished! 'decisionTree_exo_model' file was saved in '/var/data/data/'.
-[2m[36m(pid=76850)[0m 
-[2m[36m(pid=76850)[0m ::>> BetSize computation... 
-[2m[36m(pid=76850)[0m Fitting 3 folds for each of 50 candidates, totalling 150 fits
-[2m[36m(pid=76848)[0m ---Process Finished! 'randomForest_exo_model' file was saved in '/var/data/data/'.
-[2m[36m(pid=76848)[0m 
-[2m[36m(pid=76848)[0m ::>> BetSize computation... 
-[2m[36m(pid=76848)[0m Fitting 3 folds for each of 50 candidates, totalling 150 fits
-[2m[36m(pid=76852)[0m ---Process Finished! 'stochasticGradient_exo_model' file was saved in '/var/data/data/'.
-[2m[36m(pid=76852)[0m 
-[2m[36m(pid=76852)[0m ::>> BetSize computation... 
-[2m[36m(pid=76852)[0m Fitting 3 folds for each of 50 candidates, totalling 150 fits
-[2m[36m(pid=76845)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 1.2min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=38.9min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 1.2min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=42.8min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 1.2min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=43.4min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 1.3min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=43.5min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 1.3min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=43.6min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 1.9min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=42.5min
-[2m[36m(pid=76848)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 2.1min
-[2m[36m(pid=76848)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=42.5min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 2.0min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=47.6min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 2.0min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=47.8min
-[2m[36m(pid=76848)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 2.2min
-[2m[36m(pid=76848)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=47.7min
-[2m[36m(pid=76848)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 2.2min
-[2m[36m(pid=76848)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=47.8min
-[2m[36m(pid=76852)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 2.7min
-[2m[36m(pid=76852)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=50.3min
-[2m[36m(pid=76852)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 2.7min
-[2m[36m(pid=76852)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=51.4min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=37.7min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=48.3min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=38.0min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=48.3min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=41.8min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=49.1min
-[2m[36m(pid=76848)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=42.5min
-[2m[36m(pid=76848)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=49.0min
-[2m[36m(pid=76851)[0m ---Process Finished! 'perceptron_exo_model' file was saved in '/var/data/data/'.
-[2m[36m(pid=76851)[0m 
-[2m[36m(pid=76847)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 1.2min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=38.7min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=61.4min
-[2m[36m(pid=76851)[0m ::>> BetSize computation... 
-[2m[36m(pid=76851)[0m Fitting 3 folds for each of 50 candidates, totalling 150 fits
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=41.5min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=62.0min
-[2m[36m(pid=76852)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=44.7min
-[2m[36m(pid=76852)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=49.9min
-[2m[36m(pid=76848)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=45.8min
-[2m[36m(pid=76848)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=64.1min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=45.5min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=67.0min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time=13.4min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=True, max_depth=50, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=600; total time=19.1min
-[2m[36m(pid=76852)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=48.8min
-[2m[36m(pid=76852)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=65.4min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time=25.7min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time=16.6min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time=13.0min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time=14.8min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1000; total time=31.9min
-[2m[36m(pid=76851)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 3.0min
-[2m[36m(pid=76851)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=51.0min
-[2m[36m(pid=76851)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 3.0min
-[2m[36m(pid=76851)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=55.1min
-[2m[36m(pid=76851)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time= 3.0min
-[2m[36m(pid=76851)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=56.1min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time=24.8min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time=17.6min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time=14.4min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=True, max_depth=50, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=600; total time=19.5min
-[2m[36m(pid=76850)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1000; total time=31.9min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=41.6min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time=24.9min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=True, max_depth=20, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time=16.3min
-[2m[36m(pid=76847)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1900; total time=85.8min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=41.4min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time=25.0min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=True, max_depth=20, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time=16.8min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1900; total time=86.7min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time=24.9min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time=16.9min
-[2m[36m(pid=76845)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1900; total time=86.2min
-/usr/local/lib/python3.8/dist-packages/ray/autoscaler/_private/cli_logger.py:57: FutureWarning: Not all Ray CLI dependencies were found. In Ray 1.4+, the Ray CLI, autoscaler, and dashboard will only be usable via `pip install 'ray[default]'`. Please update your install command.
-  warnings.warn(
-2021-08-19 01:39:36.011750: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-2021-08-19 01:39:36.016021: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=16428)[0m ::::: >> Sklearn Model Detected...
+[2m[36m(pid=16428)[0m 
+[2m[36m(pid=16428)[0m ::::: >> No KerasClassifier Object Created...
+[2m[36m(pid=16428)[0m 
+[2m[36m(pid=16427)[0m ::::: >> Sklearn Model Detected...
+[2m[36m(pid=16427)[0m 
+[2m[36m(pid=16427)[0m ::::: >> No KerasClassifier Object Created...
+[2m[36m(pid=16427)[0m 
+[2m[36m(pid=16427)[0m ---Process Finished! 'randomForest_exo_model.pkl' file was saved in '/var/data/data/'.
+[2m[36m(pid=16427)[0m 
+[2m[36m(pid=16427)[0m ::>> BetSize computation... 
+[2m[36m(pid=16427)[0m Fitting 3 folds for each of 50 candidates, totalling 150 fits
+[2m[36m(pid=16428)[0m ---Process Finished! 'stochasticGradient_exo_model.pkl' file was saved in '/var/data/data/'.
+[2m[36m(pid=16428)[0m 
+[2m[36m(pid=16428)[0m ::>> BetSize computation... 
+[2m[36m(pid=16428)[0m Fitting 3 folds for each of 50 candidates, totalling 150 fits
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=  29.2s
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=14.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=  29.4s
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=15.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=  30.4s
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=15.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=  53.7s
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=16.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=  55.0s
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=17.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=  55.7s
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=17.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=14.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=17.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=17.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 8.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=20, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 5.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=17.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=21.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=15.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 8.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=20, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 6.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1900; total time=27.3min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 8.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 5.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1900; total time=27.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=17.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 8.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 5.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1900; total time=27.4min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 8.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 5.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1900; total time=27.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time= 4.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time= 4.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1000; total time= 9.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=70, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1400; total time=13.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=14.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=21.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=50, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=600; total time= 5.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1000; total time= 9.3min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=70, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1400; total time=13.4min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=16.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=21.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=50, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=600; total time= 5.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1000; total time= 9.4min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=70, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1400; total time=13.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=22.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=50, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=600; total time= 5.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=14.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1200; total time=17.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=15.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 8.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 5.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1900; total time=27.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1200; total time=18.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=15.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=22.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=50, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=600; total time= 5.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=15.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1200; total time=18.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=21.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=50, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=600; total time= 5.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=14.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1200; total time=17.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=50, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=600; total time= 5.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=15.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1200; total time=17.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=20, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 6.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=20, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 6.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 5.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time= 4.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1000; total time= 9.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=15.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=2, n_estimators=1200; total time=18.4min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=20, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 6.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=20, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 5.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 5.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time= 4.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1000; total time= 9.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=15.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=2, n_estimators=1200; total time=18.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=2, n_estimators=1200; total time=18.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=1, min_samples_split=5, n_estimators=1900; total time=18.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=100; total time= 1.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=100; total time= 1.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=100; total time= 1.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=500; total time= 4.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=500; total time= 4.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=1, min_samples_split=5, n_estimators=1900; total time=18.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=2, n_estimators=1200; total time=18.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=1, min_samples_split=5, n_estimators=1900; total time=19.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=100; total time= 1.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=100; total time= 1.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=100; total time= 1.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=500; total time= 4.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=500; total time= 4.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=1, min_samples_split=5, n_estimators=1900; total time=18.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=2, n_estimators=1200; total time=18.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1700; total time=25.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=13.3min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=1, min_samples_split=5, n_estimators=1900; total time=18.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1700; total time=26.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1900; total time=27.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1200; total time=17.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=13.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=1, min_samples_split=5, n_estimators=1900; total time=18.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1700; total time=25.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=70, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1400; total time=13.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=500; total time= 4.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=13.3min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=100, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=15.3min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=800; total time= 7.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=1500; total time=15.2min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1000; total time= 5.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=1500; total time=15.3min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=800; total time= 7.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=1500; total time=15.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=70, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1400; total time=13.4min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=500; total time= 4.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=13.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=100, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=15.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=800; total time= 7.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=1500; total time=15.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1700; total time=25.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1000; total time= 5.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=1500; total time=15.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=16.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=17.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time= 4.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time= 4.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1000; total time= 9.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=70, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1400; total time=13.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=2, n_estimators=1200; total time=18.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1700; total time=25.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=800; total time= 8.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=1500; total time=14.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1700; total time=26.2min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=800; total time= 7.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=90, max_features=auto, min_samples_leaf=4, min_samples_split=2, n_estimators=600; total time= 6.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=2000; total time=19.3min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=800; total time= 7.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1000; total time= 5.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=90, max_features=auto, min_samples_leaf=4, min_samples_split=2, n_estimators=600; total time= 5.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=2000; total time=19.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=800; total time= 8.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=90, max_features=auto, min_samples_leaf=4, min_samples_split=2, n_estimators=600; total time= 5.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=2000; total time=19.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=800; total time= 7.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1000; total time= 6.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=90, max_features=auto, min_samples_leaf=4, min_samples_split=2, n_estimators=600; total time= 5.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=2000; total time=19.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=40, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=800; total time= 8.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=100, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1700; total time=15.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=900; total time= 8.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=100, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1700; total time=15.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=40, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=800; total time= 8.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=100, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1700; total time=15.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=100, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=15.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1900; total time=15.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1500; total time=21.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1400; total time=20.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=900; total time= 8.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1100; total time=10.4min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1400; total time=19.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1400; total time=20.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=200; total time= 3.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=700; total time=10.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=15.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1400; total time=20.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=200; total time= 3.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=700; total time=10.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=15.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=13.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=100, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=15.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=800; total time= 7.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1000; total time= 5.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1900; total time=16.2min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=40, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=800; total time= 7.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=900; total time= 8.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1100; total time=10.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1400; total time=19.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=700; total time=10.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=15.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=700; total time=10.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=15.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1500; total time=21.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1100; total time=10.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1400; total time=20.2min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=200; total time= 3.2min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1600; total time=24.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=700; total time=10.2min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1500; total time=21.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1100; total time=10.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1400; total time=20.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=2000; total time=31.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=400; total time= 3.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=400; total time= 3.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=2000; total time=19.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=100, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1700; total time=15.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1400; total time=20.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=200; total time= 3.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1600; total time=24.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=700; total time=10.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=13.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=100, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=15.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=60, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=800; total time= 7.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=10, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1000; total time= 6.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1900; total time=15.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=40, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=800; total time= 8.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=900; total time= 8.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=100, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1700; total time=15.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1400; total time=20.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1600; total time=24.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=700; total time=10.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=700; total time=10.3min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1600; total time=16.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1400; total time=11.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=700; total time=10.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1600; total time=14.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=800; total time= 7.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=90, max_features=auto, min_samples_leaf=4, min_samples_split=2, n_estimators=600; total time= 6.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1900; total time=15.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=40, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=800; total time= 8.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=900; total time= 8.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1400; total time=19.9min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.6min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=700; total time=10.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=2000; total time=30.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=400; total time= 3.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1400; total time=11.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1400; total time=20.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1600; total time=24.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=700; total time=10.2min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.7min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1400; total time=11.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1400; total time=10.0min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1500; total time=21.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1100; total time=10.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1400; total time=20.4min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=2000; total time=30.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=400; total time= 3.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=400; total time= 3.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1400; total time=10.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=1300; total time=12.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=700; total time=10.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=2000; total time=30.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=400; total time= 3.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=90, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=1400; total time=10.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=2000; total time=19.4min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=100, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1700; total time=15.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1400; total time=20.3min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=200; total time= 3.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1600; total time=24.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=15.0min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1600; total time=17.1min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=100, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=15.2min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1900; total time=16.2min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1500; total time=21.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1400; total time=19.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1400; total time=20.3min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=2000; total time=30.8min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.5min
+[2m[36m(pid=16427)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1600; total time=16.8min
+[2m[36m(pid=16428)[0m ::>> BetSize finished...
+[2m[36m(pid=16428)[0m 
+[2m[36m(pid=16428)[0m ---Process Finished! 'rf_joined_with_stochasticGradient_endogenous_model.pkl' file was saved in '/var/data/data/'.
+[2m[36m(pid=16428)[0m 
+[2m[36m(pid=16428)[0m 
+[2m[36m(pid=16428)[0m ---Process Finished! Updated 'stochasticGradient_exo_model.pkl' file was saved in '/var/data/data/'.
+[2m[36m(pid=16428)[0m 
+[2m[36m(pid=16428)[0m <<<::::: RUNNING COMBINATORIAL PURGED KFOLD CV :::::>>>
+[2m[36m(pid=16428)[0m ::::::::::::::::: PATHS COMPUTING NOT INC. INFO |>>> 
+[2m[36m(pid=16428)[0m ::::::::::::::::: PATHS COMPUTING INC. INFO |>>> 
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=10, n_estimators=800; total time= 8.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=90, max_features=auto, min_samples_leaf=4, min_samples_split=2, n_estimators=600; total time= 5.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=10, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1900; total time=15.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=40, max_features=sqrt, min_samples_leaf=1, min_samples_split=2, n_estimators=800; total time= 8.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=2, min_samples_split=5, n_estimators=900; total time= 8.6min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1400; total time=19.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=2, n_estimators=1400; total time=20.6min
+[2m[36m(pid=16427)[0m 2021-08-24 00:03:22.703402: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=16427)[0m 2021-08-24 00:03:22.703443: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=16428)[0m 2021-08-24 00:03:22.703302: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=16428)[0m 2021-08-24 00:03:22.703350: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=2000; total time=30.9min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1600; total time=14.3min
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=100, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1500; total time=21.7min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=110, max_features=sqrt, min_samples_leaf=2, min_samples_split=10, n_estimators=1100; total time=10.3min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1400; total time=20.2min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=80, max_features=sqrt, min_samples_leaf=1, min_samples_split=5, n_estimators=200; total time= 3.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1600; total time=23.8min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1600; total time=15.1min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=True, max_depth=50, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 5.5min
+[2m[36m(pid=16428)[0m [CV] END bootstrap=False, max_depth=90, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1600; total time=14.9min
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m ::>> BetSize finished...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m 
+[2m[36m(pid=16427)[0m ---Process Finished! 'rf_joined_with_randomForest_endogenous_model.pkl' file was saved in '/var/data/data/'.
+[2m[36m(pid=16427)[0m 
+[2m[36m(pid=16427)[0m 
+[2m[36m(pid=16427)[0m ---Process Finished! Updated 'randomForest_exo_model.pkl' file was saved in '/var/data/data/'.
+[2m[36m(pid=16427)[0m 
+[2m[36m(pid=16427)[0m <<<::::: RUNNING COMBINATORIAL PURGED KFOLD CV :::::>>>
+[2m[36m(pid=16427)[0m ::::::::::::::::: PATHS COMPUTING NOT INC. INFO |>>> 
+[2m[36m(pid=16427)[0m ::::::::::::::::: PATHS COMPUTING INC. INFO |>>> 
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16428)[0m ::::::::::::::::: VECTORIZED REPRESENTATION |>>> 
+[2m[36m(pid=16428)[0m :::::>>> ENDING COMBINATORIAL PURGED KFOLD CV <<<:::::
+[2m[36m(pid=16428)[0m ::::::::::::::::::::: BACKTEST CODE: 24080424
+[2m[36m(pid=16428)[0m :::> Computing Backtest Statistics... 
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m :::: >> Fitting Exogenous Model...
+[2m[36m(pid=16427)[0m ::::::::::::::::: VECTORIZED REPRESENTATION |>>> 
+[2m[36m(pid=16427)[0m :::::>>> ENDING COMBINATORIAL PURGED KFOLD CV <<<:::::
+[2m[36m(pid=16427)[0m ::::::::::::::::::::: BACKTEST CODE: 24080433
+[2m[36m(pid=16427)[0m :::> Computing Backtest Statistics... 
+R[write to console]: Warning message:
+
+R[write to console]: In (function (package, help, pos = 2, lib.loc = NULL, character.only = FALSE,  :
+R[write to console]: 
+ 
+R[write to console]:  library ‘/usr/lib/R/site-library’ contains no packages
+
