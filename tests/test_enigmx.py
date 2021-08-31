@@ -123,10 +123,10 @@ instance.get_feature_importance(
     
 
 # get multi process for tunning and backtest
-#instance.get_multi_process(
-#    code_backtest = '001', 
-#    dict_exo_models = dict_models,
-#    endogenous_model_sufix= 'rf',    
-#    trials = 11, 
-#    partitions = 2, 
-#    )
+instance.get_multi_process(
+    code_backtest = '001', 
+    dict_exo_models = dict_models,
+    endogenous_model_sufix= 'rf',    
+    trials = 11, 
+    partitions = 2, 
+    )

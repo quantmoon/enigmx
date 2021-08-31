@@ -96,12 +96,12 @@ class Metrics():
             Si la barrera tiene de etiqueta -1, se asigna el retorno negativo menos costos
         """
         self.returns = []
-        for i in range(len(self.df2)):
-            if self.df2['barrierLabel'].iloc[i] == 0:
+        for i in range(len(self.df2)): 
+            if self.df2['barrierLabel'].iloc[i] == 0: # valor de retorno por CADA barrera igual a 0
                 self.returns.append(0)
-            elif self.df2['barrierLabel'].iloc[i] == 1:
+            elif self.df2['barrierLabel'].iloc[i] == 1: # valor de retorno por CADA barrera igual a 1
                 self.returns.append((self.df['barrierPrice'].iloc[i]-self.df['close_price'].iloc[i]-self.df["costs"].iloc[i])/self.df['close_price'].iloc[i])
-            else:
+            else: # valor de retorno por CADA barrera igual a -1
                 self.returns.append((self.df['close_price'].iloc[i]-self.df['barrierPrice'].iloc[i]-self.df["costs"].iloc[i])/self.df['close_price'].iloc[i])
          
         """
@@ -111,7 +111,7 @@ class Metrics():
         self.pnl = self.df['close_price']*self.returns
         self.df['returns'] = self.returns
         self.df['pnl'] = self.pnl
-        self.initial_cap = 5000
+        self.initial_cap = 5000 # DOLARESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
         
         #El realized cap va sumando retornos al capital inicial (sin costos)
         self.df['realized_cap'] = self.initial_cap
@@ -134,7 +134,7 @@ class Metrics():
         El Pnl total resta las columnas del realized cap (ya con costos) para el total del período
     """
     def get_pnl(self):
-        return self.cap[-1]-self.cap[0]
+        return self.cap[-1]-self.cap[0] 
 
     """
         Annualized rate of returns, el retorno neto de costos anualizado
@@ -234,7 +234,7 @@ class Metrics():
     def psr(self,benchm):
         sratio = self.sr()
         t = len(self.ret)
-        y3 = skew(self.ret)
+        y3 = skew(self.ret) # asimetría de los retornos
         y4 = kurtosis(self.ret)
         psratio = norm.cdf((sratio-benchm)*((t-1)**.5)/((1-y3*sratio+((y4-1)/4)*(sratio**2))**.5))
         return psratio

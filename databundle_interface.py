@@ -1050,6 +1050,7 @@ class SQLEnigmXinterface(object):
             self.__sampleWeights__(SQLFRAME, dbconn, cursor, 
                                    decayfactor = decayfactor)
         
+        #proceso de computación de los features
         if features_bar_computation_process:
             self.__featuresComputation__(SQLFRAME, dbconn, cursor)
 
