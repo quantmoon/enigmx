@@ -938,18 +938,30 @@ class FeaturesClass():
         print("       >>>> Computing Talib - Technical features... ")
         # features técnicos (df)
         technicals = self.technicals()
+            
+            #adding general prefix
+        technicals = technicals.add_prefix('technical_')
         
         print("       >>>> Computing Tsfresh - Statistical features... ")
         # features estadísticos (stats)
         tsfresh = self.tsfresh()
         
+            #adding general prefix
+        tsfresh = tsfresh.add_prefix('statistical_')
+        
         print("       >>>> Computing MLDP - Microstructural features... ")
         # features microestructurales 
         microstructural = self.microstructural()
         
+            #adding general prefix
+        microstructural = microstructural.add_prefix('microstructural_')
+        
         print("       >>>> Computing Complementary features... ")
         # features others 
         others = self.others()
+        
+            #adding general prefix
+        others = others.add_prefix('related_')        
         
         print("   ||*** Building base dataframe object ***|| ")
         # concadenación global de features
