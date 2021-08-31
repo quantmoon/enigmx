@@ -935,21 +935,23 @@ class FeaturesClass():
         # nombre de variables que no son features
         nonFeatures = list(self.df.columns.values)
         
+        print("       >>>> Computing Talib - Technical features... ")
         # features técnicos (df)
         technicals = self.technicals()
         
+        print("       >>>> Computing Tsfresh - Statistical features... ")
         # features estadísticos (stats)
         tsfresh = self.tsfresh()
-
+        
+        print("       >>>> Computing MLDP - Microstructural features... ")
         # features microestructurales 
         microstructural = self.microstructural()
         
+        print("       >>>> Computing Complementary features... ")
         # features others 
         others = self.others()
         
-        # features alphas 
-        alphas = self.alphas()
-        
+        print("   ||*** Building base dataframe object ***|| ")
         # concadenación global de features
         df = pd.concat(
             [
@@ -958,9 +960,20 @@ class FeaturesClass():
                 tsfresh,
                 others,
                 microstructural,
-                alphas
+
             ], axis=1
-            ).dropna()
+            )
+        
+        print("       >>>> Computing Alpha 101 - Signals features... ")
+        # features alphas 
+        alphas = self.alphas()
+        
+        print("   ||*** Final Concadenation***|| ")
+        # adding alphas to base dataframe
+        df[alphas.columns.values] = alphas
+        
+        # removing NaN's
+        df = df.dropna()
         
         # iteración para reasignación de nombre por columna
         for i in df.columns:
