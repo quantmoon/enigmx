@@ -983,10 +983,11 @@ class FeaturesClass():
         print("   ||*** Final Concadenation***|| ")
         # adding alphas to base dataframe
         df[alphas.columns.values] = alphas
-        
+        print("Filas iniciales de features:",len(df))
         # removing NaN's
         df = df.dropna()
-        
+        print("Filas finales de features:",len(df))
+
         # iteración para reasignación de nombre por columna
         for i in df.columns:
         

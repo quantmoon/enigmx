@@ -7,6 +7,7 @@ import ray
 import click
 import random
 import pandas as pd
+import numpy as np
 from time import time
 from scipy.stats import kendalltau
 from enigmx.features_algorithms import FeatureImportance
@@ -205,6 +206,7 @@ class featureImportance(object):
                  n_samples = 10,
                  clustered_features = True,
                  k_min = 5,
+                 trial = '001',
                  residuals = False, #add out
                  silh_thres = 0.65, #add out 
                  n_best_features = 7, #add out
@@ -219,6 +221,7 @@ class featureImportance(object):
         self.driver = driver
         self.uid = uid
         self.pwd = pwd
+        self.trial = trial
 
         self.pval_kendall = pval_kendall
         self.pca_comparisson = pca_comparisson
@@ -299,6 +302,11 @@ class featureImportance(object):
             
             print("      :::>>>> Clustering Feature Importance Initialized...")
             
+            #Selecciona features numéricos y discretos, todos los discretos van a formar un cluster independiente
+            discrete_feat = [x for x in featStandarizedMatrix.columns if x.split('_')[-1] == 'integer']
+            numerical_feat = [x for x in featStandarizedMatrix.columns if x not in discrete_feat]
+            
+
             # creamos instancia de featImportance clusterizado
             instance_clustered_featimp = ClusteredFeatureImportance(
                                         # parámetros obligatorios
@@ -307,7 +315,8 @@ class featureImportance(object):
                                         method = self.method,
                                         # parámetros optativos (valores predef.)
                                         max_number_clusters = None,
-                                        number_initial_iterations = 10
+                                        number_initial_iterations = 10,
+                                        additional_features = discrete_feat
                                     )
             
             # obtenemos el featImportance clusterizado y los clusters
@@ -342,6 +351,7 @@ class featureImportance(object):
             
             # lista de lista con los features de c/ cluster
             clusters_values = list(clusters.values())
+            clusters_values.append(discrete_feat)
             
             print("          ------------------>>>> Computing residuals... ")
             
@@ -452,55 +462,65 @@ class featureImportance(object):
             
             # si no se utiliza la transformación por residuos en el clusterizado
             else:
-                
-                # convenant | AVISO! Si desea continuar o no con el proceso
-                if click.confirm(clickMessage1, default=True):
-                    print("  ::::::>> OK! Starting Simple FeatImp Cluster Iteration")
-                
-                    # diccionario vacío para guardar resultados de featImp por cluster
-                    clusterDict = {}
-                    
-                    # iteración por cluster para cómputo de featImp muestras aleatorias
-                    for idxCluster in clustersIdx_sorted_by_importance:
+ 
+                #Iteración por grupo de features de cada cluster:
+                for idxClust, clusterFeatures in enumerate(clusters_values):
+
+
+                    #matriz temporal de features
+                    tempClusterFeatMatrix = featStandarizedMatrix[clusterFeatures]
+
+                    #proceso de feature importances dentro del cluster:
+                    importanceRankTemp, scoreNoPurged, scorePurgedTemp, stackedImpTemp = \
+                        baseFeatImportance(
+                                features_matrix = tempClusterFeatMatrix,
+                                labels_dataframe = labelsDataframe,
+                                random_state = 42,
+                                method = self.method,
+                                model_selected = self.model,
+                                pct_embargo = 0.01, #agregar como variable para llamar desde fuera
+                                cv = 5, #agregar como variable para llamar desde fuera
+                                oob = False,
+                            )
+
+                    # reordenamiento featImpRank | de mayor a menor rank-val
+                    importanceRankSortedTemp = importanceRankTemp.sort_values(
+                            ascending=False
+                            ) 
                         
-                        samplesByCluster = int(len(clusters[int(idxCluster)]) * 0.75)
                         
-                        print("     ||>> Samples to analize by cluster:", 
-                              samplesByCluster) 
-                        
-                        # feature importance inner cluster
-                        featImp_by_cluster = mainClusteringCombinatorialFeatImp(
-                                    # matriz de features general
-                                    standarized_features_matrix = featStandarizedMatrix,
-                                    # vector de labels más info de weights
-                                    df_labels = labelsDataframe,
-                                    # cluster elegido según Idx
-                                    cluster = clusters[int(idxCluster)],
-                                    # instancia de la clase featImp base-genérica 
-                                    featimp_instance = instance,
-                                    # index del cluster (valor referencial)
-                                    cluster_idx = idxCluster,
-                                    # num samples a computar por cluster 
-                                    n_samples = samplesByCluster,
-                                    # min. factor de agrupación de features por cluster
-                                    k_min = 2,
-                                    # path donde guardar las imágenes
-                                    picturesPathout = self.pictures_pathout,
-                                    # método de feat importance seleccionado
-                                    method_featimp = self.method,
-                                    # modelo de feat importance 
-                                    model_featimp = self.model
+                    # guardado de imágenes del featImp rank temporal
+                    plotFeatImportance(
+                                self.pictures_pathout,    
+                                stackedImpTemp,
+                                0,
+                                scorePurgedTemp,
+                                method=self.method, 
+                                tag=self.trial,
+                                simNum= self.method + '_' + type(self.model).__name__ + 
+                                'cluster' + str(idxClust) + ' || Try: ' + self.trial,
+                                model=type(self.model).__name__
+                                )                        
+                                    
+                print(" ...... El proceso se detendrá, la decisión de los features elegidos se realizará discrecionalmente >>>")
+
+                #Se plotea la importancia entre clusters
+                plotFeatImportance(
+                                self.pictures_pathout,
+                                clusteredFeatImpRank,
+                                0,
+                                0,
+                                method=self.method,
+                                tag=self.trial,
+                                simNum= self.method + '_' + type(self.model).__name__ +
+                                ' || Try: ' + self.trial,
+                                model=type(self.model).__name__
                                 )
-                        
-                        # almacenamiento de resultados en diccionario featImportance
-                        clusterDict[str(idxCluster)] = featImp_by_cluster 
-                        
-                    print(" ......... Checking General Cluster dictionary >>>")
-                    print(clusterDict)
-                    sys.exit("Execution Stopped.| No output generated yet!")
+ 
+
+                #Retorna el stacked
+                return original_stacked
                     
-                else:
-                    sys.exit("ProcessStoppedReq.| Feat Importance Finished!")
         
         # si no se utiliza el clustering featImp (featImp con Kendall Tau Corr)
         else: 
@@ -614,7 +634,7 @@ class featureImportance(object):
         print(combFeaturesSelected)
         
         # retorna el df stacked (roleado orig.) y los nombres de los features
-        return original_stacked, combFeaturesSelected 
+        return original_stacked
         
     def get_relevant_features(self, 
                               filtering = True, 
@@ -626,8 +646,14 @@ class featureImportance(object):
         assert pct_split >= 0.6, "Percentage of 'splits' should be 0.6 (60%) as min."
         
         # df stackeado de feats (rolleado = escalado) + la comb. elegida de features
-        stacked, list_features_tested = self.__instanceOverture__()
+        stacked = self.__instanceOverture__()
         
+        #En este punto el proceso se queda en standby, esperando la lista de features seleccionados:
+        list_features_tested = input("Por favor ingresa la lista de features, sin corchetes y separada por comas, luego presiona enter: ")
+        list_features_tested = list_features_tested.split(",")
+ 
+        print("Gracias, ahora voy a guardar los csv's del stacked con los features elegidos", flush = True)
+
         # si se activa el proceso de filtrado
         if filtering:
             
@@ -640,12 +666,12 @@ class featureImportance(object):
                     list_features_tested
                     ).values
                 ]                     
-            
+
             # elimina los features marginales no utiles dejando la info general principal
             stackedNoFeatures = stackedDiff[stackedDiff.columns.drop(
                 list(stackedDiff.filter(regex=self.features_sufix))
                 )]
-            
+
             # stacked df filtrado por features seleccionados con col. no-features
             stacked = pd.concat([stackedNoFeatures, stacked[list_features_tested]],axis=1) 
             
@@ -654,6 +680,7 @@ class featureImportance(object):
                         stacked.dtypes == "datetime64[ns]"
                         ).dropna().index.values
                                 
+
             # si se activa proceso de split
             if split:
                 

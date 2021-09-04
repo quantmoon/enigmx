@@ -232,7 +232,7 @@ class EnigmX:
         self.multiTuningParams = multiTuningParams          
     
     # método feature importance: model y list_stocks como parámetros obligatorios    
-    def get_feature_importance(self, model, list_stocks, **kwargs):
+    def get_feature_importance(self, model, list_stocks, trial,**kwargs):
         
         assert len(list_stocks) >= 1, "Empty 'list_stocks' is not allowed." 
         
@@ -268,6 +268,7 @@ class EnigmX:
             pca_min_var_expected = self.pca_min_var_expected,
             k_min = self.k_min,
             n_samples = self.n_samples,
+            trial = trial
             # clustered_features = True,
             # residuals = True,
             # silh_thres = 0.65

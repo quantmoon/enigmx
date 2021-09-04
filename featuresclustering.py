@@ -118,12 +118,14 @@ class ClusteredFeatureImportance(object):
                  model, 
                  method,
                  max_number_clusters = None,
-                 number_initial_iterations = 10):
+                 number_initial_iterations = 10,
+                 additional_features = None):
         
         # ingestando variables base
         self.feature_matrix=feature_matrix
         self.model=model
         self.method=method
+        self.additional_features = additional_features
         
         # se define al max clusters como la mitad - 1 del total de features
         if max_number_clusters==None: 
@@ -183,7 +185,15 @@ class ClusteredFeatureImportance(object):
         
         # computando clusterización base de los features con base a su corr.
         self.__baseClusterization__()
-        
+         
+        #Para el feature importances se añaden los features discretos, si hubieren
+        if self.additional_features is not None:
+            self.clstrs[len(self.clstrs.keys())] = self.additional_features
+ 
+        print(" ")
+        print("Clusters:",self.clstrs)
+        print(" ")
+
         # computando feature importance en los clusters 
         featureImportance = methodFunction(
                     self.model, 
@@ -193,13 +203,9 @@ class ClusteredFeatureImportance(object):
                     self.clstrs
                 )
         
-        # ordenando los features por 'importance'
-        sotredFeatImportance = featureImportance['mean'].sort_values(
-                            ascending=False
-                        )
         
         # retorna el sorted featImportance por cluster, y los clusters
-        return sotredFeatImportance, self.clstrs
+        return featureImportance, self.clstrs
 
         
         

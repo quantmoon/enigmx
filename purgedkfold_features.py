@@ -163,7 +163,7 @@ def featImportances(trnsX,cont,model,nSample,n_estimators=1000,cv=10,
     #Feature Importance calculation based on MDI & MDA process
     t1 = time()   
     fit=model.fit(X=trnsX,y=cont['labels'],sample_weight=sample_weight)
-    print("Tiempo de SOLO fiteo con todos los datos",time()-t1)
+
     if oob == True:
         oob=fit.oob_score_
     else:
@@ -175,7 +175,7 @@ def featImportances(trnsX,cont,model,nSample,n_estimators=1000,cv=10,
                     cv=cv,sample_weight=sample_weight,
                     t1=cont['t1'],pctEmbargo=pctEmbargo,
                     scoring=scoring).mean()
-        print("cvScore:",time()-t2)
+
     elif method=='MDA':
         t3 = time()
         imp,oos=featImpMDA(model,X=trnsX,y=cont['labels'],cv=cv,

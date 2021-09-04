@@ -99,11 +99,13 @@ dict_models = {
 
 main_path = '/var/data/data/'
 
+code = input('Ingresa el n° de serie de este intento: ')
+
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
                   method = 'MDI', 
                   base_path = main_path,
-                  cloud_framework = False
+                  cloud_framework = True
                   ) 
 
 # feature importance
@@ -120,13 +122,14 @@ instance.get_feature_importance(
                       driver = ("{ODBC DRIVER 17 for SQL Server}"),
                       pval_kendall = 0.1,
                       k_min = 10,
-                      n_samples = 15
+                      n_samples = 15, 
+                      trial = code
                       )
     
 
 # get multi process for tunning and backtest
 instance.get_multi_process(
-    code_backtest = '004', 
+    code_backtest = code, 
     dict_exo_models = dict_models,
     endogenous_model_sufix= 'rf',    
     trials = 11, 

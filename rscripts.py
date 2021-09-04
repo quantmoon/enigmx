@@ -32,7 +32,6 @@ def adf_test(datos):
     for (i in names(datos)[2:dim(datos)[2]]){
       t <- proc.time()
       serie <- ts(datos[i])
-      print(length(serie))
       for (j in seq(1,length(serie)-1000,100)){
         t2 <- proc.time()
         end <- j+1000
@@ -41,6 +40,8 @@ def adf_test(datos):
         if (adx$p.value > 0.05){
           feature = c(feature,i)
           pval = c(pval,adx$p.value)
+          cat("El feature ",i," no es estacionario")
+          break
         }
       }
      time <- proc.time() - t

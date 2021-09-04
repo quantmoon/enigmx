@@ -213,10 +213,14 @@ class FeatureImportance(object):
         # generamos copia del dataset
         xMatrixDf = df_base_matrix.copy()
 
-        # xMatrixDf = xMatrixDf.iloc[:,:8]
+        #xMatrixDf = xMatrixDf.iloc[:,:8]
+
+        #Selecciona features numéricos y discretos, todos los discretos van a formar un cluster independiente
+        discrete_feat = [x for x in xMatrixDf.columns if x.split('_')[-1] == 'integer']
+        numerical_feat = [x for x in xMatrixDf.columns if x not in discrete_feat]
 
         # Procesos en R, primero conversión de formato
-        df = convert_pandas_to_df(xMatrixDf)
+        df = convert_pandas_to_df(xMatrixDf[numerical_feat])
 
         # Prueba de estacionariedad
         features = adf_test(df)
@@ -237,7 +241,7 @@ class FeatureImportance(object):
 
 
         # Sí se quiere guardar el csv con todos los features, descomentar esta fila 
-        #dfStandarized.to_csv('/var/data/csvs/final.csv') 
+        dfStandarized.to_csv('/var/data/csvs/final.csv') 
 
         nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
         
