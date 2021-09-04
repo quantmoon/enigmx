@@ -3,7 +3,7 @@
 webpage: https://www.quantmoon.tech//
 """
 import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus=6)
+#ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus=8)
 
 #from enigmx.utils import EquitiesEnigmxUniverse
 from enigmx.databundle_interface import SQLEnigmXinterface
@@ -12,17 +12,18 @@ from enigmx.tests.stocks import stocks
 
 
 
-server_name = "DESKTOP-N8JUB39" 
+server_name = "34.67.28.84" 
 referential_base_database = 'TSQL'
-pathzarr = 'D:/data_zarr/'
-list_stocks = ['VTOL', 'ZNGA'] #stocks
-start_date = "2021-01-25" 
-end_date = "2021-03-25" 
+pathzarr = '/var/data/data/'
+#list_stocks = ['VTOL', 'ZNGA'] #stocks
+list_stocks = stocks
+start_date = "2020-12-01" 
+end_date = "2021-07-21" 
 desired_bars = 10
 bartype = 'volume'
-driver = "{SQL Server}"
-uid = ""
-pwd = ""
+driver = ("{ODBC DRIVER 17 for SQL Server}"),
+uid = "sqlserver"
+pwd = "quantmoon2021"
 
 print("inicializando clase")
 enigmxsql = SQLEnigmXinterface(
@@ -47,8 +48,8 @@ enigmxsql.create_table_database(
     bars_sampled = False, 
     bars_barrier = False,
     bars_weights = False,
-    bars_features = False,
-    creation_database = False)
+    bars_features = True,
+    creation_database = True)
 
 print("subiendo info")
 #try:

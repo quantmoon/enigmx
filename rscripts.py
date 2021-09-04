@@ -26,22 +26,28 @@ def adf_test(datos):
     importr("tseries")
     robjects.globalenv['datos'] = datos
     robjects.r("""
+    library(tseries)
     get_adfs <- function(datos){
     feature = pval = NULL
     for (i in names(datos)[2:dim(datos)[2]]){
       t <- proc.time()
-      serie <- ts(datos[i]) 
-      adx <- adf.test(serie)
-      time <- proc.time() - t
-      cat(time[3]," ",i," ",adx$p.value, "\n")
-      if (adx$p.value > 0.05){
-      feature = c(feature,i)
-      pval = c(pval,adx$p.value)
+      serie <- ts(datos[i])
+      print(length(serie))
+      for (j in seq(1,length(serie)-1000,100)){
+        t2 <- proc.time()
+        end <- j+1000
+        adx <- adf.test(serie[j:end])
+        time2 <- proc.time() - t2
+        if (adx$p.value > 0.05){
+          feature = c(feature,i)
+          pval = c(pval,adx$p.value)
+        }
       }
+     time <- proc.time() - t
+     cat("Tiempo total para toda la estacionarización del feature ",time[3], "\n")
      }
     df <- data.frame(feature = feature, pval = pval)
     return (df)
-
     }""")
 
     get_adfs = robjects.globalenv['get_adfs']

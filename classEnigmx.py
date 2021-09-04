@@ -272,7 +272,6 @@ class EnigmX:
             # residuals = True,
             # silh_thres = 0.65
             )        
-        print("Resultado de la creación de la instancia feature importance:",time()-t1)
         # resultado del feature importance (dataframe)
        
         t1 = time()
@@ -311,20 +310,21 @@ class EnigmX:
             assert self.exo_model != None, "'exo_model' is not defined."
             
             # modelo exógeno retornado 
+            t = time()
             valueResultExoModel = instance.get_exogenous_model(
                 model = self.exo_model,
                 dic_params = self.exo_dic_params,
                 save_as_pickle = self.save_exo_as_pickle,
                 exogenous_pickle_file_name = self.exogenous_pickle_file_name
                 )
-
+            print("Time to get exo model:",time()-t)
             # no se desea guardar, retorna el modelo
             if not self.save_exo_as_pickle:
                 return valueResultExoModel
         
         # si se activa tunning para modelo endógeno
         if endo_process:
-            
+            t = time()
             # modelo endógeno retornado
             valueResultEndoModel = instance.get_endogenous_model(
                 endogenous_model_sufix = self.endogenous_model_sufix,
@@ -339,7 +339,7 @@ class EnigmX:
                 exogenous_pickle_file_name = self.exogenous_pickle_file_name,
                 endogenous_pickle_file_name= self.endogenous_pickle_file_name
                 )
-            
+            print("Time to get endo model:",time()-t)
             # no se desea guardar, retorna el modelo
             if not self.save_endo_as_pickle:
                 return valueResultEndoModel

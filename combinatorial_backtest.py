@@ -4,6 +4,7 @@ webpage: https://www.quantmoon.tech//
 """
 import numpy as np
 import pandas as pd
+from time import time
 from sklearn.model_selection import KFold
 from enigmx.betsize import betsize_livetrading
 
@@ -219,10 +220,11 @@ class CPKFCV(object):
         
         
         #Updating Models Process using 'train' subset (idx[0])         
-        for idxs_arrays_in_tuple in items[0]:
+        for idx,idxs_arrays_in_tuple in enumerate(items[0]):
             
             
             #definition of general model: side model + size model
+            t = time()
             model = GeneralModel(
                 exogenous_model, endogenous_model
             )
@@ -249,7 +251,7 @@ class CPKFCV(object):
             y_reals.append(splitted_y_reals)
             indexPredEvent.append(splitted_index_y)
     
-            
+            print(f"Getting backtest of path {idx}:", time()-t)
         #constuction of final paths (N elements) | simple categorical pred.
         final_prediction_catpath = [
             np.concatenate(path) for path in paths(

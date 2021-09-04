@@ -81,7 +81,7 @@ class QuantmoonSQLManager(object):
             
         else:
             print("|----- Cloud Process Detected -----|")
-            self.loggin = ('Driver='+self.driver[0]+
+            self.loggin = ('Driver='+self.driver[0][0]+
                            ';Server='+ self.server +
                            ';Database='+self.base_database+
                            ';Uid='+self.uid[0]+
@@ -101,7 +101,7 @@ class QuantmoonSQLManager(object):
                            ';Uid='+self.uid+
                            ';Pwd='+self.pwd+';')
         else:
-            self.access = ('Driver='+self.driver[0]+
+            self.access = ('Driver='+self.driver[0][0]+
                            ';Server='+ self.server +
                            ';Database='+self.database_name+
                            ';Uid='+self.uid[0]+

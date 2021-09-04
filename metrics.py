@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from scipy.stats import kurtosis, skew, norm
-
+from time import time
 # diccionario con elementos base para computación de las métricas de backtest
 baseCriticsDicforBacktestMetrics = {
     'Pnl': [0.1], 
@@ -269,8 +269,10 @@ class Metrics():
     """
         Función que genera la métrica de perfomance de todos los statistics en base 100
     """
-    def performance(self, crits):
+    def performance(self, crits,idx):
         
+
+        t = time()
         pt_1 = self.get_pnl()/self.cap[0] # el pnl se divide sobre el cap inicial para obtener un retorno pnl porcentual
         pt_2 = self.aror()
         pt_3 = self.hitratio()/len(self.ret) #el número de hit se divide al número total para obtener un porcentual
@@ -283,7 +285,7 @@ class Metrics():
         pt_10 = self.psr(crits['Sharpe Ratio'][0]) #el sharpe ratio toma de benchmark el sharpe que se pide
         pt_11 = self.dppt()
         pt_12 = self.roec()
-        
+        print(f"Time for getting metrics in path:{idx}", time() - t)
         frame = pd.DataFrame({"Pnl": [pt_1], "Annualized Rate of Returns": [pt_2], "Hit Ratio": [pt_3],
                              "Average Return of Hits": [pt_4], "Max Drawdown": [pt_5], "Max Time Under Water": [pt_6],
                              "HHI positive": [pt_7], "HHI negative": [pt_8], "Sharpe Ratio": [pt_9], 
@@ -331,10 +333,10 @@ class Metrics():
 
 def metricsByPath(df, crits):
     df_2 = pd.DataFrame()
-    for x in df.trial.unique():
+    for idx,x in enumerate(df.trial.unique()):
         df_ = df[df.trial == x]
         clase = Metrics(df_)
-        clase_df, clase_score = clase.performance(crits)
+        clase_df, clase_score = clase.performance(crits,idx)
         clase_df["Score"] = clase_score
         clase_df["Trial"] = x
         df_2 = df_2.append(clase_df.loc["Real Values"])
