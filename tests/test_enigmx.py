@@ -4,7 +4,7 @@ webpage: https://www.quantmoon.tech//
 """
 
 import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True))
+#ray.init(include_dashboard=(False),ignore_reinit_error=(True))
 
 from enigmx.classEnigmx import EnigmX
 import numpy as np
@@ -99,18 +99,20 @@ dict_models = {
 
 main_path = '/var/data/data/'
 
+print("")
 code = input('Ingresa el n° de serie de este intento: ')
-
+print("")
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
-                  method = 'MDI', 
+                  method = 'MDA', 
                   base_path = main_path,
                   cloud_framework = True
                   ) 
 
 # feature importance
 instance.get_feature_importance(    
-                      model = RandomForestClassifier(max_features=1, random_state=0), 
+                      model = SGDClassifier(),
+#                      model = RandomForestClassifier(max_features=1, random_state=0), 
                       #list_stocks = ['VTOL','ZNGA'],
                       list_stocks = stocks,
                       score_constraint = 0.3, #activar 

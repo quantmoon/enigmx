@@ -6,6 +6,7 @@ import pandas as pd
 import sys
 
 importr("dplyr")
+importr("caret")
 robjects.r("options(warn=-1)")
 
 
@@ -141,3 +142,41 @@ def regression_intercluster(matrix,features_to_transform,clusters, path = 'D:/da
         df = pd.concat([df,residual_matrix], axis = 1)
 
     return df
+
+
+def remove_corr_variables(df,
+                          numerical_variables, 
+                          discrete_variables,
+                          thres = 0.8):
+   
+
+ 
+  #Convertimos el pandas en data.frame de R
+  datos = convert_pandas_to_df(df[numerical_variables])
+
+  #Los datos en Python se ingresan al entorno de r, solo las numéricas
+  robjects.globalenv['datos'] = datos
+  robjects.globalenv['thres'] = thres
+
+  #Seleccíón de variables sin mucha correlación
+  robjects.r("""
+   correlationMatrix <- cor(datos)
+   correlationMatrix <- data.frame(correlationMatrix)
+   highlyCorrelated <- findCorrelation(correlationMatrix, cutoff = thres)
+   print(colnames(datos)[highlyCorrelated])
+   variables <- colnames(datos)[-highlyCorrelated]
+   """)
+
+
+  corrMatrix = convert_df_to_pandas(robjects.globalenv['correlationMatrix'])
+
+  #Pasamos el vector de variables finales de R a python
+  variables = list(robjects.globalenv['variables'])
+
+  #Añadimos las vaeriables categóricas a la lista de variables finales
+  variables.extend(discrete_variables)
+
+
+
+  return df[variables],variables,corrMatrix
+  

@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler
 from enigmx.dbgenerator import databundle_instance 
 from sklearn.model_selection import train_test_split
 from enigmx.purgedkfold_features import featImportances
-from enigmx.rscripts import adf_test, convert_pandas_to_df
+from enigmx.rscripts import adf_test, convert_pandas_to_df, remove_corr_variables
 
 # PCA computation Snippet (8.5 page 119)
 def get_eVec(dot,varThres):
@@ -213,7 +213,7 @@ class FeatureImportance(object):
         # generamos copia del dataset
         xMatrixDf = df_base_matrix.copy()
 
-        #xMatrixDf = xMatrixDf.iloc[:,:8]
+#        xMatrixDf = xMatrixDf.iloc[:,:8]
 
         #Selecciona features numéricos y discretos, todos los discretos van a formar un cluster independiente
         discrete_feat = [x for x in xMatrixDf.columns if x.split('_')[-1] == 'integer']
@@ -226,7 +226,7 @@ class FeatureImportance(object):
         features = adf_test(df)
 
         print("WARNING! >>>>> Features to transform as stationary: ", 
-              len(features), "/", df_base_matrix.shape[1])
+              len(features), "/", len(numerical_feat))
 
         # Estacionarización:
         for feature in features:
@@ -242,6 +242,13 @@ class FeatureImportance(object):
 
         # Sí se quiere guardar el csv con todos los features, descomentar esta fila 
         dfStandarized.to_csv('/var/data/csvs/final.csv') 
+
+        # Eliminamos las variables excesivamente correlacionadas
+        dfStandarized,variables, corrMatrix = remove_corr_variables(dfStandarized,numerical_feat,discrete_feat)
+
+        # Sí se quiere guardar el csv con todos los features, descomentar esta fila
+        dfStandarized.to_csv('/var/data/csvs/final_sin_correlacion.csv')
+        corrMatrix.to_csv('/var/data/csvs/matriz_corr_completa.csv')
 
         nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
         

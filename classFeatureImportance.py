@@ -316,7 +316,8 @@ class featureImportance(object):
                                         # parámetros optativos (valores predef.)
                                         max_number_clusters = None,
                                         number_initial_iterations = 10,
-                                        additional_features = discrete_feat
+                                        additional_features = discrete_feat,
+                                        numerical_features = numerical_feat
                                     )
             
             # obtenemos el featImportance clusterizado y los clusters

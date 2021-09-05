@@ -119,13 +119,15 @@ class ClusteredFeatureImportance(object):
                  method,
                  max_number_clusters = None,
                  number_initial_iterations = 10,
-                 additional_features = None):
+                 additional_features = None,
+                 numerical_features = None):
         
         # ingestando variables base
         self.feature_matrix=feature_matrix
         self.model=model
         self.method=method
         self.additional_features = additional_features
+        self.numerical_features = numerical_features
         
         # se define al max clusters como la mitad - 1 del total de features
         if max_number_clusters==None: 
@@ -143,7 +145,7 @@ class ClusteredFeatureImportance(object):
                 "'feature_matrix' format is not correct."
         
         # estima correlacion de tipica features no clusterizada
-        corr0 = self.feature_matrix.corr()
+        corr0 = self.feature_matrix[self.numerical_features].corr()
         
         # clusterización base: corr clusterizada, clusters y silhouette score
         corr1, clstrs, silh = clusterKMeansBase(
