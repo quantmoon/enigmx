@@ -1,3 +1,4 @@
+
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
@@ -147,7 +148,7 @@ def regression_intercluster(matrix,features_to_transform,clusters, path = 'D:/da
 def remove_corr_variables(df,
                           numerical_variables, 
                           discrete_variables,
-                          thres = 0.8):
+                          thres = 0.4):
    
 
  
@@ -161,8 +162,8 @@ def remove_corr_variables(df,
   #Seleccíón de variables sin mucha correlación
   robjects.r("""
    correlationMatrix <- cor(datos)
-   correlationMatrix <- data.frame(correlationMatrix)
    highlyCorrelated <- findCorrelation(correlationMatrix, cutoff = thres)
+   correlationMatrix <- data.frame(correlationMatrix)
    print(colnames(datos)[highlyCorrelated])
    variables <- colnames(datos)[-highlyCorrelated]
    """)
@@ -172,10 +173,9 @@ def remove_corr_variables(df,
 
   #Pasamos el vector de variables finales de R a python
   variables = list(robjects.globalenv['variables'])
-
+  print(variables)
   #Añadimos las vaeriables categóricas a la lista de variables finales
   variables.extend(discrete_variables)
-
 
 
   return df[variables],variables,corrMatrix

@@ -248,6 +248,7 @@ class FeatureImportance(object):
 
         # Sí se quiere guardar el csv con todos los features, descomentar esta fila
         dfStandarized.to_csv('/var/data/csvs/final_sin_correlacion.csv')
+        print(dfStandarized.columns)
         corrMatrix.to_csv('/var/data/csvs/matriz_corr_completa.csv')
 
         nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
