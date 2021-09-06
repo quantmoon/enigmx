@@ -104,15 +104,15 @@ code = input('Ingresa el n° de serie de este intento: ')
 print("")
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
-                  method = 'MDA', 
+                  method = 'MDI', 
                   base_path = main_path,
                   cloud_framework = True
                   ) 
 
 # feature importance
 instance.get_feature_importance(    
-                      model = SGDClassifier(),
-#                      model = RandomForestClassifier(max_features=1, random_state=0), 
+#                      model = SGDClassifier(),
+                      model = RandomForestClassifier(max_features=1, random_state=0), 
                       #list_stocks = ['VTOL','ZNGA'],
                       list_stocks = stocks,
                       score_constraint = 0.3, #activar 

@@ -148,7 +148,7 @@ def regression_intercluster(matrix,features_to_transform,clusters, path = 'D:/da
 def remove_corr_variables(df,
                           numerical_variables, 
                           discrete_variables,
-                          thres = 0.4):
+                          thres = 0.8):
    
 
  
