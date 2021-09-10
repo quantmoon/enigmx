@@ -116,7 +116,7 @@ instance.get_feature_importance(
                       #list_stocks = ['VTOL','ZNGA'],
                       list_stocks = stocks,
                       score_constraint = 0.3, #activar 
-                      server_name = "34.67.28.84",
+                      server_name = "104.197.191.96",
                       database = "BARS_FEATURES",
                       uid = 'sqlserver',
                       pwd = 'quantmoon2021',

@@ -3,7 +3,7 @@
 webpage: https://www.quantmoon.tech//
 """
 import ray
-#ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus=8)
+ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus=6)
 
 #from enigmx.utils import EquitiesEnigmxUniverse
 from enigmx.databundle_interface import SQLEnigmXinterface
@@ -12,7 +12,7 @@ from enigmx.tests.stocks import stocks
 
 
 
-server_name = "34.67.28.84" 
+server_name = "34.134.239.41" 
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
 #list_stocks = ['VTOL', 'ZNGA'] #stocks
@@ -39,17 +39,17 @@ enigmxsql = SQLEnigmXinterface(
     desired_bars = desired_bars,
     referential_base_database = referential_base_database)
 
-print("creando tablas")
-enigmxsql.create_table_database(
-    bars_tunning = False, 
-    bars_basic = False, 
-    bars_entropy = False, 
-    etfs_trick = False, 
-    bars_sampled = False, 
-    bars_barrier = False,
-    bars_weights = False,
-    bars_features = True,
-    creation_database = True)
+#print("creando tablas")
+#enigmxsql.create_table_database(
+#    bars_tunning = True, 
+#    bars_basic = True, 
+#    bars_entropy = False, 
+#    etfs_trick = False, 
+#    bars_sampled = True, 
+#    bars_barrier = True,
+#    bars_weights = True,
+#    bars_features = True,
+#    creation_database = True)
 
 print("subiendo info")
 #try:
@@ -58,9 +58,9 @@ enigmxsql.compute_info_to_sql(
             bar_construction_process = False, 
             entropy_construction_process = False, 
             etftrick_construction_process = False, 
-            sampling_features_process = False, 
-            triple_barrier_computation_process = False, 
-            sample_weight_computation_process = False,
+            sampling_features_process = True, 
+            triple_barrier_computation_process = True, 
+            sample_weight_computation_process = True,
             features_bar_computation_process = True,
             #tunning_interval = "10D",
 	    )
