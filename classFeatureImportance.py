@@ -286,17 +286,21 @@ class featureImportance(object):
         
         print("----------Process {} started---------- \n".format(self.method))
 
-        # extrae matriz de features estacionaria-estandarizada, labelsDf y df stacked
-        featStandarizedMatrix, labelsDataframe, original_stacked = \
-            instance.__checkingStationary__(
-                self.pictures_pathout
-            ) 
-        
-        print("         :::: >>> \
-              Running Iteration over samples for Kendall Test...")
-              
-        
-        
+        # extrae matriz de features estacionaria-estandarizada de la base de datos, así como serie de labels
+        featStandarizedMatrix = SQLFRAME.read_table_info(
+            statement = f"SELECT * FROM [{database_name}].[dbo].STACKED",
+            dbconn_= dbconn,
+            cursor_= cursor,
+            dataframe=True
+            )
+
+        labelsDataframe = SQLFRAME.read_table_info(
+            statement = f"SELECT * FROM [{database_name}]].[dbo].LABELS",
+            dbconn_= dbconn,
+            cursor_= cursor,
+            dataframe=True
+            )
+
         # si se utiliza el clustering featImp 
         if self.clustered_features: 
             
@@ -520,7 +524,7 @@ class featureImportance(object):
  
 
                 #Retorna el stacked
-                return original_stacked
+                return featStandarizedMatrix
                     
         
         # si no se utiliza el clustering featImp (featImp con Kendall Tau Corr)

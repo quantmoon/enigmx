@@ -18,6 +18,7 @@ from enigmx.sampleweight import WeightsGeneration
 from enigmx.save_info import generate_datasets
 from enigmx.triplebarrier import new_triple_barrier_computation
 from enigmx.tests.telegram import send_message
+from enigmx.features_algorithms import StationaryStacked
 
 from enigmx.utils import (
     sel_days, 
@@ -85,6 +86,7 @@ class SQLEnigmXinterface(object):
             * triple_barrier_computation_process (bool)
             * sample_weight_computation_process (bool)
             * features_bar_computation_process (bool)
+            * features_stacking (bool)
             
             Asimismo, contiene algunos parámetros predefinidos para inicializar
             los procesos de cada etapa según la activación solicitada.
@@ -133,6 +135,7 @@ class SQLEnigmXinterface(object):
         - '__tripleBarrierProcess__'
         - '__sampleWeights__'
         - '__featuresComputation__'
+        - '__checkStationarity__'
  
     WARNING: considerar como fecha de inicio (start_date), la fecha más antigua + el intervalo de 
    tunning.
@@ -164,7 +167,7 @@ class SQLEnigmXinterface(object):
 #        data_tuple_range_for_tunning = (
 #            (
 #                datetime.strptime(self.start_date, '%Y-%m-%d').date() - 
-#                pd.Timedelta(tunning_interval)
+#              	  pd.Timedelta(tunning_interval)
 #                ).strftime('%Y-%m-%d'), 
 #            self.start_date
 #            )
@@ -184,7 +187,7 @@ class SQLEnigmXinterface(object):
         
         #obten la lista de información con los diccionarios
         list_datasets =  ray.get(ray_object_list)
-        print('Pass')
+
         #transforma los diccionarios en un pandas con los params de tunning x bar
         tunning_pandas = construct_pandas_tunning(list_datasets, self.list_stocks)
         
@@ -653,6 +656,52 @@ class SQLEnigmXinterface(object):
             fullDataframe.to_sql(tableName, engine, index=False)
             
         print("<<<::::: BAR FEATURES COMPUTATION SQL PROCESS FINISHED :::::>>>")
+ 
+
+    def __checkStationarity__(self, SQLFRAME, dbconn, cursor):
+
+
+        print(":::::: >>> SQL Alchemy Initialization for 'stationary features'  table...\n")
+
+        #obtenemos la lista de drivers temporales en uso directamente de pyodbc
+        temporalDriver = [item for item in pyodbc.drivers()]
+
+        #selecciona el temporal driver idx = 0 | en caso error, usar idx = -1
+        temporalDriver = temporalDriver[0]
+
+        print(f">>> Temporal Driver Selected is '{temporalDriver}'...")
+        print("----> Warning! In case 'InterfaceError': please change 'temporalDriver' index selection in line 620 databundle_interface.py.\n")
+
+        #construimos la sentencia de conexión a través de SQL ALchemy
+        mainSQLAlchemySentence = f'DRIVER={temporalDriver};SERVER={self.server_name};DATABASE={self.database_features};UID={self.uid[0]};PWD={self.pwd[0]}'
+
+        #generamos SQL-AL engine para inserción de nuevas tablas
+        params = urllib.parse.quote_plus(mainSQLAlchemySentence)
+
+        #inicialización del engine de SQL Alchemy
+        engine = sqlalchemy.create_engine(
+            "mssql+pyodbc:///?odbc_connect={}".format(params)
+            )
+
+
+        instance = StationaryStacked(SQLFRAME,dbconn,cursor, self.list_stocks)
+        featStandarizedMatrix, labelsDataframe  =  \
+            instance.__checkingStationary__( 
+               self.pathzarr
+        )
+
+        #llena la tabla única "STATIONARY" con la matriz stackeada en la base de datos self.database_features
+        featStandarizedMatrix.to_sql("STACKED", engine, index=False)
+
+        labelsDataframe.to_sql("LABELS", engine, index=False)
+
+  
+
+
+        print("<<<::::: FEATURES STACKING  SQL PROCESS FINISHED :::::>>>")
+
+
+     
             
     def create_table_database(self, bars_tunning, bars_basic,
                               bars_entropy, etfs_trick, bars_sampled, 
@@ -966,6 +1015,7 @@ class SQLEnigmXinterface(object):
                             triple_barrier_computation_process, 
                             sample_weight_computation_process,
                             features_bar_computation_process,
+                            features_stacking,
                             #GENERAL NAME FOR DATABASE | SOLO REF.
                             bartype_database = 'BARS',
                             #TUNNING PROCESS PARAMS
@@ -1053,6 +1103,9 @@ class SQLEnigmXinterface(object):
         #proceso de computación de los features
         if features_bar_computation_process:
             self.__featuresComputation__(SQLFRAME, dbconn, cursor)
+
+        if features_stacking:
+            self.__checkStationarity__(SQLFRAME, dbconn, cursor)
 
         print("::::> UPDATED SQL INFORMATION FINISHED <::::")
 

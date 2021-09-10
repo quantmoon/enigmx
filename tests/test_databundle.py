@@ -58,10 +58,11 @@ enigmxsql.compute_info_to_sql(
             bar_construction_process = False, 
             entropy_construction_process = False, 
             etftrick_construction_process = False, 
-            sampling_features_process = True, 
-            triple_barrier_computation_process = True, 
-            sample_weight_computation_process = True,
-            features_bar_computation_process = True,
+            sampling_features_process = False, 
+            triple_barrier_computation_process = False, 
+            sample_weight_computation_process = False,
+            features_bar_computation_process = False,
+            features_stacking = True,
             #tunning_interval = "10D",
 	    )
 #send_message('Se acabó!')

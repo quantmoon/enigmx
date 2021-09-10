@@ -121,7 +121,7 @@ class FeatureImportance(object):
             SQLFRAME.read_table_info(
                 statement = "SELECT * FROM [{}].[dbo].{}_GLOBAL".format(
                     self.database_name, stock + "_" + self.bartype
-                    ), 
+                   ), 
                 dbconn_= dbconn, 
                 cursor_= cursor, 
                 dataframe=True
@@ -343,3 +343,197 @@ class FeatureImportance(object):
         
         # retorna featuresRank (0), pcaRank (1), accuracy CPKF, accuracy con CPKF, y el stacked
         return featureImportanceRank, pcaImportanceRank, score_sin_cpkf, oos, imp
+
+
+class StationaryStacked():
+ 
+    """
+    Clase usada en el databundle, para recoger todos las tablas de acciones con sus features y generar
+    una sola tabla con una sola serie de tiempo por variable. Esta serie será rolleada, estandarizada,
+    estacionarizada (de ser necesario) y guardada para su posterior uso en el feature importance.
+    """
+
+    def __init__(self,
+                 SQLFRAME, 
+                 dbconn, 
+                 cursor,
+                 list_stocks,
+                 database = 'BARS_FEATURES',
+                 bartype = 'VOLUME',
+                 feature_sufix = 'feature',
+                 window = 10,
+                 rolling = True,
+                 win_type = 'gaussian',
+                 add_parameter = 5, 
+                 col_weight_type = 'weightTime',
+                 col_t1_type  = 'horizon',
+                 col_label_type = 'barrierLabel',):
+        
+        self.SQLFRAME = SQLFRAME
+        self.dbconn = dbconn
+        self.cursor = cursor
+
+        self.rolling = rolling
+        self.list_stocks = list_stocks
+        self.database_name = database
+        self.bartype = bartype
+        self.features_sufix = feature_sufix
+        self.window = window
+        self.win_type =  win_type
+        self.add_parameter = add_parameter
+        self.col_weight_type = col_weight_type
+        self.col_t1_type = col_t1_type
+        self.col_label_type = col_label_type
+
+
+    def __getStacked__(self):
+        """
+        Open individual csv and merge them to generate stacked.
+        """
+        
+        
+        #lista con tablas/dataframes por acción extraídas de SQL
+        list_df = [
+           self.SQLFRAME.read_table_info(
+                statement = "SELECT * FROM [{}].[dbo].{}_GLOBAL".format(
+                    self.database_name, stock + "_" + self.bartype
+                    ), 
+                dbconn_= self.dbconn, 
+                cursor_= self.cursor, 
+                dataframe=True
+                )
+            for stock in self.list_stocks
+            ]
+        #proceso de rolling para uniformizar la dist. de los features
+        
+        if self.rolling:
+            
+            #columnas para rolling 
+            columns_for_rolling = list(list_df[0].filter(
+                like=self.features_sufix
+                ).columns.values)     
+        
+            #hace rolling solo sobre las columnas de feature de forma individual por accion
+            list_df = [
+                pd.concat(
+                    [   #extrae aquellas columnas que no haran rolling
+                        dataframe[dataframe.columns.difference(
+                            columns_for_rolling
+                            ).values],
+                        #computa el rolling solo en columnas de features
+                        dataframe[columns_for_rolling].rolling(
+                            self.window, win_type=self.win_type
+                            ).sum(std=self.add_parameter) #sum? #std?
+                        ], axis=1
+                                ).dropna()  for dataframe in list_df
+                        ]
+        #dataset final concadenado
+        df_ = pd.concat(list_df).sort_index(
+            kind='merge'
+            )
+        
+        return df_, columns_for_rolling
+    
+    def __organizationDataProcess__(self): 
+        """
+        Inputs : matriz de features stackedada y nombres de features.
+        
+        Outputs : devuelve organizados el df de features y el df de labels
+        """
+        #obtener el dataframe de los valores stacked (solo rolleado) + columnas de features
+        df_global_stacked, features_col_name = self.__getStacked__()
+
+        #seleccionamos los features para su escalamiento
+        elementsToScale = df_global_stacked[features_col_name]
+        
+        # definimos el objeto de escalamiento general de los features
+        self.scalerObj = StandardScaler() 
+        
+        # fiteamos el objeto de escalamiento con todo los features del stacked
+        self.scalerObj.fit(elementsToScale)
+        
+        # transformamos los features del stacked a valores escalados
+        elementsScaled = self.scalerObj.transform(elementsToScale)
+                
+        # redefinimos los valores de los features con sus valores escalados
+        df_global_stacked[features_col_name] = elementsScaled 
+        
+        #depuracion del dataframe de entrada, seleccionando solo los features
+        if self.depured: 
+            df = df_global_stacked[features_col_name]
+        else:
+            df = df_global_stacked
+        
+        #creación de la información de las etiquetas ('y' como df)
+        y = df_global_stacked[self.col_label_type].to_frame('labels')
+        
+        #definición de 't1': horizonte temporal máx./barra (barrera vert.)
+        y['t1'] = df_global_stacked[self.col_t1_type]
+        
+        #definición de 'w': pesos para cada observación en y como df
+        y['w'] = df_global_stacked[self.col_weight_type]
+        y.set_index(df_global_stacked['close_date'],inplace=True)
+                
+        #segmentacion y definition del stacked
+        x = df
+        x.set_index(df_global_stacked['close_date'],inplace=True)
+
+        #retorna dataframe de features y dataframe de etiquetas
+        return x, y, df_global_stacked
+    
+    def __checkingStationary__(self, pathOut, pval_adf = '5%'):
+        
+        # extrae matriz de features, vector de labels del split stacked, y el global stacked
+        df_base_matrix, yVectorArray, df_global_stacked = self.__organizationDataProcess__()
+
+        # generamos copia del dataset
+        xMatrixDf = df_base_matrix.copy()
+
+        # Esta línea es para prueas con menos features
+#        xMatrixDf = xMatrixDf.iloc[:,:8]
+
+        #Selecciona features numéricos y discretos, todos los discretos van a formar un cluster independiente
+        discrete_feat = [x for x in xMatrixDf.columns if x.split('_')[-1] == 'integer']
+        numerical_feat = [x for x in xMatrixDf.columns if x not in discrete_feat]
+
+        # Procesos en R, primero conversión de formato
+        df = convert_pandas_to_df(xMatrixDf[numerical_feat])
+
+        # Prueba de estacionariedad
+        features = adf_test(df)
+
+        print("WARNING! >>>>> Features to transform as stationary: ", 
+              len(features), "/", len(numerical_feat))
+
+        # Estacionarización:
+        for feature in features:
+            print('            Stationarization over:', feature)
+            newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
+            xMatrixDf[feature] = newTemporalFeatArray
+
+        # Estandarización de la matriz                 
+        dfStandarized = xMatrixDf.sub(
+            xMatrixDf.mean(), axis=1
+            ).div(xMatrixDf.std(),axis=1)
+
+
+        # Sí se quiere guardar el csv con todos los features, descomentar esta fila 
+        dfStandarized.to_csv('/var/data/csvs/final.csv') 
+
+        # Eliminamos las variables excesivamente correlacionadas
+        dfStandarized,variables, corrMatrix = remove_corr_variables(dfStandarized,numerical_feat,discrete_feat)
+
+        # Sí se quiere guardar el csv con todos los features, descomentar esta fila
+        dfStandarized.to_csv('/var/data/csvs/final_sin_correlacion.csv')
+        print(dfStandarized.columns)
+        corrMatrix.to_csv('/var/data/csvs/matriz_corr_completa.csv')
+
+        nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
+        
+        print('        >>> Saving Scaler Object... at ', pathOut)
+        pickle.dump(self.scalerObj, open('{}/scaler_{}.pkl'.format(pathOut, nowTimeID),'wb')) 
+        
+        # elementos utiles del feat improtance (3) + el base matrix org (feat roleados + datos add.)
+        return dfStandarized, yVectorArray 
+
+
