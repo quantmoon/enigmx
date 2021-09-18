@@ -173,7 +173,7 @@ def remove_corr_variables(df,
 
   #Pasamos el vector de variables finales de R a python
   variables = list(robjects.globalenv['variables'])
-  print(variables)
+
   #Añadimos las vaeriables categóricas a la lista de variables finales
   variables.extend(discrete_variables)
 

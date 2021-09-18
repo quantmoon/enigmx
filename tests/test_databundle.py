@@ -41,13 +41,13 @@ enigmxsql = SQLEnigmXinterface(
 
 #print("creando tablas")
 #enigmxsql.create_table_database(
-#    bars_tunning = True, 
-#    bars_basic = True, 
+#    bars_tunning = False, 
+#    bars_basic = False, 
 #    bars_entropy = False, 
 #    etfs_trick = False, 
-#    bars_sampled = True, 
-#    bars_barrier = True,
-#    bars_weights = True,
+#    bars_sampled = False, 
+#    bars_barrier = False,
+#    bars_weights = False,
 #    bars_features = True,
 #    creation_database = True)
 

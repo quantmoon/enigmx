@@ -212,8 +212,7 @@ class featureImportance(object):
                  silh_thres = 0.65, #add out 
                  n_best_features = 7, #add out
                  global_featImp = True, #add out
-                 referential_database = 'TSQL',
-                 simple_correlation = False
+                 referential_database = 'TSQL'
                  ):
         
         # ingesta de parámetros
@@ -260,7 +259,6 @@ class featureImportance(object):
         
         self.n_best_features = n_best_features
         self.global_featImp = global_featImp 
-        self.simple_correlation = simple_correlation
         
         self.referential_base_database = referential_database
         self.ErrorKendallMessage = 'Any valid kendall value exists in the set of trials'
@@ -314,17 +312,29 @@ class featureImportance(object):
             dataframe=True
             )
 
-        labelsDataframe = SQLFRAME.read_table_info(
+        labelsDataframe2 = SQLFRAME.read_table_info(
             statement = f"SELECT * FROM [{self.database}].[dbo].LABELS",
             dbconn_= dbconn,
             cursor_= cursor,
             dataframe=True
             )
 
-        featStandarizedMatrix.index = featStandarizedMatrix['close_date']
-        featStandarizedMatrix.drop('close_date',axis = 1,inplace = True)
-        labelsDataframe.index = labelsDataframe['close_date']
-        labelsDataframe.drop('close_date',axis = 1,inplace = True)
+        featStandarizedMatrix2 = pd.read_csv('/var/data/csvs/tmpfeatmatrix.csv')
+        labelsDataframe = pd.read_csv('/var/data/csvs/labels.csv')
+        stacked = pd.read_csv('/var/data/csvs/original.csv')
+        print(featStandarizedMatrix)
+        print(labelsDataframe)
+        print(stacked)
+        print(featStandarizedMatrix2)
+        print(labelsDataframe2)
+
+        featStandarizedMatrix, labelsDataframe, original_stacked = instance.__checkingStationary__(self.pictures_pathout)
+
+
+        
+        print(featStandarizedMatrix)
+        print(labelsDataframe)
+        print(stacked)
 
         # si se utiliza el clustering featImp 
         if self.clustered_features: 
@@ -346,8 +356,7 @@ class featureImportance(object):
                                         max_number_clusters = None,
                                         number_initial_iterations = 10,
                                         additional_features = discrete_feat,
-                                        numerical_features = numerical_feat,
-                                        simple_correlation = self.simple_correlation
+                                        numerical_features = numerical_feat
                                     )
             
             # obtenemos el featImportance clusterizado y los clusters

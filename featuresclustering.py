@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_samples
+from enigmx.utils import prox_matrix
 
 
 #BASE SNIPPET | CLUSTERING KMEANS
@@ -71,11 +72,11 @@ def groupMeanStd(df0,clstrs):
         out.loc['C_'+str(i),'std']=df1.std()*df1.shape[0]**-.5
     return out
 
-def featImpMDI_Clustered(clf,X,y,featNames,clstrs):
+def featImpMDI_Clustered(clf,X,y,clstrs,params_dict):
     fit=clf.fit(X,y)
     df0={i:tree.feature_importances_ for i,tree in enumerate(fit.estimators_)}
     df0=pd.DataFrame.from_dict(df0,orient='index')
-    df0.columns=featNames
+    df0.columns=params_dict['featNames']
     df0=df0.replace(0,np.nan) # because max_features=1
     imp=groupMeanStd(df0,clstrs)
     imp/=imp['mean'].sum()
@@ -83,10 +84,10 @@ def featImpMDI_Clustered(clf,X,y,featNames,clstrs):
 
 #SNIPPET 6.5 CLUSTERED MDA
 #---------------------------------------------------
-def featImpMDA_Clustered(clf,X,y,clstrs,n_splits=10):
+def featImpMDA_Clustered(clf,X,y,clstrs,params_dict):
     from sklearn.metrics import log_loss
     from sklearn.model_selection._split import KFold
-    cvGen=KFold(n_splits=n_splits)
+    cvGen=KFold(n_splits=params_dict['n_splits'])
     scr0,scr1=pd.Series(),pd.DataFrame(columns=clstrs.keys())
     for i,(train,test) in enumerate(cvGen.split(X=X)):
         X0,y0=X.iloc[train,:],y.iloc[train]
@@ -120,7 +121,8 @@ class ClusteredFeatureImportance(object):
                  max_number_clusters = None,
                  number_initial_iterations = 10,
                  additional_features = None,
-                 numerical_features = None):
+                 numerical_features = None,
+                 simple_correlation = False):
         
         # ingestando variables base
         self.feature_matrix=feature_matrix
@@ -128,6 +130,7 @@ class ClusteredFeatureImportance(object):
         self.method=method
         self.additional_features = additional_features
         self.numerical_features = numerical_features
+        self.simple_correlation = simple_correlation
         
         # se define al max clusters como la mitad - 1 del total de features
         if max_number_clusters==None: 
@@ -144,8 +147,15 @@ class ClusteredFeatureImportance(object):
         assert type(self.feature_matrix) == pd.core.frame.DataFrame, \
                 "'feature_matrix' format is not correct."
         
-        # estima correlacion de tipica features no clusterizada
-        corr0 = self.feature_matrix[self.numerical_features].corr()
+        # si se va a utilizar la correlación simple como insumo para la clusterización
+        if self.simple_correlation:
+
+            # estima correlacion de tipica features no clusterizada
+            corr0 = self.feature_matrix[self.numerical_features].corr()
+
+        # se aplica la matriz de entropía: variation of information, para clusterizas los features
+        else:
+            corr0 = prox_matrix(self.feature_matrix[self.numerical_features])
         
         # clusterización base: corr clusterizada, clusters y silhouette score
         corr1, clstrs, silh = clusterKMeansBase(
@@ -172,6 +182,9 @@ class ClusteredFeatureImportance(object):
                     )
             # elije el método de feature importance
             methodFunction = featImpMDI_Clustered
+
+            # Diccionario de valores propios del mdI
+            params_dict  = {'featNames' : self.feature_matrix.columns}
                 
         # verificación de congruencia del modelo para el FeatImp | caso: 'MDA'
         if self.method == 'MDA':
@@ -184,6 +197,9 @@ class ClusteredFeatureImportance(object):
                     )
             # elije el método de feature importance
             methodFunction = featImpMDA_Clustered
+
+            #Diccionario de valores propios del mda
+            params_dict = {'n_splits':10}
         
         # computando clusterización base de los features con base a su corr.
         self.__baseClusterization__()
@@ -191,27 +207,18 @@ class ClusteredFeatureImportance(object):
         #Para el feature importances se añaden los features discretos, si hubieren
         if self.additional_features is not None:
             self.clstrs[len(self.clstrs.keys())] = self.additional_features
- 
-        print(" ")
-        print("Clusters:",self.clstrs)
-        print(" ")
 
         # computando feature importance en los clusters 
         featureImportance = methodFunction(
                     self.model, 
                     self.feature_matrix, 
                     labels, 
-                    self.feature_matrix.columns, 
-                    self.clstrs
+                    self.clstrs,
+                    params_dict
                 )
         
         
         # retorna el sorted featImportance por cluster, y los clusters
         return featureImportance, self.clstrs
 
-        
-        
-        
-        
-        
-        
+       

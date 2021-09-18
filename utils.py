@@ -23,6 +23,7 @@ from fracdiff import StationaryFracdiff
 from sklearn.preprocessing import LabelEncoder
 from enigmx.protofeatures import protoFeatures
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mutual_info_score
 from enigmx.purgedkfold_features import featImportances
 
 #general class to personalize ValueError Messages
@@ -2852,7 +2853,8 @@ def baseFeatImportance(**kwargs):
                     'RandomForestClassifier'
                     )
                 )
-            
+
+
     # importance values, score con cpkf, y mean val (NaN)
     imp,oos,oob = featImportances(x_train, 
                                   y_train, 
@@ -2879,6 +2881,102 @@ def baseFeatImportance(**kwargs):
     # retorna featuresRank (0), accuracy CPKF, accuracy con CPKF, y el stacked
     return featureImportanceRank, score_sin_cpkf, oos, imp
     
+
+
+##############################################################################
+################ ENTROPY MATRIX: VARIATION OF INFORMATION ####################
+##############################################################################
+
+######################################################################################
+# La funcion numBins es una funcion intermedia
+# Sirve para determinar el numero optimo de bins para dividir la data 
+######################################################################################
+#-------------------------------------------------------------------------------------
+def numBins(nObs,corr=None):
+    # Determina el numero optimo de intervalos (bins) en los que se divide los datos. 
+    # Necesario cuando se trabaja con V.A continuas. 
+    
+    if corr is None: 
+        # binning optimo para el "marginal entropy" (Hacine-Gharbi et.al 2012)
+        z=(8+324*nObs+12*(36*nObs+729*nObs**2)**.5)**(1/3.)
+        b=round(z/6.+2./(3*z)+1./3)
+    else: 
+        # binning optimo para el "joint entropy" (Hacine-Gharby and Ravier 2018)
+        b=round(2**-.5*(1+(1+24*nObs/(1.-corr**2))**.5)**.5)
+    return int(b)
+#-------------------------------------------------------------------------------------
+####################################################################################################
+# La funcion varInfo es la funcion principal
+# Sirve para calcular la metrica "variation of information VI[X,Y]", 
+# la cual indica el grado de incertidumbre que tengo sobre X si conozco Y
+####################################################################################################
+#---------------------------------------------------------------------------------------------------
+def varInfo(x,y,norm=True):
+    # variation of information
+    
+    ## 1) Determinar el numero optimo de bins
+    bXY=numBins(x.shape[0],corr=np.corrcoef(x,y)[0,1])
+    
+    ## 2) Se calcula el mutual information (denotado como iXY = I[X,Y]) 
+    cXY=np.histogram2d(x,y,bXY)[0]
+    iXY=mutual_info_score(None,None,contingency=cXY)
+    ## 3) se calcula el marginal entropy de X y Y
+    #### PARA MANTENER CONSISTENCIA, SE USA EL MISMO binning
+    hX=stats.entropy(np.histogram(x,bXY)[0]) 
+    hY=stats.entropy(np.histogram(y,bXY)[0]) 
+    ## 4) Se calcula el variation of information (denotado como vXY = VI[X,Y])  
+    vXY=hX+hY-2*iXY # variation of information
+    ## 5) Se normaliza el vXY (denotado \tilde{VI}[X,Y] = VI[X,Y]/H[X,Y])
+    if norm:
+        hXY=hX+hY-iXY # joint entropy
+        vXY/=hXY # normalized variation of information
+        ### opcional 6) como vXY es una metrica, si es 0 => si te dan Y conoces X (info equivalente)
+        ### para que sea comparable con la correlacion, se debería usar 1 - vXY
+        #vXY = 1 - vXY
+    return vXY
+#----------------------------------------------------------------------------------------------------
+
+# La funcion "mutualInfo" es una funcion principal
+# Sirve para calcular el "Mutual information I[X,Y]" (no es una metrica), 
+# la cual indica en que grado se reduce la incertidumbre que tengo sobre X si conozco Y
+#---------------------------------------------------------------------------------------------------
+def mutualInfo(x,y,norm=True):
+    # mutual information
+    bXY=numBins(x.shape[0],corr=np.corrcoef(x,y)[0,1])
+    cXY=np.histogram2d(x,y,bXY)[0]
+    iXY=mutual_info_score(None,None,contingency=cXY)
+    if norm:
+        hX=ss.entropy(np.histogram(x,bXY)[0]) # marginal
+        hY=ss.entropy(np.histogram(y,bXY)[0]) # marginal
+        iXY/=min(hX,hY) # normalized mutual information
+    return iXY
+#--------------------------------------------------------------------------------------------------------
+
+
+# La funcion "prox_matrix" es una funcion que calcula la "Proximity Matrix", insumo del algoritmo ONC
+# Para ello, calcula en forma iterativa \tilde{VI}[X_i,X_j], para todo i != j y completa las posiciones
+# (i,j) y (j,i) en la "Proximity Matrix" de dimension N, donde N es el numero de features.
+def prox_matrix(X):
+    
+    # Por definicion, b = \tilde{VI}[X,X] = 0 => 1-b = 1
+    # Por este motivo, la diagonal de la matrix tiene puros 1
+    NVI = np.identity(X.shape[1])
+
+    I = 1
+    L = X.shape[1]
+
+    for i in range(0,L-1):
+    
+        for j in range(I,L):
+            a = varInfo(X.iloc[:,i],X.iloc[:,j],True)
+            # usamos 1-a para que halla similitud con la matrix de correlacion
+            NVI[i,j], NVI[j,i] = 1-a, 1-a 
+        I+= 1
+
+    NVI = pd.DataFrame(NVI,columns=X.columns,index=X.columns)
+    return NVI
+
+
     
 ##############################################################################
 ############################### CLICK MESSAGES ###############################

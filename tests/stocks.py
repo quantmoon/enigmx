@@ -1,4 +1,4 @@
-stocks = [ 'VTOL',
+stocks = [  'VTOL',
  'PROS', 'HTA', 'CDE', 'BBBY', 'ARDX', 'MYE', 'IAC', 'TJX', 'PBI', 'ADMS', 'FORR', 'BGS', 'B', 'VRM', 'IMXI', 'KMB', 'VFC', 
 'PODD', 'HGEN', 'BRP', 'EHTH', 'CHNG', 'GAU', 'LCII', 'ITI', 'ATVI', 'GNUS', 'NRC', 'MRTN', 'TCX', 'ALSN', 'IVR', 'PFSI', 
 'APAM', 'SBGI', 'MGIC', 'CVM', 'SMTS', 'AJRD', 'TMX', 'IAG', 'ATUS', 'NG', 'BCOR', 'TXG', 'TER', 'FIVN',  'HROW', 'AXU', 
@@ -11,7 +11,8 @@ stocks = [ 'VTOL',
  'BBY', 'SLAB', 'SWKS', 'NVAX', 'OFLX', 'BOOM', 'BNFT', 'GLDD', 'GOLD', 'NMIH', 'SHIP', 'ITRM', 'CPB', 'AEM', 'VPG', 'PRTS', 
 'AMGN', 'TNXP', 'ABT', 'AGI', 'APYX', 'GASS', 'RBA', 'BKR', 'BLD', 'AUY', 'RKT', 'GSAT', 'PVG', 'BOXL', 'OHI', 
 'ONCY', 'ZUMZ', 'VBIV', 'XLRN', 'DIOD', 'SUPN', 'SSRM', 'FSR', 'VERO', 'CVAC', 'PERI', 'KRA', 'LNDC', 'RXT', 'OCX', 
-'CDNS', 'HUN', 'FBC', 'APEI', 'DCO', 'AEZS', 'EEFT', 'FND', 'LPRO', 'EXEL', 'CIEN', 'PAAS', 'SPKE', 'OSG', 'LHCG', 'NUS', 
+'CDNS', 'HUN', 'FBC', 'APEI', 'DCO', 'AEZS', 'EEFT', 
+'FND', 'LPRO', 'EXEL', 'CIEN', 'PAAS', 'SPKE', 'OSG', 'LHCG', 'NUS', 
 'RMR', 'YNDX', 'PLNT',  'GWRS', 'EXTN', 'REYN', 'FIZZ', 'SENS', 'LAUR', 'HCSG', 'VZ', 'SVM', 'SPPI', 'KZR', 'IMTX', 'STMP', 
 'PINC', 'JELD', 'ACCD',  'RIGL', 'DTEA', 'PDCO', 'CHEK', 'HOOK', 'CWT', 'UNF', 'ALX', 'TPHS', 'USWS', 'ENR', 'RETA', 'BLX', 
 'EIX', 'GTE', 'SVRA', 'ACA', 'STSA', 'BIO', 'AHT', 'ACIU', 'WING', 'AEIS', 'AES', 'IBP', 'CNI', 'LE', 'AGFS', 'FLWS', 'MDGL', 
@@ -23,3 +24,7 @@ stocks = [ 'VTOL',
  'KAR', 'KMX', 'REED', 'OSTK', 'EXPO', 'MORN', 'LSPD', 'KALV', 'STRM', 'MSGS', 'KIRK', 'MARA', 'CMPR', 'TRUE', 'RPAY', 'TBIO', 'LZB', 
 'FBIO', 'SMMT', 'CSCW', 'CCF', 'MRK'
 ]
+
+#already = ['MNKD', 'ACCO', 'FOSL', 'DVD', 'KGC', 'WTTR', 'NOVT', 'PTVE', 'CSGS', 'ENSG', 'JWN', 'FDBC', 'VXRT', 'PTC', 'FBRX', 'LEU', 'PETZ', 'REX', 'CERE', 'ALDX', 'MTCH', 'EYE', 'STRL', 'GLOB', 'PARR', 'WIX', 'PAE', 'LESL', 'IIIV', 'GDDY', 'XPER', 'SCPL', 'WMG', 'XELA', 'AG', 'VACQ', 'VNT', 'NKE', 'MSA', 'SELB', 'TYL', 'SGC', 'GOGO', 'HAS', 'EA', 'ECL', 'TR', 'SGOC', 'APTO', 'GLSI', 'SWI', 'CVNA', 'MYOV', 'FMC', 'MPX', 'SYBX', 'VTOL', 'FIVE', 'PROS', 'TCMD', 'HTA', 'OIS', 'CDE', 'MCFT', 'BBBY', 'RLMD', 'ARDX', 'SEAC', 'MYE', 'ORN', 'IAC', 'IFMK', 'TJX', 'ODC', 'PBI', 'ROAD', 'ADMS', 'UI', 'FORR', 'HRL', 'BGS', 'MMI', 'B', 'BBY', 'VRM', 'SLAB', 'IMXI', 'SWKS', 'KMB', 'NVAX', 'VFC', 'OFLX', 'PODD', 'BOOM', 'HGEN', 'BNFT', 'BRP', 'GLDD', 'EHTH', 'GOLD', 'CHNG', 'NMIH', 'GAU', 'SHIP', 'LCII', 'ITRM', 'ITI', 'CPB', 'ATVI', 'AEM', 'GNUS', 'VPG', 'NRC', 'PRTS', 'MRTN', 'AMGN', 'TCX', 'TNXP', 'ALSN', 'ABT', 'IVR', 'AGI', 'PFSI', 'APYX', 'APAM', 'GASS', 'SBGI', 'RBA', 'MGIC', 'BKR', 'CVM', 'BLD', 'SMTS', 'AUY', 'AJRD', 'RKT', 'TMX', 'GSAT', 'IAG', 'PVG', 'ATUS', 'BOXL', 'NG', 'OHI', 'BCOR', 'ONCY', 'TXG', 'ZUMZ', 'TER', 'VBIV', 'FIVN', 'XLRN', 'HROW', 'DIOD', 'AXU', 'SUPN', 'ICE', 'SSRM', 'INFN', 'FSR', 'AMPE', 'VERO', 'PRO', 'CVAC', 'FTI', 'PERI', 'ZNGA', 'KRA', 'COLL', 'LNDC', 'AVGO', 'RXT', 'PRG', 'OCX', 'DRQ', 'CDNS', 'CMG', 'HUN', 'ENZ', 'FBC', 'RACE', 'APEI', 'BRMK', 'DCO', 'LIVX', 'AEZS', 'MCHP', 'EEFT', 'HLIT', 'RNA', 'FND', 'KDNY', 'LPRO', 'KVHI', 'EXEL', 'BB', 'CIEN', 'NVGS', 'PAAS', 'SQ', 'SPKE', 'CRIS', 'OSG', 'STFC', 'LHCG', 'EHC', 'NUS', 'CIDM', 'RMR', 'CIR', 'YNDX', 'ALC', 'PLNT']
+
+#stocks = [x for x in stocks if x not in already]

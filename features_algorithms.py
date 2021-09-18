@@ -220,19 +220,19 @@ class FeatureImportance(object):
         numerical_feat = [x for x in xMatrixDf.columns if x not in discrete_feat]
 
         # Procesos en R, primero conversión de formato
-        df = convert_pandas_to_df(xMatrixDf[numerical_feat])
+#        df = convert_pandas_to_df(xMatrixDf[numerical_feat])
 
         # Prueba de estacionariedad
-        features = adf_test(df)
+#        features = adf_test(df)
 
-        print("WARNING! >>>>> Features to transform as stationary: ", 
-              len(features), "/", len(numerical_feat))
+#        print("WARNING! >>>>> Features to transform as stationary: ", 
+#              len(features), "/", len(numerical_feat))
 
         # Estacionarización:
-        for feature in features:
-            print('            Stationarization over:', feature)
-            newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
-            xMatrixDf[feature] = newTemporalFeatArray
+#        for feature in features:
+#            print('            Stationarization over:', feature)
+#            newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
+#            xMatrixDf[feature] = newTemporalFeatArray
 
         # Estandarización de la matriz                 
         dfStandarized = xMatrixDf.sub(
@@ -247,9 +247,9 @@ class FeatureImportance(object):
         dfStandarized,variables, corrMatrix = remove_corr_variables(dfStandarized,numerical_feat,discrete_feat)
 
         # Sí se quiere guardar el csv con todos los features, descomentar esta fila
-        dfStandarized.to_csv('/var/data/csvs/final_sin_correlacion.csv')
-        print(dfStandarized.columns)
-        corrMatrix.to_csv('/var/data/csvs/matriz_corr_completa.csv')
+#        dfStandarized.to_csv('/var/data/csvs/final_sin_correlacion.csv')
+#        print(dfStandarized.columns)
+#        corrMatrix.to_csv('/var/data/csvs/matriz_corr_completa.csv')
 
         nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
         
@@ -364,6 +364,7 @@ class StationaryStacked():
                  window = 10,
                  rolling = True,
                  win_type = 'gaussian',
+                 depured = True,
                  add_parameter = 5, 
                  col_weight_type = 'weightTime',
                  col_t1_type  = 'horizon',
@@ -372,7 +373,7 @@ class StationaryStacked():
         self.SQLFRAME = SQLFRAME
         self.dbconn = dbconn
         self.cursor = cursor
-
+        self.depured = depured
         self.rolling = rolling
         self.list_stocks = list_stocks
         self.database_name = database
@@ -453,6 +454,7 @@ class StationaryStacked():
         self.scalerObj.fit(elementsToScale)
         
         # transformamos los features del stacked a valores escalados
+
         elementsScaled = self.scalerObj.transform(elementsToScale)
                 
         # redefinimos los valores de los features con sus valores escalados
@@ -499,17 +501,17 @@ class StationaryStacked():
         # Procesos en R, primero conversión de formato
         df = convert_pandas_to_df(xMatrixDf[numerical_feat])
 
-        # Prueba de estacionariedad
-        features = adf_test(df)
+#        # Prueba de estacionariedad
+#        features = adf_test(df)
+#
+#        print("WARNING! >>>>> Features to transform as stationary: ", 
+#              len(features), "/", len(numerical_feat))
 
-        print("WARNING! >>>>> Features to transform as stationary: ", 
-              len(features), "/", len(numerical_feat))
-
-        # Estacionarización:
-        for feature in features:
-            print('            Stationarization over:', feature)
-            newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
-            xMatrixDf[feature] = newTemporalFeatArray
+#        # Estacionarización:
+ #       for feature in features:
+  #          print('            Stationarization over:', feature)
+   #         newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
+    #        xMatrixDf[feature] = newTemporalFeatArray
 
         # Estandarización de la matriz                 
         dfStandarized = xMatrixDf.sub(
@@ -518,22 +520,21 @@ class StationaryStacked():
 
 
         # Sí se quiere guardar el csv con todos los features, descomentar esta fila 
-        dfStandarized.to_csv('/var/data/csvs/final.csv') 
+#        dfStandarized.to_csv('/var/data/csvs/final.csv') 
 
         # Eliminamos las variables excesivamente correlacionadas
         dfStandarized,variables, corrMatrix = remove_corr_variables(dfStandarized,numerical_feat,discrete_feat)
 
         # Sí se quiere guardar el csv con todos los features, descomentar esta fila
-        dfStandarized.to_csv('/var/data/csvs/final_sin_correlacion.csv')
-        print(dfStandarized.columns)
-        corrMatrix.to_csv('/var/data/csvs/matriz_corr_completa.csv')
+#        dfStandarized.to_csv('/var/data/csvs/final_sin_correlacion.csv')
+#        corrMatrix.to_csv('/var/data/csvs/matriz_corr_completa.csv')
 
         nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
         
         print('        >>> Saving Scaler Object... at ', pathOut)
-        pickle.dump(self.scalerObj, open('{}/scaler_{}.pkl'.format(pathOut, nowTimeID),'wb')) 
+#        pickle.dump(self.scalerObj, open('{}/scaler_{}.pkl'.format(pathOut, nowTimeID),'wb')) 
         
         # elementos utiles del feat improtance (3) + el base matrix org (feat roleados + datos add.)
-        return dfStandarized, yVectorArray 
+        return dfStandarized, yVectorArray, df_global_stacked
 
 

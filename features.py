@@ -391,7 +391,7 @@ class FeaturesClass():
         # 2) Computa media móviles as signals según "NAME_PERIOD_SIGNAL", e.g. "EMA_30_SIGNAL"
         #                       DEPRECATED!!!
         listDictsMA = movingAveragesSignals(
-            time_frames = [10, 130], # idealmente, trabjar con: [10, 100, 200]
+            time_frames = [10], # idealmente, trabjar con: [10, 100, 200]
             close_price_series = self.c
             )
         
@@ -849,7 +849,7 @@ class FeaturesClass():
     
     # alpha features
     def alphas(self):
-        
+
         # get a dataframe 
         return MainGetAlphasFunction(
                 o = self.o, 
