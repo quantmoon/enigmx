@@ -2,7 +2,7 @@
 author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
-
+import talib
 import sys
 import os
 import zarr
@@ -1065,6 +1065,18 @@ def reformedVolatility(prices, window = 1, span=100):
     returns = lastDailyPrices/firstDailyPrices - 1
     volatility = returns.dropna().ewm(span=span).std().fillna(0)
     
+    #Generación de una sma de volatilidad
+    sma100 = talib.SMA(volatility, span)
+
+    #Si la media móvil tiene un valor más de 3 veces más alto que el valor anterior
+    # se capea a solo 3 veces el valor anterior
+    for idx,i in enumerate(sma100):
+        if idx == 0:
+            pass
+        else:
+            if i > 3*sma100[idx-1]:
+                volatility[idx+1] = 3*volatility[idx]
+
     return volatility
     
 
@@ -2306,9 +2318,7 @@ def ErrorIndexIdxFirstTrue(param):
 
 @njit
 def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upper_bound,lower_bound):
-    
-    print("Veamos Inner barrier_inside_computation")    
-    
+        
     
     selected_indexes  = np.where((ts_timeframe>init_ts)&(ts_timeframe<last_ts))
     segmented_prices = prices_timeframe[selected_indexes[0]]
@@ -2354,8 +2364,6 @@ def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upp
                 print("       ::::::: >> Warning! Timestamp selected is negative!! \
                       Upper barrier Case | Check array: ")
                 print(segmented_timestamps[first_upper_barrier_idx:,0])
-            print(" ")
-            print("***"*10)
             
             return segmented_prices[first_upper_barrier_idx:,0][0], 1 , segmented_timestamps[first_upper_barrier_idx:,0][0] 
 
