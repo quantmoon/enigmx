@@ -48,7 +48,7 @@ enigmxsql.create_table_database(
     bars_sampled = False, 
     bars_barrier = False,
     bars_weights = False,
-    bars_features = False,
+    bars_features = True,
     creation_database = True)
 
 print("subiendo info")
@@ -59,8 +59,8 @@ enigmxsql.compute_info_to_sql(
             entropy_construction_process = False, 
             etftrick_construction_process = False, 
             sampling_features_process = False, 
-            triple_barrier_computation_process = True, 
-            sample_weight_computation_process = True,
+            triple_barrier_computation_process = False, 
+            sample_weight_computation_process = False,
             features_bar_computation_process = True,
             features_stacking = True,
             #tunning_interval = "10D",

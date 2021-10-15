@@ -2862,8 +2862,7 @@ def baseFeatImportance(**kwargs):
                     )
                 )
 
-
-    # importance values, score con cpkf, y mean val (NaN)
+   # importance values, score con cpkf, y mean val (NaN)
     imp,oos,oob = featImportances(x_train, 
                                   y_train, 
                                   kwargs['model_selected'],

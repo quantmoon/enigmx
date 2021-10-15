@@ -690,6 +690,9 @@ class SQLEnigmXinterface(object):
                self.pathzarr
         )
 
+        print(featStandarizedMatrix.head())
+        print(labelsDataframe.head())
+
         #llena las tablas únicas "STACKED" y "LABELS" con la matriz stackeada en la 
         #base de datos self.database_features.
         featStandarizedMatrix.to_sql("STACKED", engine, index = True, index_label = 'close_date')

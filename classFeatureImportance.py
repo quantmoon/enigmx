@@ -291,7 +291,7 @@ class featureImportance(object):
         
         print("----------Process {} started---------- \n".format(self.method))
 
-
+        print(self.driver,self.uid,self.pwd,self.server_name,self.database)
         SQLFRAME, dbconn, cursor = databundle_instance(
                     driver = self.driver, uid = self.uid, pwd = self.pwd,
                     #nombre del servidor SQL Local
@@ -325,6 +325,9 @@ class featureImportance(object):
         featStandarizedMatrix.drop('close_date',axis = 1,inplace = True)
         labelsDataframe.index = labelsDataframe['close_date']
         labelsDataframe.drop('close_date',axis = 1,inplace = True)
+
+        print(featStandarizedMatrix)
+        print(labelsDataframe)
 
         # si se utiliza el clustering featImp 
         if self.clustered_features: 

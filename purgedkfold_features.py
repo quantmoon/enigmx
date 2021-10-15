@@ -11,6 +11,7 @@ import sys
 from sklearn.metrics import log_loss,accuracy_score
 from sklearn.model_selection._split import _BaseKFold
 from sklearn.model_selection._split import KFold
+
 #Feature Importance MDI base function
 def featImpMDI(model,featNames):
     """
@@ -92,9 +93,9 @@ def cvScore(clf,X,y,sample_weight=None,scoring='neg_log_loss',
         #Purging Process
         cvGen=PurgedKFold(n_splits=cv,t1=t1,pctEmbargo=pctEmbargo) 
     score=[]
-    
-    for train,test in cvGen.split(X=X):
 
+    for train,test in cvGen.split(X=X):
+       
         fit=clf.fit(X.iloc[idx[train],:],y.iloc[idx[train]],
                     sample_weight=sample_weight.iloc[idx[train]].values)
         if scoring=='neg_log_loss':
@@ -162,6 +163,7 @@ def featImportances(trnsX,cont,model,nSample,n_estimators=1000,cv=10,
     
     #Feature Importance calculation based on MDI & MDA process
     t1 = time()   
+    
     fit=model.fit(X=trnsX,y=cont['labels'],sample_weight=sample_weight)
 
     if oob == True:

@@ -5,6 +5,7 @@ webpage: https://www.quantmoon.tech//
 
 import numpy as np
 import pandas as pd
+from time import time
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_samples
 from enigmx.utils import prox_matrix
@@ -92,7 +93,10 @@ def featImpMDA_Clustered(clf,X,y,clstrs,params_dict):
     for i,(train,test) in enumerate(cvGen.split(X=X)):
         X0,y0=X.iloc[train,:],y.iloc[train]
         X1,y1=X.iloc[test,:],y.iloc[test]
+        t = time()
+        print('MDA clusterizado')
         fit=clf.fit(X=X0,y=y0)
+        print(time()- t)
         prob=fit.predict_proba(X1)
         scr0.loc[i]=-log_loss(y1,prob,labels=clf.classes_)
         for j in scr1.columns:

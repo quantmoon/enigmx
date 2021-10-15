@@ -219,7 +219,7 @@ class FeatureImportance(object):
         discrete_feat = [x for x in xMatrixDf.columns if x.split('_')[-1] == 'integer']
         numerical_feat = [x for x in xMatrixDf.columns if x not in discrete_feat]
 
-        # Procesos en R, primero conversión de formato
+#        # Procesos en R, primero conversión de formato
 #        df = convert_pandas_to_df(xMatrixDf[numerical_feat])
 
         # Prueba de estacionariedad
@@ -315,6 +315,8 @@ class FeatureImportance(object):
                         'RandomForestClassifier'
                         )
                     )
+
+
         # importance values, score con cpkf, y mean val (NaN)
         imp,oos,oob = featImportances(x_train, 
                                       y_train, 
@@ -502,16 +504,16 @@ class StationaryStacked():
         df = convert_pandas_to_df(xMatrixDf[numerical_feat])
 
 #        # Prueba de estacionariedad
-#        features = adf_test(df)
+        features = adf_test(df)
 #
-#        print("WARNING! >>>>> Features to transform as stationary: ", 
-#              len(features), "/", len(numerical_feat))
+        print("WARNING! >>>>> Features to transform as stationary: ", 
+              len(features), "/", len(numerical_feat))
 
-#        # Estacionarización:
- #       for feature in features:
-  #          print('            Stationarization over:', feature)
-   #         newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
-    #        xMatrixDf[feature] = newTemporalFeatArray
+        # Estacionarización:
+        for feature in features:
+            print('            Stationarization over:', feature)
+            newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
+            xMatrixDf[feature] = newTemporalFeatArray
 
         # Estandarización de la matriz                 
         dfStandarized = xMatrixDf.sub(
