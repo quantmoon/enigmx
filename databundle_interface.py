@@ -689,19 +689,21 @@ class SQLEnigmXinterface(object):
 
         instance = StationaryStacked(SQLFRAME,dbconn,cursor, self.list_stocks)
 
-        featStandarizedMatrix, featStandarizedMatrixStationary, labelsDataframe,original_stacked  =  \
+        featStandarizedMatricesList, featStandarizedStationaryMatricesList, labelsDataframe,original_stacked  =  \
             instance.__checkingStationary__( 
                self.pathzarr
         )
 
-        print(featStandarizedMatrix.head())
-        print(featStandarizedMatrixStationary.head())
-        print(labelsDataframe.head())
+        #Guardado de todas las matrices no estacionarias, a diferentes puntos de corte:
+        for matrix,cutpoint in zip(featStandarizedMatricesList,cutpoints):
+            matrix.to_sql(f"STACKED_{cutpoint}", engine, index = True, index_label = 'close_date')
 
-        #llena las tablas únicas "STACKED","STACKED_STATIONARY" y "LABELS" con la matriz stackeada en la 
-        #base de datos self.database_features.
-        featStandarizedMatrix.to_sql("STACKED", engine, index = True, index_label = 'close_date')
-        featStandarizedMatrixStationary.to_sql("STACKED_STATIONARY", engine, index = True, index_label = 'close_date')
+        #Guardado de todas las matrices no estacionarias, a diferentes puntos de corte:
+        for matrix,cutpoint in zip(featStandarizedStationaryMatricesList,cutpoints):
+            matrix.to_sql(f"STACKED_STATIONARY_{cutpoint}", engine, index = True, index_label = 'close_date')
+
+
+        #llena la tabla única "LABELS"
         labelsDataframe.to_sql("LABELS", engine, index = True, index_label = 'close_date')
 
         print("<<<::::: FEATURES STACKING  SQL PROCESS FINISHED :::::>>>")

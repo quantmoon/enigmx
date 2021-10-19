@@ -485,7 +485,7 @@ class StationaryStacked():
         #retorna dataframe de features y dataframe de etiquetas
         return x, y, df_global_stacked
     
-    def __checkingStationary__(self, pathOut, pval_adf = '5%'):
+    def __checkingStationary__(self, pathOut, pval_adf = '5%', cutpoints = [0.5,0.8]):
         
         # extrae matriz de features, vector de labels del split stacked, y el global stacked
         df_base_matrix, yVectorArray, df_global_stacked = self.__organizationDataProcess__()
@@ -503,9 +503,9 @@ class StationaryStacked():
         # Procesos en R, primero conversión de formato
         df = convert_pandas_to_df(xMatrixDf[numerical_feat])
 
-#        # Prueba de estacionariedad
+        # Prueba de estacionariedad
         features = adf_test(df)
-#
+
         print("WARNING! >>>>> Features to transform as stationary: ", 
               len(features), "/", len(numerical_feat))
 
@@ -524,24 +524,28 @@ class StationaryStacked():
             df_base_matrix.mean(), axis=1
             ).div(df_base_matrix.std(),axis=1)
 
-        # Sí se quiere guardar el csv con todos los features, descomentar esta fila 
-#        dfStandarized.to_csv('/var/data/csvs/final.csv') 
 
-        # Eliminamos las variables excesivamente correlacionadas para las matrices no estacionarizadas y la estacionarizada
-        dfStandarized,variables, corrMatrix = remove_corr_variables(dfStandarized,numerical_feat,discrete_feat)
+        #Creamos las listas de matrices estacionarias y no estacionarias a distintos puntos de corte:
+        stationaryMatrices = []
+        notStationaryMatrices = []
 
-        dfStandarizedStationary ,variablesEstacionarias, corrMatrixStationary = remove_corr_variables(dfStandarizedStationary,numerical_feat,discrete_feat)
+        #Iteración por punto de corte:
+        for i in cutpoints:
 
-        # Sí se quiere guardar el csv con todos los features, descomentar esta fila
-#        dfStandarized.to_csv('/var/data/csvs/final_sin_correlacion.csv')
-#        corrMatrix.to_csv('/var/data/csvs/matriz_corr_completa.csv')
+            # Eliminamos las variables excesivamente correlacionadas para las matrices no estacionarizadas y la estacionarizada
+            dfStandarized,variables, corrMatrix = remove_corr_variables(dfStandarized,numerical_feat,discrete_feat,i)
+            dfStandarizedStationary ,variablesEstacionarias, corrMatrixStationary = remove_corr_variables(dfStandarizedStationary,numerical_feat,discrete_feat,i)
+       
+            #Añadimos las matrices que luego se van a guardar, a las listas:
+            stationaryMatrices.append(dfStandarized)
+            notStationaryMatrices.append(dfStandarizedStationary)
 
+        #Generación de pkl de escalado 
         nowTimeID = str(datetime.datetime.now().time())[:8].replace(':','')
-        
         print('        >>> Saving Scaler Object... at ', pathOut)
 #        pickle.dump(self.scalerObj, open('{}/scaler_{}.pkl'.format(pathOut, nowTimeID),'wb')) 
         
         # elementos utiles del feat improtance (3) + el base matrix org (feat roleados + datos add.)
-        return dfStandarized,dfStandarizedStationary, yVectorArray, df_global_stacked
+        return stationaryMatrices, notStationaryMatrices, yVectorArray, df_global_stacked
 
 

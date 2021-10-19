@@ -693,16 +693,7 @@ class featureImportance(object):
         print("Columnas del stacked")
         print(stacked.columns)
 
-
-        #En este punto el proceso se queda en standby, esperando la lista de features seleccionados:
-        list_features_tested = input("Por favor ingresa la lista de features, sin corchetes y separada por comas, luego presiona enter: ")
-
-        #Se les da el formato necesario para que los features puedan entrar en una lista y se admitan
-        #como columnas del DataFrame
-        list_features_tested = list_features_tested.split(",")
-        list_features_tested = [x.strip() for x in list_features_tested]
- 
-        print("Gracias, ahora voy a guardar los csv's del stacked con los features elegidos", flush = True)
+        print("FIN DEL FEATURE IMPORTANCE", flush = True)
 
         # si se activa el proceso de filtrado
         if filtering:
