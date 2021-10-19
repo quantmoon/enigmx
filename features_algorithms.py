@@ -515,17 +515,22 @@ class StationaryStacked():
             newTemporalFeatArray = simpleFracdiff(xMatrixDf[feature])
             xMatrixDf[feature] = newTemporalFeatArray
 
-        # Estandarización de la matriz                 
-        dfStandarized = xMatrixDf.sub(
+        # Estandarización de las matrices estacionarizadas y no estacionarizadas
+        dfStandarizedStationary = xMatrixDf.sub(
             xMatrixDf.mean(), axis=1
             ).div(xMatrixDf.std(),axis=1)
 
+        dfStandarized = df_base_matrix.sub(
+            df_base_matrix.mean(), axis=1
+            ).div(df_base_matrix.std(),axis=1)
 
         # Sí se quiere guardar el csv con todos los features, descomentar esta fila 
 #        dfStandarized.to_csv('/var/data/csvs/final.csv') 
 
-        # Eliminamos las variables excesivamente correlacionadas
+        # Eliminamos las variables excesivamente correlacionadas para las matrices no estacionarizadas y la estacionarizada
         dfStandarized,variables, corrMatrix = remove_corr_variables(dfStandarized,numerical_feat,discrete_feat)
+
+        dfStandarizedStationary ,variablesEstacionarias, corrMatrixStationary = remove_corr_variables(dfStandarizedStationary,numerical_feat,discrete_feat)
 
         # Sí se quiere guardar el csv con todos los features, descomentar esta fila
 #        dfStandarized.to_csv('/var/data/csvs/final_sin_correlacion.csv')
@@ -537,6 +542,6 @@ class StationaryStacked():
 #        pickle.dump(self.scalerObj, open('{}/scaler_{}.pkl'.format(pathOut, nowTimeID),'wb')) 
         
         # elementos utiles del feat improtance (3) + el base matrix org (feat roleados + datos add.)
-        return dfStandarized, yVectorArray, df_global_stacked
+        return dfStandarized,dfStandarizedStationary, yVectorArray, df_global_stacked
 
 

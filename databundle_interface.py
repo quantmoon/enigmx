@@ -19,6 +19,7 @@ from enigmx.save_info import generate_datasets
 from enigmx.triplebarrier import new_triple_barrier_computation
 from enigmx.tests.telegram import send_message
 from enigmx.features_algorithms import StationaryStacked
+from enigmx.additional_metrics import bidAskSpread
 
 from enigmx.utils import (
     sel_days, 
@@ -642,6 +643,9 @@ class SQLEnigmXinterface(object):
                     stock
                     )
                 )                  
+
+            #computando bid/ask spread
+            dataframe = bidAskSpread(dataframe)
             
             #actualiza el dataframe final añandiéndole los features computados
             fullDataframe = FeaturesClass(dataframe).features()
@@ -673,7 +677,7 @@ class SQLEnigmXinterface(object):
         print("----> Warning! In case 'InterfaceError': please change 'temporalDriver' index selection in line 620 databundle_interface.py.\n")
 
         #construimos la sentencia de conexión a través de SQL ALchemy
-        mainSQLAlchemySentence = f'DRIVER={temporalDriver};SERVER={self.server_name};DATABASE={self.database_features};UID={self.uid[0]};PWD={self.pwd[0]}'
+        mainSQLAlchemySentence = f'DRIVER={temporalDriver};SERVER={self.server_name};DATABASE=BARS_STACKED;UID={self.uid[0]};PWD={self.pwd[0]}'
 
         #generamos SQL-AL engine para inserción de nuevas tablas
         params = urllib.parse.quote_plus(mainSQLAlchemySentence)
@@ -683,22 +687,22 @@ class SQLEnigmXinterface(object):
             "mssql+pyodbc:///?odbc_connect={}".format(params)
             )
 
-
         instance = StationaryStacked(SQLFRAME,dbconn,cursor, self.list_stocks)
-        featStandarizedMatrix, labelsDataframe,original_stacked  =  \
+
+        featStandarizedMatrix, featStandarizedMatrixStationary, labelsDataframe,original_stacked  =  \
             instance.__checkingStationary__( 
                self.pathzarr
         )
 
         print(featStandarizedMatrix.head())
+        print(featStandarizedMatrixStationary.head())
         print(labelsDataframe.head())
 
-        #llena las tablas únicas "STACKED" y "LABELS" con la matriz stackeada en la 
+        #llena las tablas únicas "STACKED","STACKED_STATIONARY" y "LABELS" con la matriz stackeada en la 
         #base de datos self.database_features.
         featStandarizedMatrix.to_sql("STACKED", engine, index = True, index_label = 'close_date')
+        featStandarizedMatrixStationary.to_sql("STACKED_STATIONARY", engine, index = True, index_label = 'close_date')
         labelsDataframe.to_sql("LABELS", engine, index = True, index_label = 'close_date')
-
-
 
         print("<<<::::: FEATURES STACKING  SQL PROCESS FINISHED :::::>>>")
 
@@ -707,7 +711,7 @@ class SQLEnigmXinterface(object):
             
     def create_table_database(self, bars_tunning, bars_basic,
                               bars_entropy, etfs_trick, bars_sampled, 
-                              bars_barrier, bars_weights, bars_features, 
+                              bars_barrier, bars_weights, bars_features, bars_stacked,
                               creation_database = True,):
         
         
@@ -1007,7 +1011,29 @@ class SQLEnigmXinterface(object):
             dbconn.commit()
             dbconn.close()     
             
-        return "SQL updating process finished." 
+        #El proceso de stackeo crea una base de datos adicional, las tablas son creadas en
+	#el proceso mismo de stackeo.
+        if bars_stacked:
+
+            #nombre de la base de datos
+            bartype_database = 'BARS_STACKED'
+
+            SQLFRAME, dbconn, cursor = databundle_instance(
+                    driver = self.driver, uid = self.uid, pwd = self.pwd,
+                    #nombre del servidor SQL Local
+                    server = self.server_name,
+                    #nombre que se le asignará a la base de datos matriz
+                    bartype_database = bartype_database,
+                    #boleano para crear la tabla: si la tabla está creada, debe ser False
+                    create_database = creation_database,
+                    #nombre global para cada tabla | "GLOBAL" x defecto
+                    global_range = self.global_range,
+                    #referential SQL Database name just for initialization
+                    referential_base_database = self.referential_base_database
+                    )
+
+        return "SQL updating process finished."
+
 
     def compute_info_to_sql(self, 
                             bars_tunning_process, 

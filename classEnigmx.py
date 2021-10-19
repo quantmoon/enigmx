@@ -77,9 +77,8 @@ class EnigmX:
                 - "endogenous_pickle_file_name": "endogenous_model.pkl"            
             
             - KCombinatorialBacktestParams (diccionario de Combinatorial Backtest)
-                - "data_file_name": "STACKED_BACKTEST_{}_{}.csv".format(
-                    self.bartype.upper(),
-                    self.method.upper(),
+                - "data_file_name": "STACKED_BACKTEST_{}.csv".format(
+                    self.bartype.upper()
                     ),
                 ############# Constant Combinatorial Backtest Params #############
                 - "features_sufix": self.features_sufix,
@@ -129,7 +128,8 @@ class EnigmX:
                  features_sufix = "feature", 
                  label_name = "barrierLabel",
                  time_label_name = "horizon",
-                 time_label_index_name = "close_date"):
+                 time_label_index_name = "close_date",
+                 stationary_stacked = True):
         
         # definimos parámetros generales para los 3 procesos
         self.bartype = bartype
@@ -140,6 +140,7 @@ class EnigmX:
         self.time_label_name = time_label_name
         self.time_label_index_name = time_label_index_name 
         self.cloud_framework = cloud_framework
+        self.stationary_stacked = stationary_stacked
         
         # diccionario con los parámetros generales del Feature Importance
         KfeatureImportanceParams = {
@@ -200,9 +201,8 @@ class EnigmX:
         
         # diccionario con los parámetros generales del Combinatorial Backtest
         KCombinatorialBacktestParams = {
-            "data_file_name": "STACKED_BACKTEST_{}_{}.csv".format(
+            "data_file_name": "STACKED_BACKTEST_{}.csv".format(
             self.bartype.upper(),
-            self.method.upper(),
             ),
             ############# Constant Combinatorial Backtest Params #############
             "features_sufix": self.features_sufix,
@@ -268,7 +268,8 @@ class EnigmX:
             pca_min_var_expected = self.pca_min_var_expected,
             k_min = self.k_min,
             n_samples = self.n_samples,
-            trial = trial
+            trial = trial,
+            stationary_stacked = self.stationary_stacked
             # clustered_features = True,
             # residuals = True,
             # silh_thres = 0.65

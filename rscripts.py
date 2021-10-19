@@ -47,7 +47,7 @@ def adf_test(datos):
         }
       }
      time <- proc.time() - t
-     cat("Tiempo total para toda la estacionarización del feature ",time[3], "\n")
+     cat("Tiempo total para toda la estacionarización del feature ",time[3]," ",i, "\n")
      }
     df <- data.frame(feature = feature, pval = pval)
     return (df)
@@ -148,7 +148,7 @@ def regression_intercluster(matrix,features_to_transform,clusters, path = 'D:/da
 def remove_corr_variables(df,
                           numerical_variables, 
                           discrete_variables,
-                          thres = 0.8):
+                          thres = 0.5):
    
 
  

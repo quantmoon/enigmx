@@ -15,7 +15,7 @@ from enigmx.tests.stocks import stocks
 server_name = "34.134.4.239" 
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
-#list_stocks = ['VTOL', 'ZNGA'] #stocks
+#list_stocks = ['VTOL', 'ZNGA', 'PROS'] #stocks
 list_stocks = stocks
 start_date = "2020-12-01" 
 end_date = "2021-07-21" 
@@ -48,7 +48,8 @@ enigmxsql.create_table_database(
     bars_sampled = False, 
     bars_barrier = False,
     bars_weights = False,
-    bars_features = True,
+    bars_features = False,
+    bars_stacked = True,
     creation_database = True)
 
 print("subiendo info")

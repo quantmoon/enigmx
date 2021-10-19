@@ -47,7 +47,6 @@ class ModelConstruction(object):
             - 'feature_sufix' (str): sufijo identificador de los features.
             - 'label_name' (str): nombre identificador del label/etiqueta.
             - 'feat_bartype' (str): nombre de barra usada (lectura de CSV).
-            - 'feat_method' (str): proceso de Feature Importance usado ('MDA' o 'MDI')
             - 'timeIndexName' (str): nombre de la columna temporal a usarse como index.
             - 'datetimeAsIndex' (bool): inicialización de datetime como índice.
             
@@ -90,7 +89,6 @@ class ModelConstruction(object):
                  feature_sufix = "feature",                 
                  label_name = "barrierLabel",
                  feat_bartype = "VOLUME", 
-                 feat_method = "MDA",
                  timeIndexName = "close_date",
                  datetimeAsIndex = True,
                  exo_openning_method_as_h5 = False,

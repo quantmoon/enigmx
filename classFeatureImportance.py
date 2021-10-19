@@ -213,7 +213,8 @@ class featureImportance(object):
                  n_best_features = 7, #add out
                  global_featImp = True, #add out
                  referential_database = 'TSQL',
-                 simple_correlation = False
+                 simple_correlation = False,
+                 stationary_stacked = True
                  ):
         
         # ingesta de parámetros
@@ -261,6 +262,7 @@ class featureImportance(object):
         self.n_best_features = n_best_features
         self.global_featImp = global_featImp 
         self.simple_correlation = simple_correlation
+        self.stationary_stacked = stationary_stacked
         
         self.referential_base_database = referential_database
         self.ErrorKendallMessage = 'Any valid kendall value exists in the set of trials'
@@ -291,13 +293,12 @@ class featureImportance(object):
         
         print("----------Process {} started---------- \n".format(self.method))
 
-        print(self.driver,self.uid,self.pwd,self.server_name,self.database)
         SQLFRAME, dbconn, cursor = databundle_instance(
                     driver = self.driver, uid = self.uid, pwd = self.pwd,
                     #nombre del servidor SQL Local
                     server = self.server_name,
                     #nombre que se le asignará a la base de datos matriz
-                    bartype_database = self.database,
+                    bartype_database = "BARS_STACKED",
                     #boleano para crear la tabla: si la tabla está creada, debe >
                     create_database = False,
                     #nombre global para cada tabla | "GLOBAL" x defecto
@@ -306,16 +307,21 @@ class featureImportance(object):
                     referential_base_database = self.referential_base_database
                     )
 
+        if self.stationary_stacked:
+            matriz = "STACKED_STATIONARY"
+        else:
+            matriz = "STACKED"
+
         # extrae matriz de features estacionaria-estandarizada de la base de datos, así como serie de labels
         featStandarizedMatrix = SQLFRAME.read_table_info(
-             statement = f"SELECT * FROM [{self.database}].[dbo].STACKED",
+             statement = f"SELECT * FROM [BARS_STACKED].[dbo].{matriz}",
             dbconn_= dbconn,
             cursor_= cursor,
             dataframe=True
             )
 
         labelsDataframe = SQLFRAME.read_table_info(
-            statement = f"SELECT * FROM [{self.database}].[dbo].LABELS",
+            statement = f"SELECT * FROM [BARS_STACKED].[dbo].LABELS",
             dbconn_= dbconn,
             cursor_= cursor,
             dataframe=True
@@ -683,9 +689,18 @@ class featureImportance(object):
         # df stackeado de feats (rolleado = escalado) + la comb. elegida de features
         stacked = self.__instanceOverture__()
         
+        #Para tener como referencia, se imprimen todas las columnas del stacked, para que los features seleccionados no tengan que ser digitados manualmente
+        print("Columnas del stacked")
+        print(stacked.columns)
+
+
         #En este punto el proceso se queda en standby, esperando la lista de features seleccionados:
         list_features_tested = input("Por favor ingresa la lista de features, sin corchetes y separada por comas, luego presiona enter: ")
+
+        #Se les da el formato necesario para que los features puedan entrar en una lista y se admitan
+        #como columnas del DataFrame
         list_features_tested = list_features_tested.split(",")
+        list_features_tested = [x.strip() for x in list_features_tested]
  
         print("Gracias, ahora voy a guardar los csv's del stacked con los features elegidos", flush = True)
 
@@ -693,14 +708,14 @@ class featureImportance(object):
         if filtering:
             
             # stacked roleado y escalado proveniente del 'features_algorithms.py'
-            stacked = stacked.reset_index(drop=True)
+#            stacked = stacked.reset_index(drop=True) #REVISAR -> Al descomentar esta columna ya no funciona porque los indices se vuelven indices y no fechas
 
             # extraemos las columnas que no están en la lista global de features
             stackedDiff = stacked[
                 stacked.columns.difference(
                     list_features_tested
                     ).values
-                ]                     
+                ]           
 
             # elimina los features marginales no utiles dejando la info general principal
             stackedNoFeatures = stackedDiff[stackedDiff.columns.drop(
@@ -709,7 +724,8 @@ class featureImportance(object):
 
             # stacked df filtrado por features seleccionados con col. no-features
             stacked = pd.concat([stackedNoFeatures, stacked[list_features_tested]],axis=1) 
-            
+
+
             # conversión a dtypes de las fechas de las columnas
             colDates = stacked.dtypes.where(
                         stacked.dtypes == "datetime64[ns]"
@@ -747,27 +763,27 @@ class featureImportance(object):
                     # si no esta activado para cloud, asigna path local primero
                     if not self.cloud_framework:
                         
-                        exo_path = "{}STACKED_EXO_{}_{}.csv".format(
-                                      self.pictures_pathout,self.bartype, self.method
+                        exo_path = "{}STACKED_EXO_{}.csv".format(
+                                      self.pictures_pathout,self.bartype
                                       )                        
-                        endo_path = "{}STACKED_ENDO_{}_{}.csv".format(
-                                      self.pictures_pathout, self.bartype, self.method
+                        endo_path = "{}STACKED_ENDO_{}.csv".format(
+                                      self.pictures_pathout, self.bartype
                                       )
-                        backtest_path = "{}STACKED_BACKTEST_{}_{}.csv".format(
-                                      self.pictures_pathout, self.bartype, self.method
+                        backtest_path = "{}STACKED_BACKTEST_{}.csv".format(
+                                      self.pictures_pathout, self.bartype
                                       )                        
                     
                     # si esta activado para cloud, no asignes path local alguno
                     else: 
                         
-                        exo_path = "STACKED_EXO_{}_{}.csv".format(
-                                      self.bartype, self.method
+                        exo_path = "STACKED_EXO_{}.csv".format(
+                                      self.bartype
                                       )                        
-                        endo_path = "STACKED_ENDO_{}_{}.csv".format(
-                                      self.bartype, self.method
+                        endo_path = "STACKED_ENDO_{}.csv".format(
+                                      self.bartype
                                       )
-                        backtest_path = "STACKED_BACKTEST_{}_{}.csv".format(
-                                      self.bartype, self.method
+                        backtest_path = "STACKED_BACKTEST_{}.csv".format(
+                                      self.bartype
                                       )
                         
                     # almacenamientos
