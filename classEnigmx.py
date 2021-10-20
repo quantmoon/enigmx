@@ -129,7 +129,8 @@ class EnigmX:
                  label_name = "barrierLabel",
                  time_label_name = "horizon",
                  time_label_index_name = "close_date",
-                 stationary_stacked = True):
+                 stationary_stacked = True,
+                 cutpoint = 0.8):
         
         # definimos parámetros generales para los 3 procesos
         self.bartype = bartype
@@ -164,11 +165,12 @@ class EnigmX:
             "n_samples" : 10,
             "clustered_features" : False,
             "k_min" : 2,
+            "cutpoint" : 0.8
             #############Constant Method Params###################
             "filtering_featimp": True,
             "save_featimp": True,
             "split_featimp": True,
-            "pct_split_featimp": 0.6,
+            "pct_split_featimp": 0.6
             }
         
         self.KfeatureImportanceParams = KfeatureImportanceParams        
@@ -270,6 +272,7 @@ class EnigmX:
             n_samples = self.n_samples,
             trial = trial,
             stationary_stacked = self.stationary_stacked
+            cutpoint = self.cutpoint
             # clustered_features = True,
             # residuals = True,
             # silh_thres = 0.65
@@ -277,12 +280,7 @@ class EnigmX:
         # resultado del feature importance (dataframe)
        
         t1 = time()
-        valueResultFeatImp = instance.get_relevant_features(
-            filtering = self.filtering_featimp,
-            save = self.save_featimp,
-            split = self.split_featimp, 
-            pct_split = self.pct_split_featimp
-            )
+        valueResultFeatImp = instance.get_relevant_features()
         print("Get relevant features:",time()-t1)
         # si no se pide guardar, retornar dataframe
         if not self.save_featimp:

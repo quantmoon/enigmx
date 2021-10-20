@@ -215,6 +215,7 @@ class featureImportance(object):
                  referential_database = 'TSQL',
                  simple_correlation = False,
                  stationary_stacked = True
+                 cutpoint = 0.8
                  ):
         
         # ingesta de parámetros
@@ -263,6 +264,7 @@ class featureImportance(object):
         self.global_featImp = global_featImp 
         self.simple_correlation = simple_correlation
         self.stationary_stacked = stationary_stacked
+        self.cutpoint = cutpoint
         
         self.referential_base_database = referential_database
         self.ErrorKendallMessage = 'Any valid kendall value exists in the set of trials'
@@ -308,9 +310,9 @@ class featureImportance(object):
                     )
 
         if self.stationary_stacked:
-            matriz = "STACKED_STATIONARY"
+            matriz = f"STACKED_STATIONARY_{self.cutpoint}"
         else:
-            matriz = "STACKED"
+            matriz = f"STACKED_{self.cutpoint}"
 
         # extrae matriz de features estacionaria-estandarizada de la base de datos, así como serie de labels
         featStandarizedMatrix = SQLFRAME.read_table_info(
@@ -677,14 +679,9 @@ class featureImportance(object):
         # retorna el df stacked (roleado orig.) y los nombres de los features
         return original_stacked
         
-    def get_relevant_features(self, 
-                              filtering = True, 
-                              save = False, 
-                              split = True, 
-                              pct_split = 0.6):
-        
-        # revisa que el pct_split no sea menor a 0.6
-        assert pct_split >= 0.6, "Percentage of 'splits' should be 0.6 (60%) as min."
+
+
+    def get_relevant_features(self):        
         
         # df stackeado de feats (rolleado = escalado) + la comb. elegida de features
         stacked = self.__instanceOverture__()
@@ -695,133 +692,3 @@ class featureImportance(object):
 
         print("FIN DEL FEATURE IMPORTANCE", flush = True)
 
-        # si se activa el proceso de filtrado
-        if filtering:
-            
-            # stacked roleado y escalado proveniente del 'features_algorithms.py'
-#            stacked = stacked.reset_index(drop=True) #REVISAR -> Al descomentar esta columna ya no funciona porque los indices se vuelven indices y no fechas
-
-            # extraemos las columnas que no están en la lista global de features
-            stackedDiff = stacked[
-                stacked.columns.difference(
-                    list_features_tested
-                    ).values
-                ]           
-
-            # elimina los features marginales no utiles dejando la info general principal
-            stackedNoFeatures = stackedDiff[stackedDiff.columns.drop(
-                list(stackedDiff.filter(regex=self.features_sufix))
-                )]
-
-            # stacked df filtrado por features seleccionados con col. no-features
-            stacked = pd.concat([stackedNoFeatures, stacked[list_features_tested]],axis=1) 
-
-
-            # conversión a dtypes de las fechas de las columnas
-            colDates = stacked.dtypes.where(
-                        stacked.dtypes == "datetime64[ns]"
-                        ).dropna().index.values
-                                
-
-            # si se activa proceso de split
-            if split:
-                
-                # obtención de df aleatorio para modelo exogeno, endogeno y backtest
-                df_exo, df_endo, backtest = enigmxSplit(
-                        df = stacked, 
-                        pct_average = pct_split
-                        )
-                
-                # ordenamiento temporal
-                df_exo.sort_values(
-                    by=['close_date']
-                    )
-                df_endo.sort_values(
-                    by=['close_date']
-                    )
-                backtest.sort_values(
-                    by =['close_date']
-                    )
-                
-                # si se decide guardar
-                if save:              
-                    
-                    # conversión de fecha como string para evitar pérdida de info
-                    df_exo[colDates] = df_exo[colDates].astype(str)                
-                    df_endo[colDates] = df_endo[colDates].astype(str)
-                    backtest[colDates] = backtest[colDates].astype(str)
-                    
-                    # si no esta activado para cloud, asigna path local primero
-                    if not self.cloud_framework:
-                        
-                        exo_path = "{}STACKED_EXO_{}.csv".format(
-                                      self.pictures_pathout,self.bartype
-                                      )                        
-                        endo_path = "{}STACKED_ENDO_{}.csv".format(
-                                      self.pictures_pathout, self.bartype
-                                      )
-                        backtest_path = "{}STACKED_BACKTEST_{}.csv".format(
-                                      self.pictures_pathout, self.bartype
-                                      )                        
-                    
-                    # si esta activado para cloud, no asignes path local alguno
-                    else: 
-                        
-                        exo_path = "STACKED_EXO_{}.csv".format(
-                                      self.bartype
-                                      )                        
-                        endo_path = "STACKED_ENDO_{}.csv".format(
-                                      self.bartype
-                                      )
-                        backtest_path = "STACKED_BACKTEST_{}.csv".format(
-                                      self.bartype
-                                      )
-                        
-                    # almacenamientos
-                    df_exo.to_csv(exo_path, index=False, 
-                                  date_format='%Y-%m-%d %H:%M:%S'
-                                  )
-                    
-                    df_endo.to_csv(endo_path, index=False, 
-                                  date_format='%Y-%m-%d %H:%M:%S'
-                                  )          
-                    
-                    backtest.to_csv(backtest_path, index=False, 
-                                  date_format='%Y-%m-%d %H:%M:%S'
-                                  )          
-                    
-                    print("Process finished! 'exo', 'endo' & 'backtest' df saved at {}...".format(
-                        self.pictures_pathout)
-                        )
-                    
-                # caso contrario, retorna solo split para modelo exogeno y endogeno
-                else:
-                    return df_exo, df_endo
-            
-            # caso contrario, si no se elije split
-            else:
-                
-                # si se elije guardar
-                if save: 
-                    
-                    # conversión de string
-                    stacked[colDates] = stacked[colDates].astype(str)                
-                    
-                    # se guarda stacked filtered df 
-                    stacked.to_csv(
-                        "STACKED_{}_{}.csv".format(
-                                self.bartype, self.method
-                                ), index=False, date_format='%Y-%m-%d %H:%M:%S'
-                            )
-                    
-                    print("Stacked Dataframe saved at {}...".format(
-                            self.pictures_pathout)
-                            )
-                
-                # caso contrario, retorna stacked filtered df                
-                else:
-                    return stacked
-        
-        # caso contrario, retorna los nombres de features seleccionados
-        else:
-            return list(list_features_tested) 

@@ -2984,6 +2984,37 @@ def prox_matrix(X):
     return NVI
 
 
+#Función que separa el dataframe "Stacked" en las bases de entrenamiento de los modelos
+#exógeno, endógeno y el backtest final
+def backtestSplit(df, pct_split):
+
+    # revisa que el pct_split no sea menor a 0.6
+    assert pct_split >= 0.6, "Percentage of 'splits' should be 0.6 (60%) as min."
+
+    # obtención de df aleatorio para modelo exogeno, endogeno y backtest
+    df_exo, df_endo, backtest = enigmxSplit(
+        df = stacked,
+        pct_average = pct_split
+        )
+
+    # ordenamiento temporal
+    df_exo.sort_values(
+    by=['close_date']
+    )
+    df_endo.sort_values(
+    by=['close_date']
+    )
+    backtest.sort_values(
+    by =['close_date']
+    )
+
+
+    # conversión de fecha como string para evitar pérdida de info
+    df_exo[colDates] = df_exo[colDates].astype(str)
+    df_endo[colDates] = df_endo[colDates].astype(str)
+    backtest[colDates] = backtest[colDates].astype(str)
+
+    return backtest, df_endo, df_exo
     
 ##############################################################################
 ############################### CLICK MESSAGES ###############################
@@ -2996,3 +3027,5 @@ M2 = "Puede generar MemoryProblems si el dispositivo no cuenta con capacidad. "
 M3 = "Asimismo, el featImpClusterizado no está conectado con el proceso post."
 M4 = ":::::::: >>>> Responda 'Y' si desea continuar o 'N' si desea detenerlo."
 clickMessage1 = M1 + M2 + M3 + M4
+
+

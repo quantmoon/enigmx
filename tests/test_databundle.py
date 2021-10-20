@@ -12,7 +12,7 @@ from enigmx.tests.stocks import stocks
 
 
 
-server_name = "34.134.4.239" 
+server_name = "34.133.134.153"
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
 #list_stocks = ['VTOL', 'ZNGA', 'PROS'] #stocks
@@ -46,10 +46,10 @@ enigmxsql.create_table_database(
     bars_entropy = False, 
     etfs_trick = False, 
     bars_sampled = False, 
-    bars_barrier = False,
+    bars_barrier = True,
     bars_weights = False,
     bars_features = False,
-    bars_stacked = True,
+    bars_stacked = False,
     creation_database = True)
 
 print("subiendo info")
@@ -60,10 +60,10 @@ enigmxsql.compute_info_to_sql(
             entropy_construction_process = False, 
             etftrick_construction_process = False, 
             sampling_features_process = False, 
-            triple_barrier_computation_process = False, 
-            sample_weight_computation_process = False,
+            triple_barrier_computation_process = True, 
+            sample_weight_computation_process = True,
             features_bar_computation_process = True,
-            features_stacking = True,
+            features_stacking = False,
             #tunning_interval = "10D",
 	    )
 #send_message('Se acabó!')
