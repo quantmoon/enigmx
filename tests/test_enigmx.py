@@ -4,7 +4,7 @@ webpage: https://www.quantmoon.tech//
 """
 
 import ray
-#ray.init(include_dashboard=(False),ignore_reinit_error=(True))
+ray.init(include_dashboard=(False),ignore_reinit_error=(True))
 
 from enigmx.classEnigmx import EnigmX
 import numpy as np
@@ -19,7 +19,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC,NuSVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import SGDClassifier
 
 from enigmx.utils import EquitiesEnigmxUniverse
@@ -41,25 +41,6 @@ def kerasModel(num_features):
 
 # dict with models, and params
 dict_models = {
-#    'decisionTree': (
-#        DecisionTreeClassifier(), 
-#        {'max_leaf_nodes': list(range(2, 20)), 
-#         'min_samples_split': [2, 3, 4],
-#         'max_features' : [1]} 
-#        ), 
-#    'perceptron':(
-#        MLPClassifier(),
-#        {'activation' : ['logistic','relu','tanh'],
-#         'early_stopping' : [True]}
-#        ),
-#    'svm' :(
-#        SVC(),
-#        {'C' : np.arange(0.5,0.9,0.1),
-#         'kernel' : ['linear','poly','rbf','sigmoid']}),
-#    'nu' : (
-#        NuSVC(),
-#        {'nu' : np.arange(0.1,0.5,0.1),
-#         'kernel' : ['linear','poly','rbf','sigmoid']}),
     'randomForest' :(
         RandomForestClassifier(),
         {'max_leaf_nodes': list(range(2, 20)), 
@@ -73,61 +54,43 @@ dict_models = {
          {'loss':['log', 'modified_huber'],
           'penalty':['l2', 'l1', 'elasticnet'],
           'max_iter':list(range(1,10))}),
-#    'qda' : (QuadraticDiscriminantAnalysis(),
-#             {}),
-#    'gaussianNB' : 
-#        (GaussianNB(), {}),
-#    'Kneighbors' : 
-#        (KNeighborsClassifier(), 
-#            {'n_neighbors': list(range(1, 5)),
-#             'weights':['uniform', 'distance'],
-#             'algorithm':['auto', 'ball_tree', 'kd_tree', 'brute']}),
-#    'XGBoost' : 
-#        (GradientBoostingClassifier(), 
-#         {'loss':['deviance', 'exponential'],
-#          'min_samples_split': [2, 3, 4]}),
-#    'keras': (
-#        kerasModel, 
-#        dict(
-#            batch_size = [10, 20, 40, 60, 80, 100], 
-#            epochs = [10, 50, 100]
-#            ) 
-#        )
      }
 
 ##############################################################################
 
-main_path = '/var/data/data/'
-
-print("")
+main_path = 'D:/data_enigmx/'
 code = input('Ingresa el n° de serie de este intento: ')
-print("")
+
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
-                  method = 'MDA', 
+                  method = 'MDI', 
                   base_path = main_path,
-                  cloud_framework = True,
+                  cloud_framework = False,
+                  server_name = "DESKTOP-N8JUB39",
                   stationary_stacked = True
+
+                  features_database = "BARS_FEATURES",
+                  uid = '',
+                  pwd = '',
+                  driver = "{SQL Server}",
                   ) 
 
 # feature importance
-instance.get_feature_importance(    
-                      model =  SGDClassifier(loss = 'log'),
+#instance.get_feature_importance(    
 #                      model = RandomForestClassifier(max_features=1, random_state=0), 
-#                      list_stocks = ['VTOL','ZNGA'],
-                      list_stocks = stocks,
-                      score_constraint = 0.3, #activar 
+#                      list_stocks = ['AEZS','AMPE', 'AWK', 'BOOM'],
+#                      score_constraint = 0.3, #activar 
                       server_name = "34.134.4.239",
                       database = "BARS_FEATURES",
                       uid = 'sqlserver',
                       pwd = 'quantmoon2021',
                      # driver = "{SQL Server}",
                       driver = ("{ODBC DRIVER 17 for SQL Server}"),
-                      pval_kendall = 0.1,
-                      k_min = 10,
-                      n_samples = 15, 
-                      trial = code
-                      )
+
+#                      pval_kendall = 0.1,
+#                      k_min = 10,
+#                      n_samples = 15
+#                      )
     
 
 # get multi process for tunning and backtest
@@ -137,4 +100,10 @@ instance.get_feature_importance(
 #    endogenous_model_sufix= 'rf',    
 #    trials = 11, 
 #    partitions = 2, 
+#    cloud_instance = False,
 #    )
+
+# extraemos las métricas del combinatorial
+instance.get_metrics(
+    code_backtest = '001'
+    )

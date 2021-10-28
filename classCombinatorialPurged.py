@@ -171,9 +171,7 @@ class EnigmxBacktest(object):
                                    n_trials, 
                                    k_partitions, 
                                    embargo_level = 5,
-                                   max_leverage = 2,
-                                   df_format = True,
-                                   save = True):
+                                   max_leverage = 2):
         
         # llamado de cómputo del combinatorial backtest
         self.__computeCombinatorialBacktest__(
@@ -182,55 +180,38 @@ class EnigmxBacktest(object):
         
         print(":::::>>> ENDING COMBINATORIAL PURGED KFOLD CV <<<:::::")
         
-        if df_format:
             
-            list_frame_trials = []
+        list_frame_trials = []
             
-            # iteración por partición para la predicción
-            for idx, partition in enumerate(self.indexEvent):
-                
-                dataTemp = self.dfStacked
-                
-                data = dataTemp.reset_index(drop=False) 
-                
-                # variables resultantes
-                data["predCat"] = self.predCat[idx]
-                data["predBetSize"] = self.predBetsize[idx]
-                data["leverage"] = data.predBetSize * max_leverage
-                data["trial"] = idx
-                
-                # ordenamiento de la data de forma temporal
-                data = data.sort_values(by='close_date')
-                
-                list_frame_trials.append(data)
+        # iteración por partición para la predicción
+        for idx, partition in enumerate(self.indexEvent):
             
-            # unión de todos los trial (n)
-            generalFrame = pd.concat(list_frame_trials).reset_index(drop=True)
+            dataTemp = self.dfStacked
+                
+            data = dataTemp.reset_index(drop=False) 
+                
+            # variables resultantes
+            data["predCat"] = self.predCat[idx]
+            data["predBetSize"] = self.predBetsize[idx]
+            data["leverage"] = data.predBetSize * max_leverage
+            data["trial"] = idx
+                
+            # ordenamiento de la data de forma temporal
+            data = data.sort_values(by='close_date')
+                
+            list_frame_trials.append(data)
             
-            # config. de IdTime para identificar el df base
-            trialTime = datetime.datetime.now() 
-            iDTime = "{}{}{}{}".format(
+        # unión de todos los trial (n)
+        generalFrame = pd.concat(list_frame_trials).reset_index(drop=True)
+        
+        # config. de IdTime para identificar el df base
+        trialTime = datetime.datetime.now() 
+        iDTime = "{}{}{}{}".format(
                     format(trialTime.day, '02'), format(trialTime.month, '02'), 
                     format(trialTime.hour, '02'), format(trialTime.minute, '02')
                     )
-            print("::::::::::::::::::::: BACKTEST CODE: {}".format(iDTime))
+        print("::::::::::::::::::::: BACKTEST CODE: {}".format(iDTime))
                 
-            self.iDTime = iDTime
-            
-            if save: 
-                # ejecuta almacenamiento obligatorio local/cloud como backup
-                generalFrame.to_csv(
-                    "{}BACKTEST_RESULTS_{}.csv".format(self.base_path, self.iDTime), 
-                    index=False
-                    ) 
-                
-                # return general frame with results + id name
-                return generalFrame, self.iDTime
-            
-            else:
-                # return general frame with results + id name
-                return generalFrame, self.iDTime
-            
-        else:
-            return self.predCat, self.predBetsize, self.trueLabel, self.indexEvent
-
+        self.iDTime = iDTime
+        
+        return generalFrame, self.iDTime

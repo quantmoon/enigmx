@@ -81,7 +81,7 @@ class QuantmoonSQLManager(object):
             
         else:
             print("|----- Cloud Process Detected -----|")
-            self.loggin = ('Driver='+self.driver[0][0]+
+            self.loggin = ('Driver='+self.driver[0]+
                            ';Server='+ self.server +
                            ';Database='+self.base_database+
                            ';Uid='+self.uid[0]+
@@ -101,7 +101,7 @@ class QuantmoonSQLManager(object):
                            ';Uid='+self.uid+
                            ';Pwd='+self.pwd+';')
         else:
-            self.access = ('Driver='+self.driver[0][0]+
+            self.access = ('Driver='+self.driver[0]+
                            ';Server='+ self.server +
                            ';Database='+self.database_name+
                            ';Uid='+self.uid[0]+
@@ -341,7 +341,7 @@ class QuantmoonSQLManager(object):
                     row.stock
                     )
                 
-            # si el tipo de tabla es para las barras o barras sampleadas
+            # si el tipo de tabla es para las barras o barras sampleadas ### POSIBLE ERROR AQUI | MISMA COMPOSICION QUE BARS SAMPLED | NO AGREGA COLUMNA 'SADF'
             elif bartype_.upper()=='BARS' or  bartype_.upper()=='BARS_SAMPLED':
                 cursor_.execute(
                     statement_, 
@@ -367,7 +367,8 @@ class QuantmoonSQLManager(object):
                     row.volatility, 
                     row.horizon,
                     row.upper_barrier,
-                    row.lower_barrier                    
+                    row.lower_barrier,
+                    row.bidask_spread,                    
                     )
             
             # si el tipo de tabla es para el cómputo de la entropía
@@ -396,12 +397,13 @@ class QuantmoonSQLManager(object):
                     row.volatility, 
                     row.horizon,
                     row.upper_barrier,
-                    row.lower_barrier,
-                    row.entropy                    
+                    row.lower_barrier,                  
+                    row.entropy,
+                    row.bidask_spread,                      
                     )            
                 
             # si el tipo de tabla es para el cómputo del etf trick
-            elif bartype_.upper() == 'ETFTRICXCK':
+            elif bartype_.upper() == 'ETFTRICK':
                 cursor_.execute(
                     statement_, 
                     row.value, 
@@ -426,8 +428,9 @@ class QuantmoonSQLManager(object):
                     row.volatility, 
                     row.horizon,
                     row.upper_barrier,
-                    row.lower_barrier,
-                    row.entropy                    
+                    row.lower_barrier,          
+                    row.entropy,
+                    row.bidask_spread,                              
                     )               
                 
             # si el tipo de tabla es para el cómputo de las barras completas (no finales)
@@ -456,10 +459,11 @@ class QuantmoonSQLManager(object):
                     row.volatility, 
                     row.horizon,
                     row.upper_barrier,
-                    row.lower_barrier,
+                    row.lower_barrier,                    
                     row.barrierPrice,
                     row.barrierLabel,
-                    row.barrierTime
+                    row.barrierTime,
+                    row.bidask_spread,                              
                     )            
                 
             # si el tipo de tabla es para el cómputo de las barras con weight y label (final)
@@ -494,7 +498,8 @@ class QuantmoonSQLManager(object):
                     row.barrierTime,
                     row.overlap,
                     row.weight,
-                    row.weightTime
+                    row.weightTime,
+                    row.bidask_spread,                              
                     )                         
             
                 

@@ -3,11 +3,14 @@
 webpage: https://www.quantmoon.tech//
 """
 import ray
+import pyodbc
 import pandas as pd
+from enigmx.dbgenerator import databundle_instance 
 from enigmx.classModelTunning import ModelConstruction, list_heuristic_elements
 from enigmx.classFeatureImportance import featureImportance 
 from enigmx.classCombinatorialPurged import EnigmxBacktest
-from enigmx.metrics import metricsByPath, baseCriticsDicforBacktestMetrics 
+from enigmx.utils import sql_alche_saving
+from enigmx.metrics import metricsParalelization
 
 from time import time
 
@@ -78,7 +81,7 @@ class EnigmX:
             
             - KCombinatorialBacktestParams (diccionario de Combinatorial Backtest)
                 - "data_file_name": "STACKED_BACKTEST_{}.csv".format(
-                    self.bartype.upper()
+                    self.bartype.upper(),
                     ),
                 ############# Constant Combinatorial Backtest Params #############
                 - "features_sufix": self.features_sufix,
@@ -125,34 +128,49 @@ class EnigmX:
                  method, 
                  base_path,
                  cloud_framework = True,
+                 features_database = "BARS_FEATURES",
+                 uid = '', #predefined for local process
+                 pwd = '', #predefined for local process
+                 server_name = 'DESKTOP-N8JUB39', #predefined for local process
+                 driver = "{SQL Server}", #predefined for local process
                  features_sufix = "feature", 
                  label_name = "barrierLabel",
                  time_label_name = "horizon",
-                 time_label_index_name = "close_date",
                  stationary_stacked = True,
-                 cutpoint = 0.8):
+                 cutpoint = 0.8,
+                 time_label_index_name = "close_date"): 
         
         # definimos parámetros generales para los 3 procesos
         self.bartype = bartype
         self.method = method
         self.base_path = base_path
+        self.features_database = features_database
         self.features_sufix = features_sufix
         self.label_name = label_name
         self.time_label_name = time_label_name
         self.time_label_index_name = time_label_index_name 
+        # sql reading params (predefined for LOCAL process)
         self.cloud_framework = cloud_framework
         self.stationary_stacked = stationary_stacked
+        self.uid = uid
+        self.pwd = pwd
+        self.server_name = server_name
+        self.driver = driver
         
         # diccionario con los parámetros generales del Feature Importance
         KfeatureImportanceParams = {
             "pca_comparisson": True,
             "pval_kendall": 0.05,
             "score_constraint": 0.6, 
-            "driver": "{ODBC Driver 17 for SQL Server}", #change for local SQL
-            "uid":"sqlserver", #change for local SQL
-            "pwd":"J7JA4L0pwz0K56oa",#change for local SQL
-            "server_name":"34.67.233.155", #change for local SQL
-            "database":'BARS_FEATURES',
+            
+            # SQL PARAMS FOR FEATURE IMPORTANCE PROCESS
+            "driver": self.driver, 
+            "uid": self.uid, 
+            "pwd": self.pwd,
+            "server_name": self.server_name, 
+            
+            # Other params
+            "database":self.features_database,
             "rolling_window": 10, 
             "rolling_type":'gaussian', 
             "rolling_std": 5, 
@@ -165,12 +183,12 @@ class EnigmX:
             "n_samples" : 10,
             "clustered_features" : False,
             "k_min" : 2,
-            "cutpoint" : 0.8
+            "cutpoint" : 0.8,
             #############Constant Method Params###################
             "filtering_featimp": True,
             "save_featimp": True,
             "split_featimp": True,
-            "pct_split_featimp": 0.6
+            "pct_split_featimp": 0.6,
             }
         
         self.KfeatureImportanceParams = KfeatureImportanceParams        
@@ -204,7 +222,7 @@ class EnigmX:
         # diccionario con los parámetros generales del Combinatorial Backtest
         KCombinatorialBacktestParams = {
             "data_file_name": "STACKED_BACKTEST_{}.csv".format(
-            self.bartype.upper(),
+            self.bartype.upper()
             ),
             ############# Constant Combinatorial Backtest Params #############
             "features_sufix": self.features_sufix,
@@ -215,12 +233,11 @@ class EnigmX:
             ############# Constant Method Combinatorial Backtest Params #############
             "embargo_level": 5, #predefined changable
             "max_leverage": 2,
-            "df_format": True, 
             "save_combinatorial": True,
-            "dict_critics_for_metrics": baseCriticsDicforBacktestMetrics,
+            #"dict_critics_for_metrics": baseCriticsDicforBacktestMetrics,
             "exo_openning_method_as_h5": False,
             "heuristic_model": False,
-            "list_heuristic_elements": list_heuristic_elements
+            "list_heuristic_elements": list_heuristic_elements,
             }
         
         self.KCombinatorialBacktestParams = KCombinatorialBacktestParams
@@ -234,7 +251,7 @@ class EnigmX:
         self.multiTuningParams = multiTuningParams          
     
     # método feature importance: model y list_stocks como parámetros obligatorios    
-    def get_feature_importance(self, model, list_stocks, trial,**kwargs):
+    def get_feature_importance(self, model, list_stocks, trial, **kwargs):
         
         assert len(list_stocks) >= 1, "Empty 'list_stocks' is not allowed." 
         
@@ -271,16 +288,22 @@ class EnigmX:
             k_min = self.k_min,
             n_samples = self.n_samples,
             trial = trial,
-            stationary_stacked = self.stationary_stacked
+            stationary_stacked = self.stationary_stacked,
             cutpoint = self.cutpoint
             # clustered_features = True,
             # residuals = True,
             # silh_thres = 0.65
             )        
+        print("Resultado de la creación de la instancia feature importance:",time()-t1)
         # resultado del feature importance (dataframe)
        
         t1 = time()
-        valueResultFeatImp = instance.get_relevant_features()
+        valueResultFeatImp = instance.get_relevant_features(
+            filtering = self.filtering_featimp,
+            save = self.save_featimp,
+            split = self.split_featimp, 
+            pct_split = self.pct_split_featimp
+            )
         print("Get relevant features:",time()-t1)
         # si no se pide guardar, retornar dataframe
         if not self.save_featimp:
@@ -310,21 +333,20 @@ class EnigmX:
             assert self.exo_model != None, "'exo_model' is not defined."
             
             # modelo exógeno retornado 
-            t = time()
             valueResultExoModel = instance.get_exogenous_model(
                 model = self.exo_model,
                 dic_params = self.exo_dic_params,
                 save_as_pickle = self.save_exo_as_pickle,
                 exogenous_pickle_file_name = self.exogenous_pickle_file_name
                 )
-            print("Time to get exo model:",time()-t)
+
             # no se desea guardar, retorna el modelo
             if not self.save_exo_as_pickle:
                 return valueResultExoModel
         
         # si se activa tunning para modelo endógeno
         if endo_process:
-            t = time()
+            
             # modelo endógeno retornado
             valueResultEndoModel = instance.get_endogenous_model(
                 endogenous_model_sufix = self.endogenous_model_sufix,
@@ -339,7 +361,7 @@ class EnigmX:
                 exogenous_pickle_file_name = self.exogenous_pickle_file_name,
                 endogenous_pickle_file_name= self.endogenous_pickle_file_name
                 )
-            print("Time to get endo model:",time()-t)
+            
             # no se desea guardar, retorna el modelo
             if not self.save_endo_as_pickle:
                 return valueResultEndoModel
@@ -349,6 +371,9 @@ class EnigmX:
         
         for (prop, default) in self.KCombinatorialBacktestParams.items():
             setattr(self, prop, kwargs.get(prop, default))        
+            
+            
+        print("           ::::> Starting EnigmX Backtesting... ")
                 
         # definición de instancia base del backtest
         instance = EnigmxBacktest(
@@ -371,42 +396,18 @@ class EnigmX:
             k_partitions = partitions,
             embargo_level = self.embargo_level,
             max_leverage = self.max_leverage,
-            df_format = self.df_format,
-            save = self.save_combinatorial
             )
         
-        print(":::> Computing Backtest Statistics... ")
+        print("           :::> Saving EnigmX Backtest Results in SQL-Table... ")
         
         # retorna el df con la prediccion del backtest y el codigo serial para identf.
-        combinatorialDataframe, backtestCode = resultValueCombinatorial 
+        combinatorialDataframe, backtest_TimeId = resultValueCombinatorial 
         
-        # transforma el label index name a formato string
-        combinatorialDataframe[self.time_label_index_name] \
-                = combinatorialDataframe[self.time_label_index_name].astype(str)  
+        # agregamos backtestId
+        combinatorialDataframe["time_id"] = backtest_TimeId 
         
-        # transforma el df combinatorial base a un df de statistical metrics
-        dfMetrics = metricsByPath(
-                combinatorialDataframe, 
-                crits = self.dict_critics_for_metrics
-                )
-        
-        # si se activa la opcion de guardado en local
-        if self.save_combinatorial:
-            
-            print(":::> Saving Metrics csv...")
-            
-            dfMetrics.to_csv(
-                        "{}BACKTEST_METRICS_{}.csv".format(
-                            self.base_path, backtestCode
-                            ), 
-                        index=False
-                        ) 
-            
-            print("||| :::: EnigmX Process Ended :::: |||")
-        
-        # si no se elige guardar, retorna la tupla de información
-        else:
-            return dfMetrics, combinatorialDataframe
+        return combinatorialDataframe
+    
         
     @ray.remote
     def __combinedGeneralMultiModel__(self, 
@@ -435,8 +436,6 @@ class EnigmX:
                                  y_true,              
                                  embargo_level,
                                  max_leverage,
-                                 df_format, 
-                                 dict_critics_for_metrics
                                  ):
         """
         Function intermediadora que reune los prorcesos de Tunning + Backtest.
@@ -491,7 +490,7 @@ class EnigmX:
             )
             
         # initializing combinatorial backtest
-        dfMetrics, dfBacktest = self.get_combinatorial_backtest(
+        dfBacktest = self.get_combinatorial_backtest(
                 ############# Constant Combinatorial Backtest Params #############
                 features_sufix = features_sufix,
                 label_name = label_name,
@@ -501,9 +500,7 @@ class EnigmX:
                 ############# Constant Method Combinatorial Backtest Params #############                
                 embargo_level = embargo_level,
                 max_leverage = max_leverage,
-                df_format = df_format, 
                 save_combinatorial = False, # don't save combinatorial, only return
-                dict_critics_for_metrics = dict_critics_for_metrics,
                 ############## Params ingested in the recent function #################
                 trials= trials,
                 partitions= partitions,
@@ -512,10 +509,9 @@ class EnigmX:
                 )
             
         # setting name of models
-        dfMetrics['model_name'] = modelName
         dfBacktest['model_name'] = modelName
-        
-        return dfMetrics, dfBacktest
+    
+        return dfBacktest
     
     
     def get_multi_process(self, 
@@ -607,37 +603,103 @@ class EnigmX:
                                  y_true = self.y_true,              
                                  embargo_level = self.embargo_level,
                                  max_leverage = self.max_leverage,
-                                 df_format = self.df_format, 
-                                 dict_critics_for_metrics = self.dict_critics_for_metrics
                                  ) 
+            
         for model_name, tuple_info_model in dict_exo_models.items()
         ]
         
         # get datasets from ray objects: tuple info for each Obj
         list_datasets =  ray.get(listModelBacktestMetrics)
         
-        # concadenation of metrics results
-        dataset_metrics = pd.concat([
-            infoTupleModels[0] for infoTupleModels in list_datasets
-            ]).reset_index(drop=True)
-        
         # concadenation of backtest results
-        dataset_backtests = pd.concat([
-            infoTupleModels[1] for infoTupleModels in list_datasets
-            ]).reset_index(drop=True)
+        dataset_backtests = pd.concat(list_datasets).reset_index(drop=True)
         
-        # setting time as string to preserve millisecond information
-        dataset_backtests[self.time_label_index_name] \
-                = dataset_backtests [self.time_label_index_name].astype(str)          
+        print('\n         ::::: >>>> CPKF saving in SQL | Process started...')
         
-        # saving metrics csv's 
-        dataset_metrics.to_csv(
-            '{}METRICS_TRIAL_{}.csv'.format(self.base_path, code_backtest), 
-            index=False
-            ) 
+        # guardamos el df general del backtest en SQL
+        sql_alche_saving(
+            dataframe = dataset_backtests, 
+            backtescode = code_backtest, 
+            server_name = self.server_name, 
+            database = 'BACKTESTS', 
+            uid = self.uid, 
+            pwd = self.pwd
+            )
         
-        # saving backtests results csv's
-        dataset_backtests.to_csv(
-            '{}BACKTEST_TRIAL_{}.csv'.format(self.base_path, code_backtest), 
-            index=False
-            )        
+        print('\n         ::::: >>>> CPKF has been successfully saved in SQL...')
+        
+    
+    def get_metrics(self, code_backtest, database = 'BACKTESTS'):
+        
+        
+        #abrir la instancia sql base, la conexión y el cursor
+        SQLFRAME, dbconn, cursor = databundle_instance(
+                    #nombre del servidor SQL Local
+                    server = self.server_name, 
+                    #nombre que se le asignará a la base de datos matriz
+                    bartype_database = database,
+                    #nombre de driver, usuario y password
+                    driver = self.driver, 
+                    uid = self.uid, 
+                    pwd = self.pwd,
+                    #boleano para crear la tabla
+                    create_database = False, 
+                    #nombre global para cada tabla | "GLOBAL" x defecto
+                    global_range = False,
+                    #referential database for SQL initial Loc
+                    referential_base_database = self.features_database
+                    )                    
+        
+        # extraemos el df de trials segun codigo de backtest
+        df_trials = SQLFRAME.read_table_info(
+            "SELECT * FROM [BACKTESTS].[dbo].BACKTEST_TRIAL_{}".format(
+                code_backtest
+                ), 
+            dbconn_= dbconn, 
+            cursor_= cursor, 
+            dataframe = True
+            )
+        
+        df_trials['barrierTime']= pd.to_datetime(df_trials['barrierTime'])
+        
+        
+        # modelos testeados
+        models = list(df_trials.model_name.unique())
+        
+        # total de trials
+        trials = list(df_trials.trial.unique())
+        
+        # result values
+        finalMetrics = []
+        
+        for model in models:
+             
+            dfModel = df_trials.query('model_name == @model')
+            
+            ray_object_list = [
+                metricsParalelization(
+                    dataframe_segmented = dfModel.query('trial == @trial_number'), 
+                    initial_cap = 5000, 
+                    capital_factor = 1, 
+                    fixed_comission = 0.70, 
+                    psp_benchmark = 0.15
+                    )
+                for trial_number in trials
+                ]
+            
+            #list_datasets = ray.get(ray_object_list)
+            
+            finalMetrics.append(ray_object_list)
+        
+        print(finalMetrics)
+        
+            
+            
+            
+        
+        
+        
+        
+        
+        
+        

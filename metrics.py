@@ -2,343 +2,414 @@
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
+import ray
 import numpy as np
 import pandas as pd
-from datetime import datetime
 from scipy.stats import kurtosis, skew, norm
-from time import time
-# diccionario con elementos base para computación de las métricas de backtest
-baseCriticsDicforBacktestMetrics = {
-    'Pnl': [0.1], 
-    'Annualized Rate of Returns': [0.45], 
-    'Hit Ratio': [0.33], 
-    'Average Return of Hits': [0.01],
-    'Max Drawdown': [0.01], 
-    'Max Time Under Water': [0.1], 
-    'HHI positive': [-0.1], 
-    'HHI negative': [-0.1], 
-    'Sharpe Ratio': [0.88], 
-    'Probabilistic Sharpe Ratio': [0.9], 
-    'Dollar Performance': [0.1], 
-    'Return Over Execution Costs': [0.5]
-    }
 
-class Metrics():
-    
-    """
-        Construye un DataFrame que inicializa columnas aleatorias para el costo y deriva el precio de estrategia por la
-        triple barrera y los retornos netos de costos del DataFrame que recibe, luego cálcula las estadísticas de
-        backtesting en cada uno de sus métodos y en el método final calcula el desempeño de estas en base a los criterios
-        esperados.
-        
-        Inputs Obligatorios:
-        
-        -df: DataFrame del que se derivan columnas de costos aleatorias, precio y retornos
-        
-        Inputs Accesitarios:
-        -crits: Diccionario con criterios discrecionales sobre el cual analizar desempeño
-        -benchm: Benchmark de Sharpe Ratio utilizado en el método .psr(self, benchm), incluye el sharpe ratio objetivo
-        
-        Diccionario de datos genéricos por método (crits)
-        
-        Crits para uso en .performance(crits):
-        
-        crits = {'Pnl': [0.1], 
-                'Annualized Rate of Returns': [0.45], 
-                'Hit Ratio': [0.33], 
-                'Average Return of Hits': [0.01],
-                'Max Drawdown': [0.01], 
-                'Max Time Under Water': [0.1], 
-                'HHI positive': [-0.1], 
-                'HHI negative': [-0.1], 
-                'Sharpe Ratio': [0.88], 
-                'Probabilistic Sharpe Ratio': [0.9], 
-                'Dollar Performance': [0.1], 
-                'Return Over Execution Costs': [0.5]}
-        
-        Output: 
-        Clase: DataFrame con columnas de costos, precio y retornos
-        Métodos: Resultado de cada estadística de backtesting por método
-        Performance: Resultado de estadísticas totales y score heurístico de performance
-        
-    """
-    def __init__(self,df):
-        self.df2 = df
-        y_price = []
-        
-        """
-                                       Y_PRICE
-            Se obtienen las columnas de precios en base a la barrera
-            Si la barrera tiene de etiqueta 0, se asigna el precio close
-            Si la barrera tiene de etiqueta 1, se asigna el tope arriba de la barrera
-            Si la barrera tiene de etiqueta -1, se asigna el tope abajo de la barrera
-        """
-        for i in range(len(self.df2)):
-            if self.df2['barrierLabel'].iloc[i] == 0:
-                y_price.append(self.df2['close_price'].iloc[i])
-            elif self.df2['barrierLabel'].iloc[i] == 1:
-                y_price.append(self.df2['upper_barrier'].iloc[i])
-            else:
-                y_price.append(self.df2['lower_barrier'].iloc[i])
-                
-             
-        self.df = self.df2[['close_price','close_date','barrierPrice','barrierLabel']] #Se seleccionan solo unas columnas
+from enigmx.additional_metrics import (
+        bidAskAdjustment, 
+        return_func, 
+        investedPrice, 
+        finalPrice, 
+        netCashEstimation, 
+        cashFlowSequential, 
+        moneyEVA
+    )
 
-        #Se completa barrier price con precio close cuando el barrier price es 0
-        self.df['barrierPrice'] = self.df.apply(lambda x: x.barrierPrice if x.barrierPrice!=0 else x.close_price, axis=1)
-        
-        self.df["costs"] = np.random.random(size=len(self.df2))*y_price*0.01
-        
-        """
-            Se obtienen las columnas de retornos en base a la barrera
-            Si la barrera tiene de etiqueta 0, se asigna el retorno 0
-            Si la barrera tiene de etiqueta 1, se asigna el retorno positivo menos costos
-            Si la barrera tiene de etiqueta -1, se asigna el retorno negativo menos costos
-        """
-        self.returns = []
-        for i in range(len(self.df2)): 
-            if self.df2['barrierLabel'].iloc[i] == 0: # valor de retorno por CADA barrera igual a 0
-                self.returns.append(0)
-            elif self.df2['barrierLabel'].iloc[i] == 1: # valor de retorno por CADA barrera igual a 1
-                self.returns.append((self.df['barrierPrice'].iloc[i]-self.df['close_price'].iloc[i]-self.df["costs"].iloc[i])/self.df['close_price'].iloc[i])
-            else: # valor de retorno por CADA barrera igual a -1
-                self.returns.append((self.df['close_price'].iloc[i]-self.df['barrierPrice'].iloc[i]-self.df["costs"].iloc[i])/self.df['close_price'].iloc[i])
-         
-        """
-            Pnl: El total de dólares obtenidos en el período, close * retornos (retornos ya inlcuye costos)
-        """
+##############################################################################
+###################### SUBCLASE #1 CASHR-ETURN METRICS #######################
+##############################################################################
 
-        self.pnl = self.df['close_price']*self.returns
-        self.df['returns'] = self.returns
-        self.df['pnl'] = self.pnl
-        self.initial_cap = 5000 # DOLARESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
-        
-        #El realized cap va sumando retornos al capital inicial (sin costos)
-        self.df['realized_cap'] = self.initial_cap
-        for i in range(len(self.df['realized_cap'])):
-            if i == 0:
-                self.df['realized_cap'].iloc[i] = self.initial_cap + self.df['pnl'].iloc[i]
-            else:
-                self.df['realized_cap'].iloc[i] = self.df['realized_cap'].iloc[i-1]+self.df['pnl'].iloc[i]
+class CashReturnMetrics(object):
+  
+  """
+  Class que engloba las metricas de performance de efectivo (cash) y retornos.
 
-        self.ret = pd.Series(self.returns)
-        self.ret.index = self.df['close_date']
-        
-        
-        self.cap = self.df['realized_cap']
-        self.cap.index = pd.DatetimeIndex(self.df.close_date)
-        self.costs = self.df.costs
-        
-        
-    """
-        El Pnl total resta las columnas del realized cap (ya con costos) para el total del período
-    """
-    def get_pnl(self):
-        return self.cap[-1]-self.cap[0] 
+  Inputs generales:
+    - trials_frame: pd.Dataframe con la informacion resultante de c/trial
+                    del combinatorial backtest x modelo.
+    - initial_cap: int/float con el valor del capital inicial seleccionado.  
+    - capital_factor: int/float entre 0 y 1 con el % del capital disponible
+                      para los trades. 
+  """
 
-    """
-        Annualized rate of returns, el retorno neto de costos anualizado
-    """
-    def aror(self):#annualized rate of returns
-        date_format = "%Y-%m-%d" #"%m/%d/%Y"
-        a = datetime.strptime(self.df['close_date'].max().split(" ")[0], date_format)
-        b = datetime.strptime(self.df['close_date'].min().split(" ")[0], date_format)
-        days = (a-b).days
-        return ((self.cap[-1]-self.cap[0])/self.cap[0] +1)**(360/days) - 1 
+  def __init__(self, 
+               trials_frame, 
+               initial_cap = 5000, 
+               capital_factor = 1,
+               fixed_comission = 0.70):
 
-    """
-        Número de bets positivos
-    """
-    def hitratio(self):
-        hit = 0
-        for i in self.ret: 
-            if i > 0: hit+=1
-        return len(self.ret[self.ret>0])
+    # definición de valores básicos para la clase
+    self.trials_frame = trials_frame
+    self.initial_cap = initial_cap 
+    self.capital_factor = capital_factor
+    self.fixed_comission = fixed_comission 
 
-    
-    """
-        Retorno promedio por hit
-    """
-    def avgrethits(self): #Average return from hits
-        posret = self.ret[self.ret>0]
-        arfh = sum(posret) / len(posret)
-        return arfh
+  # actualizacion de precios ajustados x bid/ask spread según cat. de entrada
+  def __entryExitPrices__(self):
+    # pd.Series con tupla de entry y exit price
+    seriesTemp = self.trials_frame.apply(
+        lambda row: bidAskAdjustment(
+            row.close_price, row.barrierPrice, row.bidask_spread, row.predCat
+            ), axis=1
+          ) 
+    # creación de cols entryPrice y exitPrice en df org.
+    self.trials_frame[['entryPrice', 'exitPrice']] = pd.DataFrame(
+          seriesTemp.tolist(), 
+          index=seriesTemp.index
+        )
 
-    """
-        Drawdown y TimeUnderWater, computa los drawdown dentro del dataframe y el tiempo que pasa hasta recuperar el 
-        máximo previo
-    """
-    def computeDD_TuW(self,dollars=False):
-    # compute series of drawdowns and the time under water associated with them
-        #columna con serie de capital normal:
-        df0=self.cap.to_frame('pnl')
-        
-        #columna con máximos:
-        df0['hwm']=self.cap.expanding().max()
-        
-        
-        #agrupamos por máximos mostrando el valor mínimo en ese máximo:
-        df1=df0.groupby('hwm').min().reset_index()
-        
-        #renombras columnas:
-        df1.columns=['hwm','min']
-        
-        #Asignas los indices donde empieza el primer máximo (columna hwm)
-        df1.index=df0['hwm'].drop_duplicates(keep='first').index # time of hwm
-        
-        #muestra los índices en df1 donde hubo drawdown
-        df1=df1[df1['hwm']>df1['min']] # hwm followed by a drawdown
-        
-        #Si está en dólares, el drawdown es la resta 
-        if dollars:dd=df1['hwm']-df1['min']
-        
-        #Si no es porcentaje
-        else:dd=1-df1['min']/df1['hwm']
-        
-        #Obtienes los índices y el tiempo entre índices del drawdown / No corre
-        tuw=(df1.index[1:]-df1.index[:-1])/np.timedelta64(1,'Y')
-        #tuw=(df1.index[1:]-df1.index[:-1]).astype(int).values
-        
-        #Conviertes a serie los tiempos tuw
-        tuw=pd.Series(tuw,index=df1.index[:-1])
-        return dd,tuw
-    
-    
-    """
-        Herfindahl-Hirschman, medida de concentración, mide que tan concentrados están los retornos
-        Si el índice se acerca a 1, los retornos se concentran mucho en un solo bet de suerte
-        Si el índice se acerca a 0, hay menor concentración
-    """
-    def getHHI(self,sign):
-        if sign == 'p':
-            ret = self.ret[self.ret>=0]
-        if sign == 'n':
-            ret = self.ret[self.ret<=0]
-        if ret.shape[0]<=2:return np.nan
-        wght=ret/ret.sum()
-        hhi=(wght**2).sum()
-        hhi=(hhi-ret.shape[0]**-1)/(1.-ret.shape[0]**-1)
-        return hhi
-    
-    """
-        Sharpe Ratio
-    """
-    def sr(self):
-        mu = self.ret.mean()
-        sd = self.ret.std()
-        return mu/sd
-    
-    """
-        Probabilistic Sharpe Ratio
-    """
-    def psr(self,benchm):
-        sratio = self.sr()
-        t = len(self.ret)
-        y3 = skew(self.ret) # asimetría de los retornos
-        y4 = kurtosis(self.ret)
-        psratio = norm.cdf((sratio-benchm)*((t-1)**.5)/((1-y3*sratio+((y4-1)/4)*(sratio**2))**.5))
-        return psratio
-    
-    """
-        Mínimo tamaño de la muestra para obtener un probabilistic sharpe ratio válido
-    """
-    def min_n(self):
-        sratio = self.sr()
-        y3 = skew(self.ret)
-        y4 = kurtosis(self.ret)
-        MinTRL_n = 1+(1-y3*sratio+(y4-1)/4.*sratio**2)*(norm.ppf(0.05)/(sratio-self.bechmMin))**2
-        return MinTRL_n, len(self.ret)
-        
-    """
-        Dollar Performance per Turnover, retorno promedio por cada rotación de dinero invertido sobre AUM
-    """
-    def dppt(self): #Dollar performance per turnover: 
-        dollar_perfomance = (self.cap[-1]/self.cap[0])-1
-        init_cap = self.cap[0]
-        turnover = init_cap/self.cap.mean() # dinero invertido/aum
-        return dollar_perfomance/turnover
-    
-    """
-        Retorno sobre costos
-    """
-    def roec(self): #Return on execution costs
-        dollar_perfomance = (self.cap[-1]/self.cap[0])-1
-        execution_costs = self.costs.mean()
-        return dollar_perfomance/execution_costs
-    
-    """
-        Función que genera la métrica de perfomance de todos los statistics en base 100
-    """
-    def performance(self, crits,idx):
-        
+  # calculo del retorno por evento  
+  def __returnsUpdating__(self):
+    self.trials_frame["returns"] = self.trials_frame.apply(
+        lambda row: return_func(row.entryPrice, row.exitPrice, row.predCat),
+        axis=1
+      )
+  
+  # actualizacion de los precios (inicial y final) segun apalancamiento
+  def __priceUpdating__(self):
+    # actualizacion de initial price
+    self.trials_frame["invest_price"] = self.trials_frame.apply(
+        lambda row: investedPrice(row.entryPrice, row.leverage),
+        axis =1
+      )
+    # actualizacion de final price
+    self.trials_frame["final_price"] = self.trials_frame.apply(
+        lambda row: finalPrice(row.invest_price, row.returns, row.leverage),
+        axis=1
+      ) 
+  
+  # estima cash neto como diferencial entre precio ajustado inicial y final
+  def __netCashEstimation__(self):
+    return netCashEstimation(self.trials_frame, self.fixed_comission)
 
-        t = time()
-        pt_1 = self.get_pnl()/self.cap[0] # el pnl se divide sobre el cap inicial para obtener un retorno pnl porcentual
-        pt_2 = self.aror()
-        pt_3 = self.hitratio()/len(self.ret) #el número de hit se divide al número total para obtener un porcentual
-        pt_4 = self.avgrethits()
-        pt_5 = self.computeDD_TuW(dollars=False)[0].max() #solo se toma el maximo drawdown
-        pt_6 = self.computeDD_TuW(dollars=False)[1].max() #solo se toma el máximo time under water
-        pt_7 = self.getHHI("p")
-        pt_8 = self.getHHI("n")
-        pt_9 = self.sr()
-        pt_10 = self.psr(crits['Sharpe Ratio'][0]) #el sharpe ratio toma de benchmark el sharpe que se pide
-        pt_11 = self.dppt()
-        pt_12 = self.roec()
-        print(f"Time for getting metrics in path:{idx}", time() - t)
-        frame = pd.DataFrame({"Pnl": [pt_1], "Annualized Rate of Returns": [pt_2], "Hit Ratio": [pt_3],
-                             "Average Return of Hits": [pt_4], "Max Drawdown": [pt_5], "Max Time Under Water": [pt_6],
-                             "HHI positive": [pt_7], "HHI negative": [pt_8], "Sharpe Ratio": [pt_9], 
-                             "Probabilistic Sharpe Ratio": [pt_10], "Dollar Performance": [pt_11],
-                             "Return Over Execution Costs": [pt_12]})
-        frame = frame.append(pd.DataFrame(crits), ignore_index=True)
-        
-        #Todas las métricas reales se dividen sobre las exigidas y se promedian a base 100.
-        #Las métricas de HHI se miden en negativo ya que menos concentrado es mejor siempre.
-        score = (frame.iloc[0]/frame.iloc[1]).mean()*100
-        frame.index = ["Real Values", "Benchmarks"]
-        return frame, score
-        
-        
-"""-------------------------------------------------------------------------------------------------------------------------
-    Función que aplica la clase Metrics de estadísticas de backtest para dividir el dataframe en paths
-    sobre los que se aplica la clase y se retorna un DataFrame compuesto por el puntaje de desempeño
-    de cada path
-    
-    Inputs:
-    df: DataFrame sobre el cual dividir y aplicar la clase
-    crits: Criterios de desempeño esperados de las estrategias
-    
-    Outputs:
-    df_2: DataFrame con las métricas reales por cada path dentro del frame inicial y el puntaje de desempeño
-    
-    Diccionario de datos genéricos
-    
-    Crits para uso en .performance(crits):
-        
-        crits = {'Pnl': [0.1], 
-                'Annualized Rate of Returns': [0.45], 
-                'Hit Ratio': [0.33], 
-                'Average Return of Hits': [0.01],
-                'Max Drawdown': [0.01], 
-                'Max Time Under Water': [0.1], 
-                'HHI positive': [-0.1], 
-                'HHI negative': [-0.1], 
-                'Sharpe Ratio': [0.88], 
-                'Probabilistic Sharpe Ratio': [0.9], 
-                'Dollar Performance': [0.1], 
-                'Return Over Execution Costs': [0.5]}
-    
-"""
+  # generacion de la tabla binaria secuencial de cash (binaryCashFlowTable)
+  def __binaryCashFlowTable__(self, dfNetCash):
+    return cashFlowSequential(dfNetCash)
 
-def metricsByPath(df, crits):
-    df_2 = pd.DataFrame()
-    for idx,x in enumerate(df.trial.unique()):
-        df_ = df[df.trial == x]
-        clase = Metrics(df_)
-        clase_df, clase_score = clase.performance(crits,idx)
-        clase_df["Score"] = clase_score
-        clase_df["Trial"] = x
-        df_2 = df_2.append(clase_df.loc["Real Values"])
-        df_2.index = range(len(df_2))
-    return df_2
+  # generacion de la tabla con la evolucion del CASH, AUM y CAP 
+  def __moneyAndCapitalAsessment__(self, cashFlowTable):
+    return moneyEVA(
+        binaryDF = cashFlowTable, 
+        initial_cap = self.initial_cap, 
+        cashF = self.capital_factor
+        )
+
+  def get_info(self):
+    # actualizacion de precios segun bid/ask spread
+    self.__entryExitPrices__() 
+    # actualizacion de computo de retornos
+    self.__returnsUpdating__()
+    # actualizacion de precios iniciales y finles x apalancamiento
+    self.__priceUpdating__()
+    # calculo de valor netcash
+    dfNetCash = self.__netCashEstimation__()
+    # generacion de tabla binarizada de estructura de cash flow 
+    cashFlowTable = self.__binaryCashFlowTable__(dfNetCash)
+    # tabla de evolución del cashflow, aum y capitalizacion
+    assetumTable = self.__moneyAndCapitalAsessment__(cashFlowTable)
+    # agregamos columna con el costo fijo
+    assetumTable["fixedCost"] = self.fixed_comission
+    return assetumTable  
+
+
+##############################################################################
+###################### SUBCLASE #2 COMPLEMENTARY METRICS #####################
+##############################################################################
+
+
+class ComplementaryMetrics(object):
+  """
+  Clase de Métricas complementarias
+  --------------------------------
+
+  Input:
+    - pd.Dataframe con las columnas de cap, cash y AUM *.
+
+    (*) pd.Dataframe para solo un trial y un modelo.
+
+  Output:
+    - lst() con la información de las métricas complementarias.
+
+  Listado de Métricas x Método:
+
+    - Profit and Loss:       __Pnl__() ... 
+    - Retornos anualizados:  __Aror__()...
+    - Ratio Hit:             __HitRatio__()...
+    - Retorno medio x hit:   __AvgReturnsHits__()...
+    - Herfindahl-Hirschman:  __HHI__(signo)...
+            * signo :: 'p' >> concentración de los retornos positivos
+            * signo :: 'n' >> concentración de los retornos negativos
+    - Ratio Sharpe:          __sharpreRatio__()...
+    - Probabilistic Sharpe:  __probSharpeRatio__(benchmark)...:
+            * benchmark: valor de Sharpe Ratio estimado
+    - Return over costs:     __returnOverCosts__()
+    - Drawndown & TimeUnd:   __ddtu__(dollar)...:
+            * dollar : boleano para estimar el DD y TU en formato $$$.
+    - Retorno medio x rotación de capital : __dollarPerformanceTurnover__()
+
+  Método principal de llamado:
+    - compute(psp_benchmark)...
+
+  """
+
+  # clase de inicialización
+  def __init__(self, df):
+    # df segmentado por trial y modelo inc. métricas de cash computadas 
+    self.df = df
+  
+  # cómputo de profit and loss = cap final - cap inicial
+  def __Pnl__(self):
+    return self.df.cap.iloc[-1] - self.df.cap.iloc[0] 
+
+  # cómputo de Annualized Rate of Returns (AROR)
+  def __Aror__(self):
+    # length en días del trial
+    days = (
+        self.df.close_date.iloc[-1] - self.df.close_date.iloc[0]
+        ).days
+    # tasa anualizada de los retornos
+    return (((self.__Pnl__() / self.df.cap.iloc[0]) + 1)**(360/days) ) - 1 
+
+  # hit ratio :: total de bets positivos (otrogaron ganancias)
+  def __HitRatio__(self):
+    # levantamos el df segmentado de returns > 0 objeto a la clase general
+    self.positiveReturnsDf = self.df.query("returns > 0")
+    # estimación del hit ratio como conteo total de positiveness 
+    return self.positiveReturnsDf.shape[0]
+
+  # retorno promedio por hit
+  def __AvgReturnsHits__(self):
+    return self.positiveReturnsDf.returns.sum() / self.__HitRatio__()
+  
+  # Herfindahl-Hirschman :: medida de concentración de los retornos
+  def __HHI__(self, sign):
+    # si es un HHI para retornos positivos
+    if sign == 'p':
+      ret_info = self.positiveReturnsDf.returns
+    # si es un HHI para retornos negativos
+    if sign == 'n':
+      ret_info = self.df.query("returns <= 0").returns
+    # si no se cuenta con suficiente data
+    if ret_info.shape[0]<=2:return np.nan
+    # estimacion de weights
+    wght = ret_info / ret_info.sum()
+    # estimacion del HHI
+    hhi = (wght**2).sum()
+    return (hhi-ret_info.shape[0]**-1)/(1.-ret_info.shape[0]**-1)
+  
+  # sharpe ratio
+  def __sharpreRatio__(self):
+    # mean of returns (mu value)
+    mu = self.df.returns.mean()
+    # std of returns (std val)
+    std = self.df.returns.std()
+    # compute and return sharpe ratio
+    return mu/std
+
+  # probabilistic sharpe ratio
+  def __probSharpeRatio__(self, benchmark):
+    # estimación del sharpe ratio
+    sharpeRatio = self.__sharpreRatio__()
+    # total events
+    t = self.df.returns.shape[0]
+    # skew (asimetría) de los retornos 
+    skewReturns = skew(self.df.returns)
+    # kurtosis (shape dist) de los retornos
+    kurtosisReturns = kurtosis(self.df.returns)
+    # prob. Sharpe Ratio
+    prob_sharpe_ratio = norm.cdf(
+        (sharpeRatio - benchmark) * ( (t-1) **.5 ) / 
+        ( ( 1 - skewReturns * sharpeRatio + (
+            (kurtosisReturns-1)/4
+            ) * (sharpeRatio ** 2)) **.5 )
+        )
+    return prob_sharpe_ratio
+
+  # returns over execution costs
+  def __returnOverCosts__(self):
+    # dollar performance y levantamiento como param general
+    self.dollar_performance = (self.df.cap.iloc[-1] / self.df.cap.iloc[0]) - 1 
+    # media de los costos de ejecución
+    execution_costs = self.df.fixedCost.mean()
+    # retornamos retorno sobre costos
+    return self.dollar_performance / execution_costs
+
+  # Drawndown & TimeUnderwater
+  def __ddtu__(self, dollar = False):
+    # se añade columna con máximos en el dataframe general, a medida que aparece
+    # un nuevo máximo, el .expanding() lo modifica en la serie
+    self.df['maximos'] = self.df.cap.expanding().max()
+
+    # se hace un groupby por máximos, pero con los valores mínimos de cada máximo
+    minimos = self.df.groupby('maximos').min().reset_index()[["maximos", "cap"]]
+    minimos.columns=['maximos','min']
+    minimos.index=self.df['maximos'].drop_duplicates(keep='first').index 
+
+    # muestra los índices en minimos donde hubo drawdown
+    # un máximo seguido de un mínimo
+    minimos=minimos[minimos['maximos']>minimos['min']]
+
+    #Si está en dólares, el drawdown es la resta
+    if dollar:dd=minimos['maximos']-minimos['min']
+    #Si no es porcentaje
+    else:dd=(minimos['maximos']-minimos['min'])/minimos['maximos']
+    
+    #Obtienes los índices y el tiempo entre índices del drawdown / No corre
+    tuw=(minimos.index[1:]-minimos.index[:-1])
+    #tuw=(minimos.index[1:]-minimos.index[:-1]).astype(int).values
+    #Conviertes a serie los tiempos tuw
+    tuw=pd.Series(tuw,index=minimos.index[:-1])
+    return dd.max(), tuw.max()/60
+  
+  # dollar performance per turnover 
+  def __dollarPerformanceTurnover__(self):
+    # retorno promedio por cada rotación
+    self.turnover = len(self.df.query("aum == 0"))-1
+    return self.dollar_performance/self.turnover
+
+  # callable method || input extra: benchmark para el probabilistic sharpe ratio
+  def compute(self, psp_benchmark):
+    # IMPORTANT! :::: psp_benchmark ::: float between 0 - 1 (if not, psrp  = 0)
+    
+    #######################################################
+    ##### Estimación de métricas complementarias ##########
+    #######################################################
+    # PnL
+    pnl = self.__Pnl__()
+    # Annualized Rate of Returns (AROR)
+    aror = self.__Aror__()
+    # Hit Ratio
+    hitRatio = self.__HitRatio__()
+    # Avg. Returns of Hits
+    avghits = self.__AvgReturnsHits__()
+    # Herfindahl-Hirschman :: concentración de retornos positivos
+    hh_positive = self.__HHI__('p')
+    # Herfindahl-Hirschman :: concentración de retornos negativos
+    hh_negative = self.__HHI__('n')
+    # Sharpe Ratio
+    sharpe_ratio = self.__sharpreRatio__()
+    # probabilistic sharpe ratio
+    probabilistic_sharpe = self.__probSharpeRatio__(psp_benchmark)
+    # retornos sobre costos
+    return_over_costs = self.__returnOverCosts__()
+    # drawndown and time underwater...
+    drawndown = self.__ddtu__()[0]
+    time_underwater = self.__ddtu__()[1]
+    # dolllar performance per turnover...
+    dollar_performance_per_turnover = self.__dollarPerformanceTurnover__()
+
+    # lista de resultados finales
+    resultsList = [
+          pnl, 
+          aror, 
+          hitRatio, 
+          avghits, 
+          hh_positive,
+          hh_negative,
+          sharpe_ratio,
+          probabilistic_sharpe,
+          return_over_costs,
+          drawndown,
+          time_underwater,
+          dollar_performance_per_turnover
+        ]
+    return resultsList
+
+##############################################################################
+############## CLASE PRINCIPAL | CÓMPUTO DE MÉTRICAS COMPLETAS ###############
+##############################################################################
+
+class EnigmxMetrics(object):
+    
+    """
+    Clase que integra las subclases:
+        1. Subclase de Cálculo de métricas de cash (subclase #1)
+        2. Subclase de Cálculo de métricas financieras y ML (subclase #2)
+    
+    La presente clase funciona solo con el insumo de 'df_trials' 
+    para un trial y un modelo en particular.  
+    
+    Debe ser ingestada dentro de una función paralelizadora (Ray).
+
+    Método único:
+        - generate():
+                * Permite el cómputo de los VALORES de métricas.
+                  Estos son computados en una lista que posee 
+                  el siguiente ordenamiento de valores:
+                      ** pnl :: en $$ 
+                      ** aror :: % retorno anualizado
+                      ** hitRatio :: total de bets positivos (profits)
+                      ** avghits  :: retorno promedio por hit %
+                      ** hh_positive :: concentración de los retornos + en %
+                      ** hh_negative :: concentración de los retornos - en %
+                      ** sharpe_ratio :: ratio sharpe
+                      ** probabilistic_sharpe :: ratio sharpe probabilístico
+                      ** return_over_costs :: retorno sobre costos en %
+                      ** drawndown :: máximo drawdown en %
+                      ** time_underwater :: tiempo en negativo (minutos)
+                      ** dollar_performance_per_turnover :: performance x c/ rotación de cap. en %
+                    
+    """
+    
+    def __init__(self, 
+                 df_trials, 
+                 initial_cap, 
+                 capital_factor, 
+                 fixed_comission = 0.70, 
+                 psp_benchmark = 0.15):
+        
+        # definición de parámetros generales
+        
+        # df con info del trial N# | DEBE TENER UN SOLO TRIAL DE UN SOLO MODELO
+        self.df_trials = df_trials 
+        # int de capital inicial
+        self.initial_cap = initial_cap
+        # factor de capital: de 0 a 1 en % sobre capital útil
+        self.capital_factor = capital_factor
+        # monto de comision fija x trade
+        self.fixed_comission = fixed_comission
+        # benchmark de 0 a 1 para el probabilistic sharpe ratio
+        self.psp_benchmark = psp_benchmark 
+        
+    def generate(self):
+        
+        # computo de la primera subclase #1 | cómputo de métricas de cash
+        cashDf = CashReturnMetrics(
+            trials_frame = self.df_trials,
+            initial_cap = self.initial_cap,
+            capital_factor = self.capital_factor,
+            fixed_comission = self.fixed_comission
+            ).get_info()
+        
+        # actualizacion del df de trials
+        df_trials_updated = pd.merge(
+            self.df_trials, cashDf, "left", on = "close_date"
+            )
+        
+        # computo de la segunda subclase #2 | cómputo de métricas financieras
+        metricsDf = ComplementaryMetrics(df_trials_updated).compute(
+            psp_benchmark = self.fixed_comission
+            )
+        
+        return metricsDf
+
+#@ray.remote
+def metricsParalelization(
+        dataframe_segmented, 
+        initial_cap, 
+        capital_factor, 
+        fixed_comission, 
+        psp_benchmark
+        ):
+    
+    instance = EnigmxMetrics(
+        dataframe_segmented,
+        initial_cap, 
+        capital_factor, 
+        fixed_comission, 
+        psp_benchmark
+        )
+    
+    return instance.generate()

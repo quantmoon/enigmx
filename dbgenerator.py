@@ -45,7 +45,8 @@ table_standard_bar_structure = {
     'feat_hasbrouckSign':'float',
     'vwap':'float',	'fracdiff':'float',	
     'volatility':'float','horizon':'DATETIME', 'upper_barrier':'float',
-    'lower_barrier':'float'
+    'lower_barrier':'float',
+    'bidask_spread': 'float',
     }
 
 table_entropy_bar_structure = {
@@ -63,7 +64,9 @@ table_entropy_bar_structure = {
     'feat_hasbrouckSign':'float',    
     'vwap':'float',	'fracdiff':'float',	
     'volatility':'float','horizon':'DATETIME', 'upper_barrier':'float',
-    'lower_barrier':'float', 'entropy':'float'
+    'lower_barrier':'float', 
+    'entropy':'float',
+    'bidask_spread': 'float',
     }
 
 table_barrier_bar_structure = {
@@ -82,7 +85,8 @@ table_barrier_bar_structure = {
     'vwap':'float',	'fracdiff':'float',	
     'volatility':'float','horizon':'DATETIME', 'upper_barrier':'float',
     'lower_barrier':'float', 'barrierPrice': 'float', 'barrierLabel': 'int',
-    'barrierTime': 'DATETIME'
+    'barrierTime': 'DATETIME',
+    'bidask_spread': 'float',
     }
 
 table_weighted_bar_structure = {
@@ -102,7 +106,8 @@ table_weighted_bar_structure = {
     'volatility':'float','horizon':'DATETIME', 'upper_barrier':'float',
     'lower_barrier':'float', 'barrierPrice': 'float', 'barrierLabel': 'int',
     'barrierTime': 'DATETIME', 'overlap': 'int', 'weight': 'float', 
-    'weightTime':'float'
+    'weightTime':'float',
+    'bidask_spread': 'float',
     }
 
 #############################################################################

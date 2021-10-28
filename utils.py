@@ -2,11 +2,15 @@
 author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
+
 import talib
 import sys
 import os
 import zarr
 import math
+import pyodbc
+import urllib
+import sqlalchemy
 import numpy as np
 import pandas as pd
 from time import time
@@ -23,7 +27,6 @@ from fracdiff import StationaryFracdiff
 from sklearn.preprocessing import LabelEncoder
 from enigmx.protofeatures import protoFeatures
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mutual_info_score
 from enigmx.purgedkfold_features import featImportances
 
 #general class to personalize ValueError Messages
@@ -2316,15 +2319,15 @@ def ErrorIndexIdxFirstTrue(param):
 
 
 
-@njit
+#@njit
 def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upper_bound,lower_bound):
-        
+    
+    print("Veamos Inner barrier_inside_computation | LLEVA NUMBA | UTILS.PY (line 2309)")    
     
     selected_indexes  = np.where((ts_timeframe>init_ts)&(ts_timeframe<last_ts))
     segmented_prices = prices_timeframe[selected_indexes[0]]
     segmented_timestamps = ts_timeframe[selected_indexes[0]]
     
-
     try:
         first_upper_barrier_idx = np.where(segmented_prices > upper_bound)[0][0]
     except:
@@ -2335,7 +2338,7 @@ def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upp
     except:
         first_lower_barrier_idx = None
 
-    # conditional definition of barrierBoolValues (horizontal barrier)
+    # conditional definition of barrierBoolValues (vertical barrier)
     if segmented_prices.shape[0] == 0:
         return  0, 0, last_ts
 
@@ -2364,9 +2367,12 @@ def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upp
                 print("       ::::::: >> Warning! Timestamp selected is negative!! \
                       Upper barrier Case | Check array: ")
                 print(segmented_timestamps[first_upper_barrier_idx:,0])
+            print(" ")
+            print("***"*10)
             
             return segmented_prices[first_upper_barrier_idx:,0][0], 1 , segmented_timestamps[first_upper_barrier_idx:,0][0] 
-
+        
+        #lower barrier happens first (or it's unique) than upper barrier
         else:
             
             if segmented_timestamps[first_lower_barrier_idx:,0][0] < 0:
@@ -2375,7 +2381,7 @@ def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upp
                 print(segmented_timestamps[first_lower_barrier_idx:,0])
             
             #definition of horizontal lower barrier
-            return segmented_prices[first_lower_barrier_idx:,0][0],-1 , segmented_timestamps[first_lower_barrier_idx:,0][0]
+            return segmented_prices[first_lower_barrier_idx:,0][0],-1, segmented_timestamps[first_lower_barrier_idx:,0][0]
 
   
 
@@ -2432,12 +2438,15 @@ def vectorizedTripleBarrier(arr,arr2,path, init, init_ts, last, last_ts, upper_b
         prices_timeframe = prices_timeframe.reshape(-1,1)
         ts_timeframe = ts_timeframe.reshape(-1,1)
         
-        
+        print("INICIA BARRIER INSIDE COMPUTATION")
         finalPrice, finalLabel, finalTimestamp = barrier_inside_computation(
                                                                         ts_timeframe,
                                                                         prices_timeframe,
                                                                         init_ts,last_ts,
                                                                         upper_bound,lower_bound)
+        print("FINAL BARRIER PRICE")
+        print(finalPrice)
+        print(" ")
     return finalPrice, finalLabel, finalTimestamp 
 
 ########### NEW TRIPLE BARRIER COMPUTATION ######################
@@ -2470,7 +2479,7 @@ def LabelTripleBarrierComputation(barDataframe, stock, data_dir):
     for idx,i in enumerate(zarrds.timestamp):
         arr2[zarrds.date[idx]] = zarrds.timestamp[idx]
 
-    print("Armado de arrays",stock,time() - t1)
+    print("Armado de arrays", stock,time() - t1)
     t2 = time()
     #tripleBarrier vectorized computation version
     tripleBarrierInfo = barDataframe.apply( 
@@ -2861,8 +2870,8 @@ def baseFeatImportance(**kwargs):
                     'RandomForestClassifier'
                     )
                 )
-
-   # importance values, score con cpkf, y mean val (NaN)
+            
+    # importance values, score con cpkf, y mean val (NaN)
     imp,oos,oob = featImportances(x_train, 
                                   y_train, 
                                   kwargs['model_selected'],
@@ -2888,50 +2897,99 @@ def baseFeatImportance(**kwargs):
     # retorna featuresRank (0), accuracy CPKF, accuracy con CPKF, y el stacked
     return featureImportanceRank, score_sin_cpkf, oos, imp
     
+    
+##############################################################################
+############################### CLICK MESSAGES ###############################
+##############################################################################
 
+
+M1 = "¿Desea continuar el featImp-clusterizado sin residuos? \
+    Este genera N combinatorias x cluster evaluadas por el Kendall-Tau Corr."
+M2 = "Puede generar MemoryProblems si el dispositivo no cuenta con capacidad. "
+M3 = "Asimismo, el featImpClusterizado no está conectado con el proceso post."
+M4 = ":::::::: >>>> Responda 'Y' si desea continuar o 'N' si desea detenerlo."
+clickMessage1 = M1 + M2 + M3 + M4
 
 ##############################################################################
+################### FUNCION PARA GUARDAR TABLA SQL ALCHEMY ###################
+##############################################################################
+
+def sql_alche_saving(dataframe, backtescode, 
+                     server_name, database, uid = '', pwd = ''):
+    
+    print("------------ SAVING IN 'BACKTEST' sql database -------------")
+    print(":::::: >>> SQL Alchemy Initialization for 'backtest' table...\n")
+    
+    #obtenemos la lista de drivers temporales en uso directamente de pyodbc
+    temporalDriver = [item for item in pyodbc.drivers()]
+    
+    #selecciona el temporal driver idx = 0 | en caso error, usar idx = -1
+    temporalDriver = temporalDriver[0]
+    
+    print(f">>> Temporal Driver Selected is '{temporalDriver}'...")
+    print("----> Warning! In case 'InterfaceError':") 
+    print("Please, change 'temporalDriver' idx selection in line 2912 utils.py.\n")    
+    
+    #construimos la sentencia de conexión a través de SQL ALchemy
+    mainSQLAlchemySentence = f'DRIVER={temporalDriver};SERVER={server_name};DATABASE={database};UID={uid};PWD={pwd}'
+    
+    #generamos SQL-AL engine para inserción de nuevas tablas
+    params = urllib.parse.quote_plus(mainSQLAlchemySentence)
+        
+    #inicialización del engine de SQL Alchemy
+    engine = sqlalchemy.create_engine(
+            "mssql+pyodbc:///?odbc_connect={}".format(params)
+            )        
+    
+    #definimos nombre de la tabla
+    tableName = "BACKTEST_TRIAL_{}".format(backtescode)
+    
+    #escritura del dataframe a SQL usando SQL alchemy
+    dataframe.to_sql(tableName, engine, index=False)
+    
+    print("<<<::::: BACKTEST TABLE COMPUTATION SQL PROCESS FINISHED :::::>>>")
+    
+ ##############################################################################
 ################ ENTROPY MATRIX: VARIATION OF INFORMATION ####################
 ##############################################################################
 
 ######################################################################################
 # La funcion numBins es una funcion intermedia
-# Sirve para determinar el numero optimo de bins para dividir la data 
+# Sirve para determinar el numero optimo de bins para dividir la data
 ######################################################################################
 #-------------------------------------------------------------------------------------
 def numBins(nObs,corr=None):
-    # Determina el numero optimo de intervalos (bins) en los que se divide los datos. 
-    # Necesario cuando se trabaja con V.A continuas. 
-    
-    if corr is None: 
+    # Determina el numero optimo de intervalos (bins) en los que se divide los datos.
+    # Necesario cuando se trabaja con V.A continuas.
+
+    if corr is None:
         # binning optimo para el "marginal entropy" (Hacine-Gharbi et.al 2012)
         z=(8+324*nObs+12*(36*nObs+729*nObs**2)**.5)**(1/3.)
         b=round(z/6.+2./(3*z)+1./3)
-    else: 
+    else:
         # binning optimo para el "joint entropy" (Hacine-Gharby and Ravier 2018)
         b=round(2**-.5*(1+(1+24*nObs/(1.-corr**2))**.5)**.5)
     return int(b)
 #-------------------------------------------------------------------------------------
 ####################################################################################################
 # La funcion varInfo es la funcion principal
-# Sirve para calcular la metrica "variation of information VI[X,Y]", 
+# Sirve para calcular la metrica "variation of information VI[X,Y]",
 # la cual indica el grado de incertidumbre que tengo sobre X si conozco Y
 ####################################################################################################
-#---------------------------------------------------------------------------------------------------
 def varInfo(x,y,norm=True):
     # variation of information
-    
+
     ## 1) Determinar el numero optimo de bins
     bXY=numBins(x.shape[0],corr=np.corrcoef(x,y)[0,1])
-    
-    ## 2) Se calcula el mutual information (denotado como iXY = I[X,Y]) 
+
+    ## 2) Se calcula el mutual information (denotado como iXY = I[X,Y])
     cXY=np.histogram2d(x,y,bXY)[0]
     iXY=mutual_info_score(None,None,contingency=cXY)
     ## 3) se calcula el marginal entropy de X y Y
     #### PARA MANTENER CONSISTENCIA, SE USA EL MISMO binning
-    hX=stats.entropy(np.histogram(x,bXY)[0]) 
-    hY=stats.entropy(np.histogram(y,bXY)[0]) 
-    ## 4) Se calcula el variation of information (denotado como vXY = VI[X,Y])  
+    hX=stats.entropy(np.histogram(x,bXY)[0])
+    hY=stats.entropy(np.histogram(y,bXY)[0])
+    ## 4) Se calcula el variation of information (denotado como vXY = VI[X,Y])
     vXY=hX+hY-2*iXY # variation of information
     ## 5) Se normaliza el vXY (denotado \tilde{VI}[X,Y] = VI[X,Y]/H[X,Y])
     if norm:
@@ -2944,7 +3002,7 @@ def varInfo(x,y,norm=True):
 #----------------------------------------------------------------------------------------------------
 
 # La funcion "mutualInfo" es una funcion principal
-# Sirve para calcular el "Mutual information I[X,Y]" (no es una metrica), 
+# Sirve para calcular el "Mutual information I[X,Y]" (no es una metrica),
 # la cual indica en que grado se reduce la incertidumbre que tengo sobre X si conozco Y
 #---------------------------------------------------------------------------------------------------
 def mutualInfo(x,y,norm=True):
@@ -2958,13 +3016,11 @@ def mutualInfo(x,y,norm=True):
         iXY/=min(hX,hY) # normalized mutual information
     return iXY
 #--------------------------------------------------------------------------------------------------------
-
-
 # La funcion "prox_matrix" es una funcion que calcula la "Proximity Matrix", insumo del algoritmo ONC
 # Para ello, calcula en forma iterativa \tilde{VI}[X_i,X_j], para todo i != j y completa las posiciones
 # (i,j) y (j,i) en la "Proximity Matrix" de dimension N, donde N es el numero de features.
 def prox_matrix(X):
-    
+
     # Por definicion, b = \tilde{VI}[X,X] = 0 => 1-b = 1
     # Por este motivo, la diagonal de la matrix tiene puros 1
     NVI = np.identity(X.shape[1])
@@ -2973,11 +3029,11 @@ def prox_matrix(X):
     L = X.shape[1]
 
     for i in range(0,L-1):
-    
+
         for j in range(I,L):
             a = varInfo(X.iloc[:,i],X.iloc[:,j],True)
             # usamos 1-a para que halla similitud con la matrix de correlacion
-            NVI[i,j], NVI[j,i] = 1-a, 1-a 
+            NVI[i,j], NVI[j,i] = 1-a, 1-a
         I+= 1
 
     NVI = pd.DataFrame(NVI,columns=X.columns,index=X.columns)
@@ -3015,17 +3071,3 @@ def backtestSplit(df, pct_split):
     backtest[colDates] = backtest[colDates].astype(str)
 
     return backtest, df_endo, df_exo
-    
-##############################################################################
-############################### CLICK MESSAGES ###############################
-##############################################################################
-
-
-M1 = "¿Desea continuar el featImp-clusterizado sin residuos? \
-    Este genera N combinatorias x cluster evaluadas por el Kendall-Tau Corr."
-M2 = "Puede generar MemoryProblems si el dispositivo no cuenta con capacidad. "
-M3 = "Asimismo, el featImpClusterizado no está conectado con el proceso post."
-M4 = ":::::::: >>>> Responda 'Y' si desea continuar o 'N' si desea detenerlo."
-clickMessage1 = M1 + M2 + M3 + M4
-
-
