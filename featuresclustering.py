@@ -1,5 +1,5 @@
 """
-@author: Quantmoon Technologies
+@	author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
 
@@ -46,7 +46,7 @@ def clusterKMeansBase(corr0,maxNumClusters=None,n_init=10,val_abs=False):
 
     for init in range(n_init):
         for i in range(2,maxNumClusters+1): # find optimal num clusters
-            kmeans_=KMeans(n_clusters=i,n_jobs=1,n_init=1)
+            kmeans_=KMeans(n_clusters=i,n_init=1)
             kmeans_=kmeans_.fit(dist)
             silh_=silhouette_samples(dist,kmeans_.labels_)
             stat=(silh_.mean()/silh_.std(),silh.mean()/silh.std())

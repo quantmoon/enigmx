@@ -298,12 +298,7 @@ class EnigmX:
         # resultado del feature importance (dataframe)
        
         t1 = time()
-        valueResultFeatImp = instance.get_relevant_features(
-            filtering = self.filtering_featimp,
-            save = self.save_featimp,
-            split = self.split_featimp, 
-            pct_split = self.pct_split_featimp
-            )
+        valueResultFeatImp = instance.get_relevant_features()
         print("Get relevant features:",time()-t1)
         # si no se pide guardar, retornar dataframe
         if not self.save_featimp:
@@ -321,7 +316,6 @@ class EnigmX:
             feature_sufix = self.features_sufix,
             label_name = self.label_name,
             feat_bartype = self.bartype,
-            feat_method = self.method,
             timeIndexName = self.time_label_index_name,
             datetimeAsIndex = self.datetimeAsIndex,
             exo_openning_method_as_h5 =  self.exo_openning_method_as_h5,

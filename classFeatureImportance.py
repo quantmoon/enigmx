@@ -214,7 +214,7 @@ class featureImportance(object):
                  global_featImp = True, #add out
                  referential_database = 'TSQL',
                  simple_correlation = False,
-                 stationary_stacked = True
+                 stationary_stacked = True,
                  cutpoint = 0.8
                  ):
         
@@ -309,10 +309,12 @@ class featureImportance(object):
                     referential_base_database = self.referential_base_database
                     )
 
+        cutpoint = '_'.join(str(self.cutpoint).split('.'))
+
         if self.stationary_stacked:
-            matriz = f"STACKED_STATIONARY_{self.cutpoint}"
+            matriz = f"STACKED_STATIONARY_{cutpoint}"
         else:
-            matriz = f"STACKED_{self.cutpoint}"
+            matriz = f"STACKED_{cutpoint}"
 
         # extrae matriz de features estacionaria-estandarizada de la base de datos, así como serie de labels
         featStandarizedMatrix = SQLFRAME.read_table_info(

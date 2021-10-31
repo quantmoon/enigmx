@@ -3,7 +3,7 @@
 webpage: https://www.quantmoon.tech//
 """
 import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus=6)
+ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus=2)
 
 #from enigmx.utils import EquitiesEnigmxUniverse
 from enigmx.databundle_interface import SQLEnigmXinterface
@@ -12,17 +12,18 @@ from enigmx.tests.stocks import stocks
 
 
 
-server_name = "DESKTOP-N8JUB39" 
+server_name = "34.133.134.153"
 referential_base_database = 'TSQL'
-pathzarr = 'D:/data_zarr/'
-list_stocks = ['AEZS'] #stocks
-start_date = "2020-12-10" 
+pathzarr = '/var/data/data/'
+list_stocks = ['VTOL', 'ZNGA']
+start_date = "2020-12-01" 
 end_date = "2021-03-25" 
 desired_bars = 10
 bartype = 'volume'
-driver = "{SQL Server}"
-uid = ""
-pwd = ""
+driver = ("{ODBC DRIVER 17 for SQL Server}"),
+uid = "sqlserver"
+pwd = "quantmoon2021"
+
 
 print("inicializando clase")
 enigmxsql = SQLEnigmXinterface(
@@ -48,8 +49,8 @@ enigmxsql.create_table_database(
     bars_barrier = False,
     bars_weights = False,
     bars_features = False,
-    backtest_database = True,
-    bars_stacked = False,
+    backtest_database = False,
+    bars_stacked = True,
     creation_database = True)
 
 print("subiendo info")
@@ -62,6 +63,7 @@ enigmxsql.compute_info_to_sql(
             triple_barrier_computation_process = False, 
             sample_weight_computation_process = False,
             features_bar_computation_process = False,
+            features_stacking = True,
 	    )
 
 

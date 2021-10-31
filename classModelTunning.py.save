@@ -115,7 +115,7 @@ class ModelConstruction(object):
     def __featuresLabelConstruction__(self):
         
         # construcción del csv path
-        csv_path = "{}STACKED_{}_{}.csv".format(
+        sql_path = "{}STACKED_{}_{}.csv".format(
             self.stacked_path, 
             self.dataReq,
             self.feat_bartype.upper(), 

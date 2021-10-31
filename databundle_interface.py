@@ -148,6 +148,7 @@ class SQLEnigmXinterface(object):
                  bartype, start_date, 
                  end_date, desired_bars, 
                  referential_base_database = 'TSQL',
+                 cutpoints = [0.5,0.65,0.8],
                  global_range=True):
         
         self.database_features = 'BARS_FEATURES'
@@ -163,6 +164,7 @@ class SQLEnigmXinterface(object):
         self.desired_bars = desired_bars
         self.referential_base_database = referential_base_database
         self.global_range = global_range
+        self.cutpoints = cutpoints
         
     def __barTunningProcess__(self, SQLFRAME, dbconn, cursor):
         
@@ -699,11 +701,16 @@ class SQLEnigmXinterface(object):
             )
         instance = StationaryStacked(SQLFRAME,dbconn,cursor, self.list_stocks)
 
-        featStandarizedMatricesList, featStandarizedStationaryMatricesList,
-        labelsDataframe,original_stackeds, original_stationary_stackeds =  \
+        featStandarizedMatricesList, featStandarizedStationaryMatricesList,\
+        labelsDataframe,original_stackeds, original_stationary_stackeds, coldates =  \
             instance.__checkingStationary__(
-               self.pathzarr
+               self.pathzarr,
+               cutpoints = self.cutpoints
         )
+        
+        #Se cambia el nombre a los puntos de corte para que luego estas bases puedan ser leídas
+        # ya que arroja errores la base al tener puntos en el nombre
+        cutpoints = ['_'.join(str(cutpoint).split('.')) for cutpoint in self.cutpoints]
 
 
         #Guardado de todas las matrices no estacionarias, a diferentes puntos de corte:
@@ -713,19 +720,21 @@ class SQLEnigmXinterface(object):
             matrix.to_sql(f"STACKED_{cutpoint}", engine, index = True, index_label = 'close_date')
 
             #Separación del dataframe con features y datos adicionales
-            backtest_df, endo_df, exo_df = backtestSplit(original_stacked, pct_split = 0.6)
+            backtest_df, endo_df, exo_df = backtestSplit(original_stacked, pct_split = 0.6, colDates = coldates)
 
             #Guardado de las bases de datos para el combinatorial
             backtest_df.to_sql(f"STACKED_BACKTEST_{cutpoint}", engine, index = True, index_label = 'close_date')
             endo_df.to_sql(f"STACKED_ENDO_{cutpoint}", engine, index = True, index_label = 'close_date')
             exo_df.to_sql(f"STACKED_EXO_{cutpoint}", engine, index = True, index_label = 'close_date')
+
         #Guardado de todas las matrices no estacionarias, a diferentes puntos de corte:
         for matrix,original_stacked,cutpoint in zip(featStandarizedStationaryMatricesList,original_stationary_stackeds, cutpoints):
+
             #Base de datos para el Feature Importance
             matrix.to_sql(f"STACKED_STATIONARY_{cutpoint}", engine, index = True, index_label = 'close_date')
 
             #Separación del dataframe con features y datos adicionales
-            backtest_df, endo_df, exo_df = backtestSplit(original_stacked, pct_split = 0.6)
+            backtest_df, endo_df, exo_df = backtestSplit(original_stacked, pct_split = 0.6, colDates = coldates)
 
             #Guardado de las bases de datos para el combinatorial
             backtest_df.to_sql(f"STACKED_BACKTEST_STATIONARY_{cutpoint}", engine, index = True, index_label = 'close_date')
@@ -747,6 +756,7 @@ class SQLEnigmXinterface(object):
                               bars_barrier, 
                               bars_weights, 
                               bars_features, 
+                              bars_stacked,
                               backtest_database,
                               creation_database = True,):
         
@@ -1052,6 +1062,23 @@ class SQLEnigmXinterface(object):
 
             #nombre de la base de datos
             bartype_database = 'BARS_STACKED'
+
+            SQLFRAME, dbconn, cursor = databundle_instance(
+                    driver = self.driver, uid = self.uid, pwd = self.pwd,
+                    #nombre del servidor SQL Local
+                    server = self.server_name, 
+                    #nombre que se le asignará a la base de datos matriz
+                    bartype_database = bartype_database,
+                    #boleano para crear la tabla: si la tabla está creada, debe ser False
+                    create_database = creation_database, 
+                    #nombre global para cada tabla | "GLOBAL" x defecto
+                    global_range = self.global_range,
+                    #referential SQL Database name just for initialization
+                    referential_base_database = self.referential_base_database                    
+                    )                  
+            
+            dbconn.commit()
+            dbconn.close()  
            
             
         if backtest_database:

@@ -4,7 +4,7 @@ webpage: https://www.quantmoon.tech//
 """
 
 import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True))
+ray.init(include_dashboard=(False),ignore_reinit_error=(True), num_cpus=2)
 
 from enigmx.classEnigmx import EnigmX
 import numpy as np
@@ -58,35 +58,33 @@ dict_models = {
 
 ##############################################################################
 
-main_path = 'D:/data_enigmx/'
+main_path = '/var/data/data/'
 code = input('Ingresa el n° de serie de este intento: ')
 
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
                   method = 'MDI', 
                   base_path = main_path,
-                  cloud_framework = False,
-                  server_name = "DESKTOP-N8JUB39",
-                  stationary_stacked = True
-
+                  cloud_framework = True,
+                  server_name = "34.133.134.153",
+                  stationary_stacked = True,
                   features_database = "BARS_FEATURES",
-                  uid = '',
-                  pwd = '',
-                  driver = "{SQL Server}",
+                  uid = 'sqlserver',
+                  pwd = 'quantmoon2021',
+                  driver = ("{ODBC DRIVER 17 for SQL Server}"),
                   ) 
 
 # feature importance
 #instance.get_feature_importance(    
 #                      model = RandomForestClassifier(max_features=1, random_state=0), 
-#                      list_stocks = ['AEZS','AMPE', 'AWK', 'BOOM'],
+#                      list_stocks = ['VTOL','ZNGA'],
 #                      score_constraint = 0.3, #activar 
-                      server_name = "34.134.4.239",
-                      database = "BARS_FEATURES",
-                      uid = 'sqlserver',
-                      pwd = 'quantmoon2021',
-                     # driver = "{SQL Server}",
-                      driver = ("{ODBC DRIVER 17 for SQL Server}"),
-
+#                      server_name = "34.133.134.153",
+#                      database = "BARS_FEATURES",
+#                      uid = 'sqlserver',
+#                      pwd = 'quantmoon2021',
+#                      driver = ("{ODBC DRIVER 17 for SQL Server}"),
+#                      trial = code
 #                      pval_kendall = 0.1,
 #                      k_min = 10,
 #                      n_samples = 15
@@ -94,16 +92,16 @@ instance = EnigmX(bartype = 'VOLUME',
     
 
 # get multi process for tunning and backtest
-#instance.get_multi_process(
-#    code_backtest = code, 
-#    dict_exo_models = dict_models,
-#    endogenous_model_sufix= 'rf',    
-#    trials = 11, 
-#    partitions = 2, 
-#    cloud_instance = False,
-#    )
+instance.get_multi_process(
+    code_backtest = code, 
+    dict_exo_models = dict_models,
+    endogenous_model_sufix= 'rf',    
+    trials = 11, 
+    partitions = 2, 
+    cloud_instance = True,
+    )
 
 # extraemos las métricas del combinatorial
-instance.get_metrics(
-    code_backtest = '001'
-    )
+#instance.get_metrics(
+#    code_backtest = '001'
+#    )

@@ -531,20 +531,30 @@ class StationaryStacked():
         global_stackeds = []
         global_stationary_stackeds = []
 
+
+        #Separación de columnas no - features:
+        df_global_stacked_final = df_global_stacked[df_global_stacked.columns.drop(
+                                        list(df_global_stacked.filter(regex = self.features_sufix)))]
+
+        df_global_stacked.index = df_global_stacked['close_date']
+        df_global_stacked.drop('close_date',axis=1, inplace = True)
+
+        # conversión a dtypes de las fechas de las columnas
+        colDates = df_global_stacked.dtypes.where(
+                        df_global_stacked.dtypes == "datetime64[ns]"
+                        ).dropna().index.values
+
         #Iteración por punto de corte:
         for i in cutpoints:
 
             # Eliminamos las variables excesivamente correlacionadas para las matrices no estacionarizadas y la estacionarizada
-            dfStandarized,variables, corrMatrix = remove_corr_variables(dfStandarized,numerical_feat,discrete_feat,i)
-            dfStandarizedStationary ,variablesEstacionarias, corrMatrixStationary = remove_corr_variables(dfStandarizedStationary,numerical_feat,discrete_feat,i)
+            dfStandarized_final,variables, corrMatrix = remove_corr_variables(dfStandarized,numerical_feat,discrete_feat,i)
+            dfStandarizedStationary_final ,variablesEstacionarias, corrMatrixStationary = remove_corr_variables(dfStandarizedStationary,numerical_feat,discrete_feat,i)
  
-            #Separación de columnas no - features:
-            df_global_stacked = df_global_stacked[df_global_stacked.columns.drop(
-					list(df_global_stacked(regex = self.features_sufix)))]
 
             #Stacked final con los features rolleados y standarizados tanto estacionarizados como no estacionarizados:
-            df_global_stacked_stationary = pd.concat([df_global_stacked, dfStandarizedStationary], axis = 1)
-            df_global_stacked_non_stationary =  pd.concat([df_global_stacked, dfStandarizedStationary], axis = 1)
+            df_global_stacked_stationary = pd.concat([df_global_stacked, dfStandarizedStationary_final], axis = 1)
+            df_global_stacked_non_stationary =  pd.concat([df_global_stacked, dfStandarized_final], axis = 1)
 
        
             #Añadimos las matrices que luego se van a guardar, a las listas:
@@ -559,6 +569,6 @@ class StationaryStacked():
 #        pickle.dump(self.scalerObj, open('{}/scaler_{}.pkl'.format(pathOut, nowTimeID),'wb')) 
         
         # elementos utiles del feat improtance (3) + el base matrix org (feat roleados + datos add.)
-        return stationaryMatrices, notStationaryMatrices, yVectorArray, global_stationary_stackeds, global_stackeds
+        return stationaryMatrices, notStationaryMatrices, yVectorArray, global_stationary_stackeds, global_stackeds, colDates
 
 

@@ -1416,10 +1416,54 @@ def dataPreparation_forTuning(csv_path,
 
 def data_heuristic_preparation_for_tunning(csv_path,
                                            list_heuristic_elements):
+    print("----------Process {} started---------- \n".format(self.method))
+    SQLFRAME, dbconn, cursor = databundle_instance(
+                    driver = self.driver, uid = self.uid, pwd = self.pwd,
+                    #nombre del servidor SQL Local
+                    server = self.server_name,
+                    #nombre que se le asignará a la base de datos matriz
+                    bartype_database = "BARS_STACKED",
+                    #boleano para crear la tabla: si la tabla está creada, debe >
+                    create_database = False,
+                    #nombre global para cada tabla | "GLOBAL" x defecto
+                    global_range = True,
+                    #referential SQL Database name just for initialization
+                    referential_base_database = self.referential_base_database
+                    )
+
+    cutpoint = '_'.join(str(self.cutpoint).split('.'))
+
+    if self.stationary_stacked:
+        matriz = f"STACKED_STATIONARY_{cutpoint}"
+    else:
+        matriz = f"STACKED_{cutpoint}"
+
+        # extrae matriz de features estacionaria-estandarizada de la base de datos, así como serie de labels
+    featStandarizedMatrix = SQLFRAME.read_table_info(
+             statement = f"SELECT * FROM [BARS_STACKED].[dbo].{matriz}",
+            dbconn_= dbconn,
+            cursor_= cursor,
+            dataframe=True
+            )
+
+    labelsDataframe = SQLFRAME.read_table_info(
+            statement = f"SELECT * FROM [BARS_STACKED].[dbo].LABELS",
+            dbconn_= dbconn,
+            cursor_= cursor,
+            dataframe=True
+            )
+
+    featStandarizedMatrix.index = featStandarizedMatrix['close_date']
+    featStandarizedMatrix.drop('close_date',axis = 1,inplace = True)
+
     # obtención del df stacked desde path
     dfStacked = pd.read_csv(
-        csv_path, 
+        csv_path,
         ).dropna()
+
+
+
+
     
     # array conteniendo los elementos de la data según nombre de columna 
     dataframe = dfStacked[list_heuristic_elements]
