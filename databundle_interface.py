@@ -720,7 +720,7 @@ class SQLEnigmXinterface(object):
             matrix.to_sql(f"STACKED_{cutpoint}", engine, index = True, index_label = 'close_date')
 
             #Separación del dataframe con features y datos adicionales
-            backtest_df, endo_df, exo_df = backtestSplit(original_stacked, pct_split = 0.6, colDates = coldates)
+            backtest_df, endo_df, exo_df, labels_backtest, labels_endo, labels_exo,original_backtest  = backtestSplit(original_stacked,labelsDataframe, pct_split = 0.6, colDates = coldates)
 
             #Guardado de las bases de datos para el combinatorial
             backtest_df.to_sql(f"STACKED_BACKTEST_{cutpoint}", engine, index = True, index_label = 'close_date')
@@ -734,7 +734,7 @@ class SQLEnigmXinterface(object):
             matrix.to_sql(f"STACKED_STATIONARY_{cutpoint}", engine, index = True, index_label = 'close_date')
 
             #Separación del dataframe con features y datos adicionales
-            backtest_df, endo_df, exo_df = backtestSplit(original_stacked, pct_split = 0.6, colDates = coldates)
+            backtest_df, endo_df, exo_df, labels_backtest, labels_endo, labels_exo, original_backtest = backtestSplit(original_stacked, labelsDataframe,pct_split = 0.6, colDates = coldates)
 
             #Guardado de las bases de datos para el combinatorial
             backtest_df.to_sql(f"STACKED_BACKTEST_STATIONARY_{cutpoint}", engine, index = True, index_label = 'close_date')
@@ -743,6 +743,9 @@ class SQLEnigmXinterface(object):
 
         #llena la "LABELS"
         labelsDataframe.to_sql("LABELS", engine, index = True, index_label = 'close_date')
+        labels_backtest.to_sql("LABELS_BACKTEST", engine, index = True, index_label = 'close_date')
+        labels_exo.to_sql("LABELS_EXO", engine, index = True, index_label = 'close_date')
+        labels_endo.to_sql("LABELS_ENDO", engine, index = True, index_label = 'close_date')
 
         print("<<<::::: FEATURES STACKING  SQL PROCESS FINISHED :::::>>>")
 

@@ -93,7 +93,16 @@ class ModelConstruction(object):
                  datetimeAsIndex = True,
                  exo_openning_method_as_h5 = False,
                  heuristic_model = False,
-                 list_heuristic_elements = list_heuristic_elements):
+                 list_heuristic_elements = list_heuristic_elements,
+                 driver = "{ODBC DRIVER 17 for SQL Server}",
+                 uid = '',
+                 pwd = '',
+                 server_name = '',
+                 referential_base_data_base = 'TSQL',
+                 set_instance = None,
+                 stationary_stacked = None,
+                 cutpoint = None,
+                 variables = None):
         
         # revisión de correcto formato del path
         assert stacked_path[-1] == '/', "Check path ingested. Should be end in '/'"
@@ -110,16 +119,20 @@ class ModelConstruction(object):
         self.heuristic_model = heuristic_model
         
         self.list_heuristic_elements = list_heuristic_elements
+     
+        self.driver = driver
+        self.uid = uid
+        self.pwd = pwd
+        self.server_name = server_name
+        self.referential_base_data_base = referential_base_data_base
+
+        self.set_instance = set_instance
+        self.stationary_stacked = stationary_stacked
+        self.cutpoint = cutpoint
+        self.variables = variables
     
         
-    def __featuresLabelConstruction__(self):
-        
-        # construcción del csv path
-        csv_path = "{}STACKED_{}_{}.csv".format(
-            self.stacked_path, 
-            self.dataReq,
-            self.feat_bartype.upper(), 
-            )
+    def __featuresLabelConstruction__(self, step):
         
         if self.heuristic_model:
             X = data_heuristic_preparation_for_tunning(
@@ -140,11 +153,20 @@ class ModelConstruction(object):
         else:
             # obtención de matriz de features, vector de label y de timeIndex
             X, y, t1 = dataPreparation_forTuning(
-                csv_path = csv_path, 
-                label_name = self.label_name, 
-                features_sufix = self.feature_sufix, 
-                timeIndexName = self.timeIndexName, 
-                set_datetime_as_index = self.datetimeAsIndex 
+                driver = self.driver,
+                uid = self.uid,
+                pwd = self.pwd,
+                server_name = self.server_name,
+                referential_base_database = self.referential_base_data_base,
+                label_name = self.label_name,
+                features_sufix = self.feature_sufix,
+                timeIndexName = self.timeIndexName,
+                set_datetime_as_index = self.datetimeAsIndex,
+                set_instance = self.set_instance,
+                cutpoint = self.cutpoint,
+                stationary_stacked = self.stationary_stacked,
+	        variables = self.variables,
+                step = step
                 )
             return X, y, t1
     
@@ -160,7 +182,7 @@ class ModelConstruction(object):
 
         else:
             # ejecuta el proceso de entrenamiento o tunning para sklearn o keras
-            X, y, t1 = self.__featuresLabelConstruction__()
+            X, y, t1 = self.__featuresLabelConstruction__(step = 'EXO')
             
             # si el modelo ingestado es una funcion no sklearn (keras)
             if hasattr(self.model, '__call__') and self.exo_openning_method_as_h5:
@@ -179,6 +201,8 @@ class ModelConstruction(object):
                 print('::::: >> No KerasClassifier Object Created...\n')
                 
                 pass
+            
+
             
             # obtención del modelo exógeno
             exogenous_model = clfHyperFit(
@@ -264,7 +288,7 @@ class ModelConstruction(object):
         # si no es heuristico
         else:
             # partición del tipo de dato 
-            X, y, t1 = self.__featuresLabelConstruction__()
+            X, y, t1 = self.__featuresLabelConstruction__(step = 'ENDO')
         
             # conversión de dataframe en arrays 
             X, y = X.values, y.values

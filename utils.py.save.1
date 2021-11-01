@@ -1,4 +1,3 @@
-
 """
 author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
@@ -1415,7 +1414,7 @@ def dataPreparation_forTuning(driver,
     if stationary_stacked:
             matriz = f"STACKED_{step}_STATIONARY_{cutpoint}"
     else:
-            matriz = f"STACKED_{step}_{cutpoint}"
+            matriz = f"STACKED_EXO_{cutpoint}"
 
     # extrae matriz de features estacionaria-estandarizada de la base de datos, así como serie de labels
     dfStacked = SQLFRAME.read_table_info(
@@ -1426,7 +1425,7 @@ def dataPreparation_forTuning(driver,
             )
 
     y = SQLFRAME.read_table_info(
-            statement = f"SELECT * FROM [BARS_STACKED].[dbo].LABELS_{step}",
+            statement = f"SELECT * FROM [BARS_STACKED].[dbo].LABELS_EXO",
             dbconn_= dbconn,
             cursor_= cursor,
             dataframe=True
@@ -1441,10 +1440,6 @@ def dataPreparation_forTuning(driver,
     # array conteniendo los nombres de features ingresados
     variables = [variable.strip() for variable in variables.split(',')]
     
-    # Para calcular la purga y embargo
-    if step == 'BACKTEST':
-        variables.append('horizon')
-
     # selección únicamente de features
     X = dfStacked[variables]
     
@@ -1454,10 +1449,6 @@ def dataPreparation_forTuning(driver,
     # ordenamiento serie-temporal según timeIndexName
     X = X.sort_index()
     y = y.sort_index()
-
-    # Para calcular purga y embargo
-    if step == 'BACKTEST':
-        X['horizon'] = X['horizon'].astype('datetime64[ns]')
 
     # obtención de vector de timeIndex
     t1 = pd.Series(data=y.index, index=y.index)
@@ -1647,7 +1638,6 @@ def purge_embargo(X,train_indices,test_indices,embargo):
     los indices del training despues del Purge y Embargo
     '''
     sub = X[['horizon']]
-   
     train = sub.iloc[train_indices,:]
     test = sub.iloc[test_indices,:]
     

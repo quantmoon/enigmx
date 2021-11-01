@@ -59,14 +59,14 @@ dict_models = {
 ##############################################################################
 
 main_path = '/var/data/data/'
-code = input('Ingresa el n° de serie de este intento: ')
-
+#code = input('Ingresa el n° de serie de este intento: ')
+#variables = input('Por favor ingresa las variables con las que se va a construir el modelo (solo separados por comas): ')
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
-                  method = 'MDI', 
+                  method = 'MDA', 
                   base_path = main_path,
                   cloud_framework = True,
-                  server_name = "34.133.134.153",
+                  server_name = "35.192.156.82",
                   stationary_stacked = True,
                   features_database = "BARS_FEATURES",
                   uid = 'sqlserver',
@@ -77,31 +77,34 @@ instance = EnigmX(bartype = 'VOLUME',
 # feature importance
 #instance.get_feature_importance(    
 #                      model = RandomForestClassifier(max_features=1, random_state=0), 
+#                      model =  SGDClassifier(loss='log'),
 #                      list_stocks = ['VTOL','ZNGA'],
 #                      score_constraint = 0.3, #activar 
-#                      server_name = "34.133.134.153",
+#                      server_name = "35.192.156.82",
 #                      database = "BARS_FEATURES",
 #                      uid = 'sqlserver',
 #                      pwd = 'quantmoon2021',
 #                      driver = ("{ODBC DRIVER 17 for SQL Server}"),
-#                      trial = code
+#                      trial = code,
 #                      pval_kendall = 0.1,
 #                      k_min = 10,
-#                      n_samples = 15
+#                      n_samples = 15,
+#                      cutpoint = 0.5
 #                      )
-    
+   
 
 # get multi process for tunning and backtest
-instance.get_multi_process(
-    code_backtest = code, 
-    dict_exo_models = dict_models,
-    endogenous_model_sufix= 'rf',    
-    trials = 11, 
-    partitions = 2, 
-    cloud_instance = True,
-    )
+#instance.get_multi_process(
+#   code_backtest = code, 
+#    dict_exo_models = dict_models,
+#    endogenous_model_sufix= 'rf',    
+#    trials = 11, 
+#   partitions = 2, 
+#   cloud_instance = True,
+#   variables = variables
+#   )
 
 # extraemos las métricas del combinatorial
-#instance.get_metrics(
-#    code_backtest = '001'
-#    )
+instance.get_metrics(
+    code_backtest = '001'
+    )

@@ -156,7 +156,9 @@ class EnigmX:
         self.pwd = pwd
         self.server_name = server_name
         self.driver = driver
-        
+        self.stationary_stacked = stationary_stacked
+        self.cutpoint = cutpoint
+
         # diccionario con los parámetros generales del Feature Importance
         KfeatureImportanceParams = {
             "pca_comparisson": True,
@@ -305,7 +307,7 @@ class EnigmX:
             return valueResultFeatImp
         
     # método model tunning: activación boleana y modelo como entradas
-    def get_model_tunning(self, exo_process, endo_process, **kwargs):
+    def get_model_tunning(self, exo_process, endo_process, variables,**kwargs):
         
         for (prop, default) in self.KModelConstructionParams.items():
             setattr(self, prop, kwargs.get(prop, default))        
@@ -319,7 +321,16 @@ class EnigmX:
             timeIndexName = self.time_label_index_name,
             datetimeAsIndex = self.datetimeAsIndex,
             exo_openning_method_as_h5 =  self.exo_openning_method_as_h5,
-            heuristic_model = self.heuristic_model
+            heuristic_model = self.heuristic_model,
+            driver = "{ODBC DRIVER 17 for SQL Server}",
+            uid = self.uid,
+            pwd = self.pwd,
+            server_name = self.server_name,
+            referential_base_data_base = 'TSQL',
+            set_instance = databundle_instance,
+            stationary_stacked = self.stationary_stacked,
+            cutpoint = self.cutpoint,
+            variables = variables
             )
     
         # si se activa tunning para modelo exógeno    
@@ -361,7 +372,7 @@ class EnigmX:
                 return valueResultEndoModel
     
     # método combinatorial purgked kfold cv: 'n' y 'k' como valores obligatorios
-    def get_combinatorial_backtest(self, trials, partitions, **kwargs): 
+    def get_combinatorial_backtest(self, trials, partitions, variables,**kwargs): 
         
         for (prop, default) in self.KCombinatorialBacktestParams.items():
             setattr(self, prop, kwargs.get(prop, default))        
@@ -381,7 +392,16 @@ class EnigmX:
             timeLabelName = self.time_label_name,
             y_true = self.y_true,
             exo_openning_method_as_h5 = self.exo_openning_method_as_h5,
-            heuristic_model = self.heuristic_model
+            heuristic_model = self.heuristic_model,
+            stationary_stacked = self.stationary_stacked,
+            uid = self.uid,
+            pwd = self.pwd,
+            server_name = self.server_name,
+            driver = self.driver,
+            cutpoint = self.cutpoint,
+            referential_base_database = 'TSQL',
+            set_instance = databundle_instance,
+            variables = variables
             )
         
         # resultado del combinatorial purged KFold CV (dataframe)
@@ -430,6 +450,7 @@ class EnigmX:
                                  y_true,              
                                  embargo_level,
                                  max_leverage,
+                                 variables
                                  ):
         """
         Function intermediadora que reune los prorcesos de Tunning + Backtest.
@@ -480,7 +501,9 @@ class EnigmX:
                 endo_process = True,
                 #################### Params for Model Understanding ####################
                 exo_openning_method_as_h5 =  self.exo_openning_method_as_h5,
-                heuristic_model = self.heuristic_model
+                heuristic_model = self.heuristic_model,
+                variables = variables,
+                step = 'EXO'
             )
             
         # initializing combinatorial backtest
@@ -499,7 +522,9 @@ class EnigmX:
                 trials= trials,
                 partitions= partitions,
                 exo_openning_method_as_h5 =  self.exo_openning_method_as_h5,
-                heuristic_model = self.heuristic_model
+                heuristic_model = self.heuristic_model,
+                set_instance = databundle_instance,
+                variables = variables
                 )
             
         # setting name of models
@@ -514,6 +539,7 @@ class EnigmX:
                           endogenous_model_sufix,
                           trials, 
                           partitions, 
+                          variables,
                           **kwargs):
         """
         Descripción General:
@@ -597,6 +623,7 @@ class EnigmX:
                                  y_true = self.y_true,              
                                  embargo_level = self.embargo_level,
                                  max_leverage = self.max_leverage,
+                                 variables = variables
                                  ) 
             
         for model_name, tuple_info_model in dict_exo_models.items()
@@ -653,6 +680,9 @@ class EnigmX:
             cursor_= cursor, 
             dataframe = True
             )
+
+        print(df_trials)
+        print(df_trials.columns)
         
         df_trials['barrierTime']= pd.to_datetime(df_trials['barrierTime'])
         

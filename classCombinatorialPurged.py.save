@@ -7,7 +7,7 @@ import datetime
 import pandas as pd
 pd.options.mode.chained_assignment = None  
 from enigmx.combinatorial_backtest import CPKFCV
-from enigmx.utils import dataPreparation, data_heuristic_preparation_for_tunning,dataPreparation_forTuning
+from enigmx.utils import dataPreparation, data_heuristic_preparation_for_tunning
 from keras.models import load_model
 
 from enigmx.classModelTunning import list_heuristic_elements
@@ -77,7 +77,6 @@ class EnigmxBacktest(object):
                  pwd = None,
                  server_name = None,
                  driver = None,
-                 referential_base_database = None
 		 ):
         
         # ingesta de parámetros a la clase
@@ -113,12 +112,7 @@ class EnigmxBacktest(object):
         self.stationary_stacked = stationary_stacked
         self.cutpoint = cutpoint
         self.variables = variables
-        self.uid = uid
-        self.pwd = pwd
-        self.server_name = server_name
-        self.driver = driver
-        self.referential_base_database = referential_base_database
-
+        
     def __infoReader__(self):
         
         # carga de modelos desde formato pickle o h5 dependiendo del caso
@@ -130,42 +124,38 @@ class EnigmxBacktest(object):
         self.endogenousModel = pickle.load(open(self.endogenous_path, 'rb'))     
         
         # carga de csv con data ciega stacked para backtest
-        self.dfStacked,y,t1 = dataPreparation_forTuning(
-                driver = self.driver,
-                uid = self.uid,
-                pwd = self.pwd,
-                server_name = self.server_name,
-                referential_base_database = self.referential_base_database,
-                set_instance = self.set_instance,
-                stationary_stacked = self.stationary_stacked,
-                cutpoint = self.cutpoint,
-                variables = self.variables,
-                step = 'BACKTEST'
-                )
-                
-        # cambio de formato de col de tiempo de str a datetime
+#        self.dfStacked = pd.read_csv(
+#            self.csv_path, 
+#            ).dropna()
+#        
+#        # cambio de formato de col de tiempo de str a datetime
 #        self.dfStacked[self.timeIndexName] = self.dfStacked[self.timeIndexName].astype('datetime64[ns]')
-        
+#        
 #        # seteo de datetime como índice
 #        self.dfStacked = self.dfStacked.set_index(self.timeIndexName)        
-        
-        # check if model is heuristic
-        if self.heuristic_model:
-            self.dataset = data_heuristic_preparation_for_tunning(
-                csv_path = self.csv_path,
-                list_heuristic_elements = self.list_heuristic_elements
-                )
-        
+#        
+#        # check if model is heuristic
+#        if self.heuristic_model:
+#            self.dataset = data_heuristic_preparation_for_tunning(
+#                csv_path = self.csv_path,
+#                list_heuristic_elements = self.list_heuristic_elements
+#                )
+#        
         # if model is not heuristic
         else:
-
-#            nuevas_variables = list(self.dfStacked.columns)
-#            nuevas_variables.remove('horizon')
-            
             # dataset útil para el combinatorial 
-            self.dataset = pd.concat([self.dfStacked,y],axis = 1)
-
-        print(self.dataset.columns)
+            self.dataset = dataPreparation_forTuning(
+                 driver = self.driver,
+                 uid = self.uid,
+                 server_name = self.server_name,
+		referential_base_database = self.referential_base_database,
+		set_instance = self.set_instance,
+                stationary_stacked = self.stationary_stacked,
+                cutpoint = self.cutpoint,
+        	variables = self.variables,
+	        step = 'BACKTEST'
+                )
+        
     def __computeCombinatorialBacktest__(self, n, k, embargo_level = 5):
         
         assert embargo_level >= 5, "Level of embargo should be >= 5" 

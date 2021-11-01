@@ -12,7 +12,7 @@ from enigmx.tests.stocks import stocks
 
 
 
-server_name = "34.133.134.153"
+server_name = "35.192.156.82"
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
 list_stocks = ['VTOL', 'ZNGA']
