@@ -1,4 +1,3 @@
-
 """
 author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
@@ -1442,11 +1441,11 @@ def dataPreparation_forTuning(driver,
     variables = [variable.strip() for variable in variables.split(',')]
     
     # Para calcular la purga y embargo
-    if step == 'BACKTEST':
-        variables.append('horizon')
+#    if step == 'BACKTEST':
+#        variables.extend(['horizon'])
 
     # selección únicamente de features
-    X = dfStacked[variables]
+#    X = dfStacked[variables]
     
 #    # selección únicamente de label
 #    y = dfStacked[label_name]
@@ -1458,6 +1457,7 @@ def dataPreparation_forTuning(driver,
     # Para calcular purga y embargo
     if step == 'BACKTEST':
         X['horizon'] = X['horizon'].astype('datetime64[ns]')
+        X['barrierTime'] = X['barrierTime'].astype('datetime64[ns]')
 
     # obtención de vector de timeIndex
     t1 = pd.Series(data=y.index, index=y.index)
@@ -3121,6 +3121,15 @@ def backtestSplit(stacked, labels, pct_split,colDates):
     by=['close_date']
     )
     backtest.sort_values(
+    by =['close_date']
+    )
+    labels_exo.sort_values(
+    by=['close_date']
+    )
+    labels_endo.sort_values(
+    by=['close_date']
+    )
+    labels_backtest.sort_values(
     by =['close_date']
     )
 

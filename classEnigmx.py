@@ -681,10 +681,7 @@ class EnigmX:
             dataframe = True
             )
 
-        print(df_trials)
-        print(df_trials.columns)
-        
-        df_trials['barrierTime']= pd.to_datetime(df_trials['barrierTime'])
+        #df_trials['barrierTime']= pd.to_datetime(df_trials['barrierTime'])
         
         
         # modelos testeados

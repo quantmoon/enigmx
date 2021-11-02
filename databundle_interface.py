@@ -720,7 +720,7 @@ class SQLEnigmXinterface(object):
             matrix.to_sql(f"STACKED_{cutpoint}", engine, index = True, index_label = 'close_date')
 
             #Separación del dataframe con features y datos adicionales
-            backtest_df, endo_df, exo_df, labels_backtest, labels_endo, labels_exo,original_backtest  = backtestSplit(original_stacked,labelsDataframe, pct_split = 0.6, colDates = coldates)
+            backtest_df, endo_df, exo_df, labels_backtest, labels_endo, labels_exo = backtestSplit(original_stacked,labelsDataframe, pct_split = 0.6, colDates = coldates)
 
             #Guardado de las bases de datos para el combinatorial
             backtest_df.to_sql(f"STACKED_BACKTEST_{cutpoint}", engine, index = True, index_label = 'close_date')
@@ -734,7 +734,7 @@ class SQLEnigmXinterface(object):
             matrix.to_sql(f"STACKED_STATIONARY_{cutpoint}", engine, index = True, index_label = 'close_date')
 
             #Separación del dataframe con features y datos adicionales
-            backtest_df, endo_df, exo_df, labels_backtest, labels_endo, labels_exo, original_backtest = backtestSplit(original_stacked, labelsDataframe,pct_split = 0.6, colDates = coldates)
+            backtest_df, endo_df, exo_df, labels_backtest, labels_endo, labels_exo  = backtestSplit(original_stacked, labelsDataframe,pct_split = 0.6, colDates = coldates)
 
             #Guardado de las bases de datos para el combinatorial
             backtest_df.to_sql(f"STACKED_BACKTEST_STATIONARY_{cutpoint}", engine, index = True, index_label = 'close_date')

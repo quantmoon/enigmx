@@ -46,6 +46,7 @@ class CashReturnMetrics(object):
     self.capital_factor = capital_factor
     self.fixed_comission = fixed_comission 
 
+
   # actualizacion de precios ajustados x bid/ask spread según cat. de entrada
   def __entryExitPrices__(self):
     # pd.Series con tupla de entry y exit price

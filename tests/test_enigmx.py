@@ -59,8 +59,8 @@ dict_models = {
 ##############################################################################
 
 main_path = '/var/data/data/'
-#code = input('Ingresa el n° de serie de este intento: ')
-#variables = input('Por favor ingresa las variables con las que se va a construir el modelo (solo separados por comas): ')
+code = input('Ingresa el n° de serie de este intento: ')
+variables = input('Por favor ingresa las variables con las que se va a construir el modelo (solo separados por comas): ')
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
                   method = 'MDA', 
@@ -94,15 +94,15 @@ instance = EnigmX(bartype = 'VOLUME',
    
 
 # get multi process for tunning and backtest
-#instance.get_multi_process(
-#   code_backtest = code, 
-#    dict_exo_models = dict_models,
-#    endogenous_model_sufix= 'rf',    
-#    trials = 11, 
-#   partitions = 2, 
-#   cloud_instance = True,
-#   variables = variables
-#   )
+instance.get_multi_process(
+   code_backtest = code, 
+    dict_exo_models = dict_models,
+    endogenous_model_sufix= 'rf',    
+    trials = 11, 
+   partitions = 2, 
+   cloud_instance = True,
+   variables = variables
+   )
 
 # extraemos las métricas del combinatorial
 instance.get_metrics(
