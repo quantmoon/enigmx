@@ -204,6 +204,7 @@ class QuantmoonSQLManager(object):
         # chequear que no exista previamente dicha base de datos
         self.__checkDatabase__()
         
+
         # loggearse a la base de datos
         dbconn = pyodbc.connect(self.loggin)
         

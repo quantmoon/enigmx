@@ -115,7 +115,7 @@ def generate_datasets(stock,
     else:
         raise ValueError(
             "Only 'close'&'open' for fracdiff estimation. Check args. params."
-            )
+            ) 
         
     list_of_list = []            
     #iteración simple día x día para cálculo de barras
@@ -139,7 +139,10 @@ def generate_datasets(stock,
                 daily_time_bars_organization=alpha_calibration[bartype+'_t'].item()
                 )
             for bartype in bartypesList]
-
+        
+        print("**"*20)
+        print(result_value)
+        print("----"*15)
         list_of_list.append(result_value)
     
     

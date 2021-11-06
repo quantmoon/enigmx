@@ -213,7 +213,7 @@ class featureImportance(object):
                  n_best_features = 7, #add out
                  global_featImp = True, #add out
                  referential_database = 'TSQL',
-                 simple_correlation = False,
+                 simple_correlation = True,
                  stationary_stacked = True,
                  cutpoint = 0.8
                  ):
@@ -543,7 +543,7 @@ class featureImportance(object):
                                 method=self.method, 
                                 tag=self.trial,
                                 simNum= self.method + '_' + type(self.model).__name__ + 
-                                'cluster' + str(idxClust) + ' || Try: ' + self.trial,
+                                'cluster' + str(idxClust) + 'try_' + self.trial,
                                 model=type(self.model).__name__
                                 )                        
                                     
@@ -557,8 +557,7 @@ class featureImportance(object):
                                 0,
                                 method=self.method,
                                 tag=self.trial,
-                                simNum= self.method + '_' + type(self.model).__name__ +
-                                ' || Try: ' + self.trial,
+                                simNum= self.method + '_' + type(self.model).__name__ + 'try_' + self.trial,
                                 model=type(self.model).__name__
                                 )
  

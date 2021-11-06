@@ -3,8 +3,8 @@
 webpage: https://www.quantmoon.tech//
 """
 
-import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True), num_cpus=2)
+# import ray
+# ray.init(include_dashboard=(False),ignore_reinit_error=(True), num_cpus=2)
 
 from enigmx.classEnigmx import EnigmX
 import numpy as np
@@ -46,7 +46,7 @@ dict_models = {
         {'max_leaf_nodes': list(range(2, 20)), 
          'min_samples_split': [2, 3, 4],
          'max_features' : [1],
-         'max_samples': [100],
+         'max_samples': [20],
          'n_estimators' : [10]} 
         ),
     'stochasticGradient' : 
@@ -58,53 +58,54 @@ dict_models = {
 
 ##############################################################################
 
-main_path = '/var/data/data/'
-code = input('Ingresa el n° de serie de este intento: ')
-variables = input('Por favor ingresa las variables con las que se va a construir el modelo (solo separados por comas): ')
+main_path = 'D:/data_zarr/'
+#code = input('Ingresa el n° de serie de este intento: ')
+#variables = input('Por favor ingresa las variables con las que se va a construir el modelo (solo separados por comas): ')
+variables = "feature_technical_EMA_10_signal, feature_technical_sar_signal, feature_technical_bollinger_band_integer, feature_technical_bollinger_volatility_compression"
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
-                  method = 'MDA', 
+                  method = 'MDI', 
                   base_path = main_path,
-                  cloud_framework = True,
-                  server_name = "35.192.156.82",
+                  cloud_framework = False,
+                  server_name = "DESKTOP-N8JUB39",
                   stationary_stacked = True,
                   features_database = "BARS_FEATURES",
-                  uid = 'sqlserver',
-                  pwd = 'quantmoon2021',
-                  driver = ("{ODBC DRIVER 17 for SQL Server}"),
+                  uid = '',
+                  pwd = '',
+                  driver = "{SQL Server}",
                   ) 
 
 # feature importance
-#instance.get_feature_importance(    
-#                      model = RandomForestClassifier(max_features=1, random_state=0), 
-#                      model =  SGDClassifier(loss='log'),
-#                      list_stocks = ['VTOL','ZNGA'],
-#                      score_constraint = 0.3, #activar 
-#                      server_name = "35.192.156.82",
-#                      database = "BARS_FEATURES",
-#                      uid = 'sqlserver',
-#                      pwd = 'quantmoon2021',
-#                      driver = ("{ODBC DRIVER 17 for SQL Server}"),
-#                      trial = code,
-#                      pval_kendall = 0.1,
-#                      k_min = 10,
-#                      n_samples = 15,
-#                      cutpoint = 0.5
-#                      )
+# instance.get_feature_importance(    
+#                       model = RandomForestClassifier(max_features=1, random_state=0), 
+#                       #model = SGDClassifier(loss='log'), #para MDA
+#                       list_stocks = ['ACIW'],
+#                       score_constraint = 0.3, #activar 
+#                       server_name = "DESKTOP-N8JUB39",
+#                       database = "BARS_FEATURES",
+#                       uid = '',
+#                       pwd = '',
+#                       driver = "{SQL Server}",
+#                       trial = code,
+#                       pval_kendall = 0.1,
+#                       k_min = 10,
+#                       n_samples = 15,
+#                       cutpoint = 0.5
+#                       )
    
 
 # get multi process for tunning and backtest
-instance.get_multi_process(
-   code_backtest = code, 
-    dict_exo_models = dict_models,
-    endogenous_model_sufix= 'rf',    
-    trials = 11, 
-   partitions = 2, 
-   cloud_instance = True,
-   variables = variables
-   )
+# instance.get_multi_process(
+#     code_backtest = 100, 
+#     dict_exo_models = dict_models,
+#     endogenous_model_sufix= 'rf',    
+#     trials = 11, 
+#     partitions = 2, 
+#     cloud_instance = False,
+#     variables = variables
+#     )
 
-# extraemos las métricas del combinatorial
+# # extraemos las métricas del combinatorial
 instance.get_metrics(
-    code_backtest = '001'
+    code_backtest = '100'
     )

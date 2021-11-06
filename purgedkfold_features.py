@@ -52,8 +52,12 @@ class PurgedKFold(_BaseKFold):
     def split(self,X,y=None,groups=None):
 
         self.t1 = self.t1.sort_index()
-        if (X.index==self.t1.index).sum()!=len(self.t1):
-            raise ValueError('X and ThruDateValues must have the same index')
+        
+        # DESCOMENTAR ERROR STATEMENT PARA SOLUCION CONFLICTO:
+        #           ---> DIFERENTE INDICE 
+        
+        #if (X.index==self.t1.index).sum()!=len(self.t1):
+        #    raise ValueError('X and ThruDateValues must have the same index')
 
         indices=np.arange(X.shape[0])
         mbrg=int(X.shape[0]*self.pctEmbargo)
@@ -255,6 +259,10 @@ def plotFeatImportance(pathOut,imp,oob,oos,method,
         plt.title('tag='+tag+' | simNUm='+str(simNum)+
                   ' | oob='+str(round(oob,4))+' | oos='+str(round(oos,4)))
     
-    plt.savefig(pathOut+'featImportance_'+str(simNum)+'.png',dpi=100)
+    
+    define_pathout = pathOut+'featImportance_'+str(simNum)+'.png'
+
+    
+    plt.savefig(define_pathout ,dpi=100)
     plt.clf()
     plt.close()

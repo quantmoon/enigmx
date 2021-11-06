@@ -12,17 +12,18 @@ from enigmx.tests.stocks import stocks
 
 
 
-server_name = "35.192.156.82"
+
+server_name = "DESKTOP-N8JUB39" 
 referential_base_database = 'TSQL'
-pathzarr = '/var/data/data/'
-list_stocks = ['VTOL', 'ZNGA']
-start_date = "2020-12-01" 
+pathzarr = 'D:/data_zarr/'
+list_stocks = ['ACIW'] #stocks
+start_date = "2021-01-20" 
 end_date = "2021-03-25" 
 desired_bars = 10
 bartype = 'volume'
-driver = ("{ODBC DRIVER 17 for SQL Server}"),
-uid = "sqlserver"
-pwd = "quantmoon2021"
+driver = ["{SQL Server}"]
+uid = ""
+pwd = ""
 
 
 print("inicializando clase")
@@ -50,8 +51,9 @@ enigmxsql.create_table_database(
     bars_weights = False,
     bars_features = False,
     backtest_database = False,
-    bars_stacked = True,
-    creation_database = True)
+    bars_stacked = False,
+    creation_database = False
+    )
 
 print("subiendo info")
 enigmxsql.compute_info_to_sql(

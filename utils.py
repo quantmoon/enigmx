@@ -184,6 +184,13 @@ def getTickPrices(path, date_):
 #OPEN ZARR | Version 2.0: vectorized version (use range of dates)
 def open_zarr_general(zarrDates, range_dates, zarrObject, ref_stock_name = None):    
     #resultado de la función mini nueva    
+    print("VEAMOS RANGE DATES")
+    print(range_dates)
+    print(" ")
+    
+    print("veamos ZarrDates")
+    print(zarrDates)
+    print("  ")
     
     if range_dates not in zarrDates:
         print('Date selected is not in range_dates from zarr vector for {}'.format(
@@ -1423,7 +1430,12 @@ def dataPreparation_forTuning(driver,
             cursor_= cursor,
             dataframe=True
             )
-
+    
+    
+    print("ORIGINAL DF STACKED COLUMNS")
+    print(dfStacked.columns)
+    print(" ")
+    
     y = SQLFRAME.read_table_info(
             statement = f"SELECT * FROM [BARS_STACKED].[dbo].LABELS_{step}",
             dbconn_= dbconn,
@@ -1445,7 +1457,7 @@ def dataPreparation_forTuning(driver,
 #        variables.extend(['horizon'])
 
     # selección únicamente de features
-#    X = dfStacked[variables]
+    X = dfStacked[variables]
     
 #    # selección únicamente de label
 #    y = dfStacked[label_name]
@@ -1456,8 +1468,11 @@ def dataPreparation_forTuning(driver,
 
     # Para calcular purga y embargo
     if step == 'BACKTEST':
-        X['horizon'] = X['horizon'].astype('datetime64[ns]')
-        X['barrierTime'] = X['barrierTime'].astype('datetime64[ns]')
+        X['horizon'] = dfStacked['horizon'].astype('datetime64[ns]')
+        X['barrierTime'] = dfStacked['barrierTime'].astype('datetime64[ns]')
+        X['close_price'] = dfStacked['close_price']
+        X['barrierPrice'] = dfStacked['barrierPrice']
+        X['bidask_spread'] = dfStacked['bidask_spread']
 
     # obtención de vector de timeIndex
     t1 = pd.Series(data=y.index, index=y.index)
@@ -2929,7 +2944,13 @@ def baseFeatImportance(**kwargs):
                     'RandomForestClassifier'
                     )
                 )
-            
+    
+    
+    print("REVISANDO INDICES")
+    print(x_train.sort_index())
+    print(y_train.sort_index())
+    print(" ")
+    
     # importance values, score con cpkf, y mean val (NaN)
     imp,oos,oob = featImportances(x_train, 
                                   y_train, 
@@ -3036,11 +3057,9 @@ def numBins(nObs,corr=None):
 # la cual indica el grado de incertidumbre que tengo sobre X si conozco Y
 ####################################################################################################
 def varInfo(x,y,norm=True):
-    # variation of information
-
+    # variation of information 
     ## 1) Determinar el numero optimo de bins
     bXY=numBins(x.shape[0],corr=np.corrcoef(x,y)[0,1])
-
     ## 2) Se calcula el mutual information (denotado como iXY = I[X,Y])
     cXY=np.histogram2d(x,y,bXY)[0]
     iXY=mutual_info_score(None,None,contingency=cXY)

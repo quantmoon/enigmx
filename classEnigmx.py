@@ -4,6 +4,7 @@ webpage: https://www.quantmoon.tech//
 """
 import ray
 import pyodbc
+import numpy as np
 import pandas as pd
 from enigmx.dbgenerator import databundle_instance 
 from enigmx.classModelTunning import ModelConstruction, list_heuristic_elements
@@ -322,7 +323,7 @@ class EnigmX:
             datetimeAsIndex = self.datetimeAsIndex,
             exo_openning_method_as_h5 =  self.exo_openning_method_as_h5,
             heuristic_model = self.heuristic_model,
-            driver = "{ODBC DRIVER 17 for SQL Server}",
+            driver = "{SQL Server}",
             uid = self.uid,
             pwd = self.pwd,
             server_name = self.server_name,
@@ -680,10 +681,11 @@ class EnigmX:
             cursor_= cursor, 
             dataframe = True
             )
+        
+        print("<<<<< :::::::::::::: Metrics Computation Initialization...")
 
         #df_trials['barrierTime']= pd.to_datetime(df_trials['barrierTime'])
-        
-        
+
         # modelos testeados
         models = list(df_trials.model_name.unique())
         
@@ -693,12 +695,15 @@ class EnigmX:
         # result values
         finalMetrics = []
         
+        # iteracion por modelo
         for model in models:
              
+            # query unicamente con datos de modelo selec.
             dfModel = df_trials.query('model_name == @model')
             
+            # ray object: calculo de metricas paralizadas x trial
             ray_object_list = [
-                metricsParalelization(
+                metricsParalelization.remote(
                     dataframe_segmented = dfModel.query('trial == @trial_number'), 
                     initial_cap = 5000, 
                     capital_factor = 1, 
@@ -708,19 +713,49 @@ class EnigmX:
                 for trial_number in trials
                 ]
             
-            #list_datasets = ray.get(ray_object_list)
+            # metodo "get" de ray
+            list_datasets = ray.get(ray_object_list)
             
-            finalMetrics.append(ray_object_list)
-        
-        print(finalMetrics)
-        
+            # temporal dataframe para concat posterior
+            tempDf = pd.DataFrame.from_records(list_datasets)
             
+            # append de dataframe temporal a lista vacia de df x modelo
+            finalMetrics.append(tempDf)
             
-            
+        # concat general de cada metrica estimada x datos de modelo
+        resultDf = pd.concat(finalMetrics)
         
+        # reseteo de index para nombramiento de trial (c/ idx = 1 trial)
+        resultDf.reset_index(level=0, inplace=True)
         
+        # renombramiento de columnas (orden de metrics.py)
+        resultDf.columns = [
+              "trial",
+              "pnl", 
+              "aror", 
+              "hitRatio", 
+              "avghits", 
+              "hh_positive",
+              "hh_negative",
+              "sharpe_ratio",
+              "probabilistic_sharpe",
+              "return_over_costs",
+              "drawndown",
+              "time_underwater",
+              "dollar_performance_per_turnover"
+            ]
         
+        # nombramiento de modelo
+        resultDf["model"] = np.repeat(models,len(trials))
         
+        # reemplazamos valores nan e inf con cero
+        resultDf = resultDf.replace(np.nan, 0)
+        resultDf = resultDf.replace(np.inf, 0)
+        resultDf = resultDf.replace(-np.inf, 0)
         
+        print(resultDf.dollar_performance_per_turnover)
         
-        
+        # almacenamiento local de resultados en .csv
+        resultDf.to_csv(self.base_path + "METRICS_" + code_backtest + ".csv", 
+                        index=False)
+        print(":::::::::::::: >>>> Metrics Computation Finished...")

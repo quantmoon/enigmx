@@ -49,6 +49,7 @@ class CashReturnMetrics(object):
 
   # actualizacion de precios ajustados x bid/ask spread según cat. de entrada
   def __entryExitPrices__(self):
+      
     # pd.Series con tupla de entry y exit price
     seriesTemp = self.trials_frame.apply(
         lambda row: bidAskAdjustment(
@@ -396,7 +397,7 @@ class EnigmxMetrics(object):
         
         return metricsDf
 
-#@ray.remote
+@ray.remote
 def metricsParalelization(
         dataframe_segmented, 
         initial_cap, 

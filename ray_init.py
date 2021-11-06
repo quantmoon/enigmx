@@ -6,4 +6,4 @@ Created on Sat Feb  6 20:23:04 2021
 """
 import ray
 
-ray.init(include_dashboard=(False),ignore_reinit_error=(True))
+ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus=(2))

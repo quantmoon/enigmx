@@ -71,18 +71,20 @@ class GeneralModel(object):
         assert isinstance(basedata, 
                           (pd.DataFrame, np.ndarray)
                          ), "Wrong format for arg2*"    
+
         
         if type(basedata) == pd.DataFrame:    
-            basedata = basedata.reset_index(drop=True).values
-            
+            basedata = basedata.reset_index(drop=True).values     
+
+
         #select features and labels
         featuresMatrix, labelsVector = (
-                basedata[idxs,:-1].astype(np.float32), 
+                basedata[idxs,:-5].astype(np.float32), 
                 basedata[idxs,-1:]
             )        
 
-        assert len(np.unique(labelsVector)) > 2, \
-            'Only 2 of 3 labels exist. Increase sample to get more labels.'
+        # assert len(np.unique(labelsVector)) > 2, \
+        #     'Only 2 of 3 labels exist. Increase sample to get more labels.'
     
         # revisamos si el modelo ingresado es una NN de Keras
         if type(self.MA) in (KerasClassifier, Sequential):
@@ -101,6 +103,9 @@ class GeneralModel(object):
 
         #fitting/update training process in exogenous model (side)
         print(':::: >> Fitting Exogenous Model...')
+        
+        y=y.astype('int') 
+
         self.MA.fit(X,y)
     
     def predict(self, idxs, basedata, y_true=False):

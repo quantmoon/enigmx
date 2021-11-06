@@ -34,10 +34,12 @@ def adf_test(datos):
     for (i in names(datos)[2:dim(datos)[2]]){
       t <- proc.time()
       serie <- ts(datos[i])
-      for (j in seq(1,length(serie)-1000,100)){
+      for (j in seq(1,length(serie)-400,40)){
         t2 <- proc.time()
-        end <- j+1000
+        end <- j+400
+
         adx <- adf.test(serie[j:end])
+
         time2 <- proc.time() - t2
         if (adx$p.value > 0.05){
           feature = c(feature,i)
@@ -52,7 +54,9 @@ def adf_test(datos):
     df <- data.frame(feature = feature, pval = pval)
     return (df)
     }""")
-
+    
+    #print(datos)
+    
     get_adfs = robjects.globalenv['get_adfs']
 
     df = get_adfs(datos)
