@@ -58,7 +58,7 @@ dict_models = {
 
 ##############################################################################
 
-main_path = 'D:/data_zarr/'
+main_path = 'C:/Users/ASUS/Desktop/'
 #code = input('Ingresa el n° de serie de este intento: ')
 #variables = input('Por favor ingresa las variables con las que se va a construir el modelo (solo separados por comas): ')
 variables = "feature_technical_EMA_10_signal, feature_technical_sar_signal, feature_technical_bollinger_band_integer, feature_technical_bollinger_volatility_compression"
@@ -67,8 +67,8 @@ instance = EnigmX(bartype = 'VOLUME',
                   method = 'MDI', 
                   base_path = main_path,
                   cloud_framework = False,
-                  server_name = "DESKTOP-N8JUB39",
-                  stationary_stacked = True,
+                  server_name = "DESKTOP-7M3O8GO\SQLEXPRESS",
+                  stationary_stacked = False,
                   features_database = "BARS_FEATURES",
                   uid = '',
                   pwd = '',
@@ -76,22 +76,22 @@ instance = EnigmX(bartype = 'VOLUME',
                   ) 
 
 # feature importance
-# instance.get_feature_importance(    
-#                       model = RandomForestClassifier(max_features=1, random_state=0), 
-#                       #model = SGDClassifier(loss='log'), #para MDA
-#                       list_stocks = ['ACIW'],
-#                       score_constraint = 0.3, #activar 
-#                       server_name = "DESKTOP-N8JUB39",
-#                       database = "BARS_FEATURES",
-#                       uid = '',
-#                       pwd = '',
-#                       driver = "{SQL Server}",
-#                       trial = code,
-#                       pval_kendall = 0.1,
-#                       k_min = 10,
-#                       n_samples = 15,
-#                       cutpoint = 0.5
-#                       )
+instance.get_feature_importance(    
+                      model = RandomForestClassifier(max_features=1, random_state=0), 
+                      #model = SGDClassifier(loss='log'), #para MDA
+                      list_stocks = ['INFN','KRA','LCII','LUNA'],
+                      score_constraint = 0.3, #activar 
+                      server_name = "DESKTOP-7M3O8GO\SQLEXPRESS",
+                      database = "BARS_FEATURES",
+                      uid = '',
+                      pwd = '',
+                      driver = "{SQL Server}",
+                      trial = '001',
+                      pval_kendall = 0.1,
+                      k_min = 10,
+                      n_samples = 15,
+                      cutpoint = 0.8
+                      )
    
 
 # get multi process for tunning and backtest
@@ -106,6 +106,6 @@ instance = EnigmX(bartype = 'VOLUME',
 #     )
 
 # # extraemos las métricas del combinatorial
-instance.get_metrics(
-    code_backtest = '100'
-    )
+#instance.get_metrics(
+#    code_backtest = '100'
+#    )

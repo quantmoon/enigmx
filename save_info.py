@@ -140,9 +140,7 @@ def generate_datasets(stock,
                 )
             for bartype in bartypesList]
         
-        print("**"*20)
-        print(result_value)
-        print("----"*15)
+        
         list_of_list.append(result_value)
     
     

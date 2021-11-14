@@ -30,17 +30,20 @@ def adf_test(datos):
     robjects.r("""
     library(tseries)
     get_adfs <- function(datos){
-    feature = pval = NULL
+    feature = pval = delete_features = NULL
     for (i in names(datos)[2:dim(datos)[2]]){
       t <- proc.time()
+      
       serie <- ts(datos[i])
       for (j in seq(1,length(serie)-400,40)){
         t2 <- proc.time()
-        end <- j+400
-
+        end <- j+40
         adx <- adf.test(serie[j:end])
-
         time2 <- proc.time() - t2
+        if (is.nan(adx$p.value)){
+                cat("El feature ",i," se va a eliminar por no contener información")
+                delete_features <- c(delete_features, i)
+                break}
         if (adx$p.value > 0.05){
           feature = c(feature,i)
           pval = c(pval,adx$p.value)
@@ -52,20 +55,25 @@ def adf_test(datos):
      cat("Tiempo total para toda la estacionarización del feature ",time[3]," ",i, "\n")
      }
     df <- data.frame(feature = feature, pval = pval)
-    return (df)
+    return (list(df = df, delete_features = delete_features))
     }""")
     
     #print(datos)
     
     get_adfs = robjects.globalenv['get_adfs']
 
-    df = get_adfs(datos)
+    df, delete_features = get_adfs(datos)
+    
     try:
         features = list(df[0])
     except:
         features = []
-
-    return features
+    
+    try:
+        delete_features = list(delete_features)
+    except:
+        delete_features = []
+    return features, delete_features
 
 
 def regression_intracluster(matrix,clusters, path = 'D:/data_enigmx/'):
@@ -168,7 +176,6 @@ def remove_corr_variables(df,
    correlationMatrix <- cor(datos)
    highlyCorrelated <- findCorrelation(correlationMatrix, cutoff = thres)
    correlationMatrix <- data.frame(correlationMatrix)
-   print(colnames(datos)[highlyCorrelated])
    variables <- colnames(datos)[-highlyCorrelated]
    """)
 

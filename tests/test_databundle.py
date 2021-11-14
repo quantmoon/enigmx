@@ -2,8 +2,8 @@
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
-import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus=2)
+#import ray
+#ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus = 1)
 
 #from enigmx.utils import EquitiesEnigmxUniverse
 from enigmx.databundle_interface import SQLEnigmXinterface
@@ -13,12 +13,17 @@ from enigmx.tests.stocks import stocks
 
 
 
-server_name = "DESKTOP-N8JUB39" 
+server_name = "DESKTOP-7M3O8GO\SQLEXPRESS" 
 referential_base_database = 'TSQL'
-pathzarr = 'D:/data_zarr/'
-list_stocks = ['ACIW'] #stocks
-start_date = "2021-01-20" 
-end_date = "2021-03-25" 
+pathzarr = 'C:/Users/ASUS/Desktop/zarrs/'
+list_stocks = stocks
+#list_stocks = ['ACIW','IBM'] #stocks
+#list_stocks = ['IBM']
+#list_stocks = ['ACIW','IBM','INFN','KRA','LCII','LUNA']
+#list_stocks = ['ACIW','IBM','KRA','LCII','LUNA']
+#list_stocks = ['INFN','KRA','LCII','LUNA','ACCO','ACCD','VTOL','AEZS','AHT','ECL']
+start_date = "2020-12-01" 
+end_date = "2021-07-15" 
 desired_bars = 10
 bartype = 'volume'
 driver = ["{SQL Server}"]
@@ -41,19 +46,19 @@ enigmxsql = SQLEnigmXinterface(
     referential_base_database = referential_base_database)
 
 print("creando tablas")
-enigmxsql.create_table_database(
-    bars_tunning = False, 
-    bars_basic = False, 
-    bars_entropy = False, 
-    etfs_trick = False, 
-    bars_sampled = False, 
-    bars_barrier = False,
-    bars_weights = False,
-    bars_features = False,
-    backtest_database = False,
-    bars_stacked = False,
-    creation_database = False
-    )
+# enigmxsql.create_table_database(
+#     bars_tunning = False, 
+#     bars_basic = False, 
+#     bars_entropy = False, 
+#     etfs_trick = False, 
+#     bars_sampled = True, 
+#     bars_barrier = True,
+#     bars_weights = True,
+#     bars_features = True,
+#     backtest_database = True,
+#     bars_stacked = True,
+#     creation_database = True
+#     )
 
 print("subiendo info")
 enigmxsql.compute_info_to_sql(

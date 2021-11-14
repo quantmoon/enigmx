@@ -699,38 +699,61 @@ class SQLEnigmXinterface(object):
         engine = sqlalchemy.create_engine(
             "mssql+pyodbc:///?odbc_connect={}".format(params)
             )
+        
+        #Se crea la instancia para transformar los features y revisar estacionariedad
         instance = StationaryStacked(SQLFRAME,dbconn,cursor, self.list_stocks)
 
+        #Función que genera las matrices stackeadas y los labels
         featStandarizedMatricesList, featStandarizedStationaryMatricesList,\
         labelsDataframe,original_stackeds, original_stationary_stackeds, coldates =  \
             instance.__checkingStationary__(
                self.pathzarr,
                cutpoints = self.cutpoints
         )
+
         
         #Se cambia el nombre a los puntos de corte para que luego estas bases puedan ser leídas
         # ya que arroja errores la base al tener puntos en el nombre
         cutpoints = ['_'.join(str(cutpoint).split('.')) for cutpoint in self.cutpoints]
-
+        
 
         #Guardado de todas las matrices no estacionarias, a diferentes puntos de corte:
-        for matrix,original_stacked,cutpoint in zip(featStandarizedMatricesList,original_stationary_stackeds, cutpoints):
+        for matrix,original_stacked,cutpoint in zip(featStandarizedMatricesList,original_stackeds, cutpoints):
 
             #Base de datos para el Feature Importance
-            matrix.to_sql(f"STACKED_{cutpoint}", engine, index = True, index_label = 'close_date')
+            matrix.to_sql(f"STACKED_{cutpoint}", 
+                          engine, 
+                          index = True, 
+                          index_label = 'close_date')
 
             #Separación del dataframe con features y datos adicionales
-            backtest_df, endo_df, exo_df, labels_backtest, labels_endo, labels_exo = backtestSplit(original_stacked,labelsDataframe, pct_split = 0.6, colDates = coldates)
+            backtest_df, endo_df, exo_df, labels_backtest, labels_endo, \
+                labels_exo = backtestSplit(original_stacked,
+                                            labelsDataframe, 
+                                            pct_split = 0.6, 
+                                            colDates = coldates)
 
             #Guardado de las bases de datos para el combinatorial
-            backtest_df.to_sql(f"STACKED_BACKTEST_{cutpoint}", engine, index = True, index_label = 'close_date')
-            endo_df.to_sql(f"STACKED_ENDO_{cutpoint}", engine, index = True, index_label = 'close_date')
-            exo_df.to_sql(f"STACKED_EXO_{cutpoint}", engine, index = True, index_label = 'close_date')
+            backtest_df.to_sql(f"STACKED_BACKTEST_{cutpoint}", 
+                                engine, 
+                                index = True, 
+                                index_label = 
+                                'close_date')
+            endo_df.to_sql(f"STACKED_ENDO_{cutpoint}", 
+                            engine, 
+                            index = True, 
+                            index_label = 'close_date')
+            exo_df.to_sql(f"STACKED_EXO_{cutpoint}", 
+                          engine, 
+                          index = True, 
+                          index_label = 'close_date')
+            
+            # print(cutpoint)
 
         #Guardado de todas las matrices no estacionarias, a diferentes puntos de corte:
         for matrix,original_stacked,cutpoint in zip(featStandarizedStationaryMatricesList,original_stationary_stackeds, cutpoints):
 
-            #Base de datos para el Feature Importance
+            # Base de datos para el Feature Importance
             matrix.to_sql(f"STACKED_STATIONARY_{cutpoint}", engine, index = True, index_label = 'close_date')
 
             #Separación del dataframe con features y datos adicionales
@@ -741,13 +764,13 @@ class SQLEnigmXinterface(object):
             endo_df.to_sql(f"STACKED_ENDO_STATIONARY_{cutpoint}", engine, index = True, index_label = 'close_date')
             exo_df.to_sql(f"STACKED_EXO_STATIONARY_{cutpoint}", engine, index = True, index_label = 'close_date')
 
-        #llena la "LABELS"
+        # #llena la "LABELS"
         labelsDataframe.to_sql("LABELS", engine, index = True, index_label = 'close_date')
         labels_backtest.to_sql("LABELS_BACKTEST", engine, index = True, index_label = 'close_date')
         labels_exo.to_sql("LABELS_EXO", engine, index = True, index_label = 'close_date')
         labels_endo.to_sql("LABELS_ENDO", engine, index = True, index_label = 'close_date')
 
-        print("<<<::::: FEATURES STACKING  SQL PROCESS FINISHED :::::>>>")
+        # print("<<<::::: FEATURES STACKING  SQL PROCESS FINISHED :::::>>>")
 
             
     def create_table_database(self, 

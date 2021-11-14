@@ -183,14 +183,6 @@ def getTickPrices(path, date_):
 
 #OPEN ZARR | Version 2.0: vectorized version (use range of dates)
 def open_zarr_general(zarrDates, range_dates, zarrObject, ref_stock_name = None):    
-    #resultado de la función mini nueva    
-    print("VEAMOS RANGE DATES")
-    print(range_dates)
-    print(" ")
-    
-    print("veamos ZarrDates")
-    print(zarrDates)
-    print("  ")
     
     if range_dates not in zarrDates:
         print('Date selected is not in range_dates from zarr vector for {}'.format(
@@ -2387,10 +2379,10 @@ def ErrorIndexIdxFirstTrue(param):
 
 
 
-#@njit
+@njit
 def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upper_bound,lower_bound):
     
-    print("Veamos Inner barrier_inside_computation | LLEVA NUMBA | UTILS.PY (line 2309)")    
+    #print("Veamos Inner barrier_inside_computation | LLEVA NUMBA | UTILS.PY (line 2309)")    
     
     selected_indexes  = np.where((ts_timeframe>init_ts)&(ts_timeframe<last_ts))
     segmented_prices = prices_timeframe[selected_indexes[0]]
@@ -2435,8 +2427,7 @@ def barrier_inside_computation(ts_timeframe,prices_timeframe,init_ts,last_ts,upp
                 print("       ::::::: >> Warning! Timestamp selected is negative!! \
                       Upper barrier Case | Check array: ")
                 print(segmented_timestamps[first_upper_barrier_idx:,0])
-            print(" ")
-            print("***"*10)
+
             
             return segmented_prices[first_upper_barrier_idx:,0][0], 1 , segmented_timestamps[first_upper_barrier_idx:,0][0] 
         
@@ -2506,15 +2497,11 @@ def vectorizedTripleBarrier(arr,arr2,path, init, init_ts, last, last_ts, upper_b
         prices_timeframe = prices_timeframe.reshape(-1,1)
         ts_timeframe = ts_timeframe.reshape(-1,1)
         
-        print("INICIA BARRIER INSIDE COMPUTATION")
         finalPrice, finalLabel, finalTimestamp = barrier_inside_computation(
                                                                         ts_timeframe,
                                                                         prices_timeframe,
                                                                         init_ts,last_ts,
                                                                         upper_bound,lower_bound)
-        print("FINAL BARRIER PRICE")
-        print(finalPrice)
-        print(" ")
     return finalPrice, finalLabel, finalTimestamp 
 
 ########### NEW TRIPLE BARRIER COMPUTATION ######################

@@ -11,7 +11,7 @@ import numpy as np
 from time import time
 from scipy.stats import kendalltau
 from enigmx.dbgenerator import databundle_instance
-from enigmx.features_algorithms import FeatureImportance
+#from enigmx.features_algorithms import FeatureImportance
 from enigmx.purgedkfold_features import plotFeatImportance
 from enigmx.featuresclustering import ClusteredFeatureImportance
 from enigmx.utils import enigmxSplit, baseFeatImportance, clickMessage1 #,kendall_evaluation
@@ -273,25 +273,25 @@ class featureImportance(object):
     def __instanceOverture__(self):
         
         # instancia feature importance base
-        instance = FeatureImportance(
-                server_name = self.server_name,
-                database_name = self.database, 
-		        driver = self.driver,
-		        uid = self.uid,
-		        pwd = self.pwd,
-                list_stocks = self.list_stocks, 
-                bartype = self.bartype,
-                depured = self.depured, 
-                rolling = self.rolling, 
-                global_range = self.global_range,
-                features_sufix = self.features_sufix,
-                window = self.rolling_window,
-                win_type = self.rolling_type,
-                add_parameter= self.rolling_std,
-                col_weight_type = self.col_weight_type,
-                col_t1_type = self.col_t1_type,
-                col_label_type = self.col_label_type
-                )
+#         instance = FeatureImportance(
+#                 server_name = self.server_name,
+#                 database_name = self.database, 
+# 		        driver = self.driver,
+# 		        uid = self.uid,
+# 		        pwd = self.pwd,
+#                 list_stocks = self.list_stocks, 
+#                 bartype = self.bartype,
+#                 depured = self.depured, 
+#                 rolling = self.rolling, 
+#                 global_range = self.global_range,
+#                 features_sufix = self.features_sufix,
+#                 window = self.rolling_window,
+#                 win_type = self.rolling_type,
+#                 add_parameter= self.rolling_std,
+#                 col_weight_type = self.col_weight_type,
+#                 col_t1_type = self.col_t1_type,
+#                 col_label_type = self.col_label_type
+#                 )
         
         print("----------Process {} started---------- \n".format(self.method))
 
