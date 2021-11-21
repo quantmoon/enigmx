@@ -121,7 +121,7 @@ class GeneralModel(object):
         # revisamos si el modelo ingresado es una NN de Keras
         if type(self.MA) in (KerasClassifier, Sequential):
              
-            # reduce 3D predictions to single prediction
+            # reduce 3D predictions to single prediction | HAVE TO DO THIS IN LIVETRADING IN CASE USE NN models
             predictionA = np.argmax(predictionA, axis=-1)
             
             # Transform values from 3Label vector to original (-1,0,1) labels
