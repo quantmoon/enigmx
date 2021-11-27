@@ -13,22 +13,22 @@ from enigmx.tests.stocks import stocks
 
 
 
-server_name = "DESKTOP-7M3O8GO\SQLEXPRESS" 
+server_name = "34.71.58.11" 
 referential_base_database = 'TSQL'
-pathzarr = 'C:/Users/ASUS/Desktop/zarrs/'
+pathzarr = '/var/data/data/'
 list_stocks = stocks
 #list_stocks = ['ACIW','IBM'] #stocks
 #list_stocks = ['IBM']
 #list_stocks = ['ACIW','IBM','INFN','KRA','LCII','LUNA']
 #list_stocks = ['ACIW','IBM','KRA','LCII','LUNA']
 #list_stocks = ['INFN','KRA','LCII','LUNA','ACCO','ACCD','VTOL','AEZS','AHT','ECL']
-start_date = "2020-12-01" 
-end_date = "2021-07-15" 
+start_date = "2020-12-20" 
+end_date = "2021-10-31" 
 desired_bars = 10
 bartype = 'volume'
-driver = ["{SQL Server}"]
-uid = ""
-pwd = ""
+driver =("{ODBC DRIVER 17 for SQL Server}")
+uid = "sqlserver"
+pwd = "quantmoon2021"
 
 
 print("inicializando clase")
@@ -45,31 +45,31 @@ enigmxsql = SQLEnigmXinterface(
     desired_bars = desired_bars,
     referential_base_database = referential_base_database)
 
-print("creando tablas")
-# enigmxsql.create_table_database(
-#     bars_tunning = False, 
-#     bars_basic = False, 
-#     bars_entropy = False, 
-#     etfs_trick = False, 
-#     bars_sampled = True, 
-#     bars_barrier = True,
-#     bars_weights = True,
-#     bars_features = True,
-#     backtest_database = True,
-#     bars_stacked = True,
-#     creation_database = True
-#     )
+#print("creando tablas")
+enigmxsql.create_table_database(
+     bars_tunning = False, 
+     bars_basic = True, 
+     bars_entropy = False, 
+     etfs_trick = False, 
+     bars_sampled = False, 
+     bars_barrier = False,
+     bars_weights = False,
+     bars_features = False,
+     backtest_database = False,
+     bars_stacked = False,
+     creation_database = True
+     )
 
 print("subiendo info")
 enigmxsql.compute_info_to_sql(
             bars_tunning_process = False, 
-            bar_construction_process = False, 
+            bar_construction_process = True, 
             entropy_construction_process = False, 
             etftrick_construction_process = False, 
-            sampling_features_process = False, 
-            triple_barrier_computation_process = False, 
-            sample_weight_computation_process = False,
-            features_bar_computation_process = False,
+            sampling_features_process = True, 
+            triple_barrier_computation_process = True, 
+            sample_weight_computation_process = True,
+            features_bar_computation_process = True,
             features_stacking = True,
 	    )
 

@@ -35,24 +35,24 @@ def adf_test(datos):
       t <- proc.time()
       
       serie <- ts(datos[i])
-      for (j in seq(1,length(serie)-400,40)){
+      for (j in seq(1,length(serie)-1000,100)){
         t2 <- proc.time()
-        end <- j+40
+        end <- j+1000
         adx <- adf.test(serie[j:end])
         time2 <- proc.time() - t2
         if (is.nan(adx$p.value)){
                 cat("El feature ",i," se va a eliminar por no contener información")
                 delete_features <- c(delete_features, i)
                 break}
-        if (adx$p.value > 0.05){
+        else if (adx$p.value > 0.05){
           feature = c(feature,i)
           pval = c(pval,adx$p.value)
-          cat("El feature ",i," no es estacionario")
+          cat("El feature ",i," no es estacionario"," \n")
           break
         }
       }
      time <- proc.time() - t
-     cat("Tiempo total para toda la estacionarización del feature ",time[3]," ",i, "\n")
+     cat("Tiempo total para chequeo del feature ",time[3]," ",i, "\n")
      }
     df <- data.frame(feature = feature, pval = pval)
     return (list(df = df, delete_features = delete_features))

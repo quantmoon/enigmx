@@ -1,3 +1,4 @@
+
 """
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
@@ -78,14 +79,16 @@ class QuantmoonSQLManager(object):
                             ';Database='+self.base_database+
                             ';Uid='+self.uid+
                             ';Pwd='+self.pwd+';')
+            print("loggin1:",self.loggin)
             
         else:
             print("|----- Cloud Process Detected -----|")
-            self.loggin = ('Driver='+self.driver[0][0]+
+            self.loggin = ('Driver='+self.driver[0]+
                            ';Server='+ self.server +
                            ';Database='+self.base_database+
                            ';Uid='+self.uid[0]+
                            ';Pwd='+self.pwd[0]+';')
+            print("loggin2:",self.loggin)
 
         # setting global Range sufix element
         if self.globalRange:
@@ -95,17 +98,19 @@ class QuantmoonSQLManager(object):
         
         # check if input is string (running local device) or tuple (running google cloud)
         if type(self.uid) == str and type(self.pwd) == str and type(self.driver) == str:
-            self.access = ('Driver='+self.driver+
+            self.access = ('Driver='+self.driver[0]+
                            ';Server='+ self.server +
                            ';Database='+self.database_name+
                            ';Uid='+self.uid+
                            ';Pwd='+self.pwd+';')
+            print("access1:",self.access)
         else:
-            self.access = ('Driver='+self.driver[0][0]+
+            self.access = ('Driver='+self.driver[0]+
                            ';Server='+ self.server +
                            ';Database='+self.database_name+
                            ';Uid='+self.uid[0]+
                            ';Pwd='+self.pwd[0]+';')
+            print("access2:",self.access)
         
     def __checkDatabase__(self):
         # revisar si la base de datos ya existe con ese nombre
@@ -647,7 +652,7 @@ class DataRespositoryInitialization(object):
         #check time_vwap daily upper/lower case
         if time == 'd':
             time = time.upper()
-        
+
         #get dates information from ticks
         datesOnly = self.__stateResults__[0].astype(
             "M8[{}{}]".format(
@@ -697,6 +702,9 @@ class DataRespositoryInitialization(object):
         
         #OUTPUT 6: total ticks
         total_ticks = self.__stateResults__[1].shape[0]
+
+
+ 
         
         return ( #agregar el groupTickRule
             groupDataTime, 
@@ -772,10 +780,12 @@ class DataRespositoryInitialization(object):
             #get list of column names for dataframe construction 
             
             #results_ tuple info (last arg. is 'alpha_calibration')   
+            
             try:
                 a=info_tuple[0][0]
             except:
                 print(self.stock,"Gaaaaaaaaaaaa")
+                print(self.stock,info_tuple)
 
             result_info = __newVolumeBarConstruction__(
     	        info_tuple[0][0],

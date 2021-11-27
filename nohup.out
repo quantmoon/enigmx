@@ -1,0 +1,85 @@
+2021-11-20 23:49:13.362199: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2021-11-20 23:49:13.362263: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+inicializando clase
+ 
+Accessing SQL Info --->>>
+|----- Cloud Process Detected -----|
+Driver={ODBC DRIVER 17 for SQL Server};Server=34.71.58.11;Database=TSQL;Uid=sqlserver;Pwd=quantmoon2021;
+Database 'BARS_STACKED' successfully created
+:::::::::>> SQL Connection Path...
+Driver={ODBC DRIVER 17 for SQL Server};Server=34.71.58.11;Database=BARS_STACKED;Uid=sqlserver;Pwd=quantmoon2021;
+ 
+subiendo info
+ 
+Accessing SQL Info --->>>
+|----- Cloud Process Detected -----|
+Driver={ODBC DRIVER 17 for SQL Server};Server=34.71.58.11;Database=TSQL;Uid=sqlserver;Pwd=quantmoon2021;
+:::::::::>> SQL Connection Path...
+Driver={ODBC DRIVER 17 for SQL Server};Server=34.71.58.11;Database=BARS;Uid=sqlserver;Pwd=quantmoon2021;
+ 
+:::::: >>> SQL Alchemy Initialization for 'stationary features'  table...
+
+>>> Temporal Driver Selected is 'ODBC Driver 17 for SQL Server'...
+----> Warning! In case 'InterfaceError': please change 'temporalDriver' index selection in line 620 databundle_interface.py.
+
+Tiempo total para chequeo del feature  18.171   feature_technical_sar_signal 
+Tiempo total para chequeo del feature  17.767   feature_technical_bollinger_volatility_compression 
+WARNING! >>>>> Features to transform as stationary:  0 / 3
+::::> UPDATED SQL INFORMATION FINISHED <::::
+R[write to console]: Warning messages:
+
+R[write to console]: 1: 
+R[write to console]: In (function (package, help, pos = 2, lib.loc = NULL, character.only = FALSE,  :
+R[write to console]: 
+ 
+R[write to console]:  library ‘/usr/lib/R/site-library’ contains no packages
+
+R[write to console]: 2: 
+R[write to console]: In (function (package, help, pos = 2, lib.loc = NULL, character.only = FALSE,  :
+R[write to console]: 
+ 
+R[write to console]:  library ‘/usr/lib/R/site-library’ contains no packages
+
+Exception ignored on calling ctypes callback function: <function ExecutionEngine._raw_object_cache_notify at 0x7f93f0d43550>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/llvmlite/binding/executionengine.py", line 171, in _raw_object_cache_notify
+    def _raw_object_cache_notify(self, data):
+KeyboardInterrupt: 
+2021-11-21 20:47:59.087670: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2021-11-21 20:47:59.087717: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+Traceback (most recent call last):
+  File "tests/test_enigmx.py", line 9, in <module>
+    from enigmx.classEnigmx import EnigmX
+  File "/usr/local/lib/python3.8/dist-packages/enigmx/classEnigmx.py", line 9, in <module>
+    from enigmx.dbgenerator import databundle_instance 
+  File "/usr/local/lib/python3.8/dist-packages/enigmx/dbgenerator.py", line 6, in <module>
+    from enigmx.databundle import QuantmoonSQLManager as QSQL
+  File "/usr/local/lib/python3.8/dist-packages/enigmx/databundle.py", line 15, in <module>
+    from enigmx.utils import (
+  File "/usr/local/lib/python3.8/dist-packages/enigmx/utils.py", line 24, in <module>
+    from keras.utils import np_utils
+  File "/usr/local/lib/python3.8/dist-packages/keras/__init__.py", line 21, in <module>
+    from tensorflow.python import tf2
+  File "/usr/local/lib/python3.8/dist-packages/tensorflow/__init__.py", line 41, in <module>
+    from tensorflow.python.tools import module_util as _module_util
+  File "/usr/local/lib/python3.8/dist-packages/tensorflow/python/__init__.py", line 40, in <module>
+    from tensorflow.python import pywrap_tensorflow as _pywrap_tensorflow
+  File "/usr/local/lib/python3.8/dist-packages/tensorflow/python/pywrap_tensorflow.py", line 64, in <module>
+    from tensorflow.python._pywrap_tensorflow_internal import *
+KeyboardInterrupt
+2021-11-21 20:48:03.073563: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2021-11-21 20:48:03.073604: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+R[write to console]: Warning messages:
+
+R[write to console]: 1: 
+R[write to console]: In (function (package, help, pos = 2, lib.loc = NULL, character.only = FALSE,  :
+R[write to console]: 
+ 
+R[write to console]:  library ‘/usr/lib/R/site-library’ contains no packages
+
+R[write to console]: 2: 
+R[write to console]: In (function (package, help, pos = 2, lib.loc = NULL, character.only = FALSE,  :
+R[write to console]: 
+ 
+R[write to console]:  library ‘/usr/lib/R/site-library’ contains no packages
+

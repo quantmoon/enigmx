@@ -78,7 +78,7 @@ instance = EnigmX(bartype = 'VOLUME',
 # feature importance
 instance.get_feature_importance(    
                       model = RandomForestClassifier(max_features=1, random_state=0), 
-#                      model = SGDClassifier(loss='log'), #para MDA
+                     # model = SGDClassifier(loss='log'), #para MDA
                       list_stocks = stocks,
                       #list_stocks = ['INFN','KRA','LCII','LUNA'],
                       score_constraint = 0.3, #activar 
@@ -91,7 +91,7 @@ instance.get_feature_importance(
                       pval_kendall = 0.1,
                       k_min = 10,
                       n_samples = 15,
-                      cutpoint = 0.5
+                      cutpoint = 0.8
                       )
    
 

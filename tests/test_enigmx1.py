@@ -91,7 +91,7 @@ instance.get_feature_importance(
                       pval_kendall = 0.1,
                       k_min = 10,
                       n_samples = 15,
-                      cutpoint = 0.5
+                      cutpoint = 0.65
                       )
    
 

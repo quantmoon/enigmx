@@ -497,7 +497,7 @@ class StationaryStacked():
         xMatrixDf = df_base_matrix.copy()
 
         # Esta línea es para prueas con menos features
-        # xMatrixDf = xMatrixDf.iloc[:,:8]
+#        xMatrixDf = xMatrixDf.iloc[:,:10]
 
         #Selecciona features numéricos y discretos, todos los discretos van a formar un cluster independiente
         discrete_feat = [x for x in xMatrixDf.columns if x.split('_')[-1] == 'integer']

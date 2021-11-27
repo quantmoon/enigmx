@@ -2912,15 +2912,15 @@ def baseFeatImportance(**kwargs):
         random_state = kwargs['random_state']
         )
     
-    # si el método seleccionado es 'MDA'
-    if kwargs['method'] == 'MDA':
-        # verificación de modelo utilizado
-        if type(kwargs['model_selected']).__name__=='RandomForestClassifier':
-            raise ValueError(
-                "{} model is not allowed to implement 'MDA'".format(
-                    'RandomForestClassifier'
-                    )
-                )      
+#    # si el método seleccionado es 'MDA'
+#    if kwargs['method'] == 'MDA':
+#        # verificación de modelo utilizado
+#        if type(kwargs['model_selected']).__name__=='RandomForestClassifier':
+#            raise ValueError(
+#                "{} model is not allowed to implement 'MDA'".format(
+#                    'RandomForestClassifier'
+#                    )
+#                )      
         
     # si el método seleccionado es 'MDI
     if kwargs['method'] == 'MDI': 
