@@ -43,6 +43,7 @@ def clfHyperFit(feat, lbl, t1, param_grid,
     """
     
     # determinar las categorias de label que hay: si solo son 2, usa 'f1Score'
+    print("Modelo:",pipe_clf)
     if set(lbl.values) == {0, 1}:
         scoring = make_scorer(
             f1_score, 
@@ -85,7 +86,9 @@ def clfHyperFit(feat, lbl, t1, param_grid,
                                 cv= inner_cv, # cant. de folds para el cross val
                                 n_jobs= n_jobs, #nJbos para paralelizacion
                                 iid= False, #definir si la data es iiD
-                                n_iter= rndSearchIter) # num Iteraciones randomSearch
+                                n_iter= rndSearchIter,
+                                error_score = "raise",
+                                verbose = 10) # num Iteraciones randomSearch
     
     # fit de la busqueda grid con los parametros X e Y
     gs = gs.fit(feat, lbl, **fit_params).best_estimator_

@@ -2,8 +2,8 @@
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
-#import ray
-#ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus = 1)
+import ray
+ray.init(include_dashboard=(False),ignore_reinit_error=(True),num_cpus = 4)
 
 #from enigmx.utils import EquitiesEnigmxUniverse
 from enigmx.databundle_interface import SQLEnigmXinterface
@@ -13,7 +13,7 @@ from enigmx.tests.stocks import stocks
 
 
 
-server_name = "34.71.58.11" 
+server_name = "34.71.157.141" 
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
 list_stocks = stocks
@@ -45,10 +45,10 @@ enigmxsql = SQLEnigmXinterface(
     desired_bars = desired_bars,
     referential_base_database = referential_base_database)
 
-#print("creando tablas")
+print("creando tablas")
 enigmxsql.create_table_database(
      bars_tunning = False, 
-     bars_basic = True, 
+     bars_basic = False, 
      bars_entropy = False, 
      etfs_trick = False, 
      bars_sampled = False, 
@@ -56,20 +56,20 @@ enigmxsql.create_table_database(
      bars_weights = False,
      bars_features = False,
      backtest_database = False,
-     bars_stacked = False,
+     bars_stacked = True,
      creation_database = True
      )
 
 print("subiendo info")
 enigmxsql.compute_info_to_sql(
             bars_tunning_process = False, 
-            bar_construction_process = True, 
+            bar_construction_process = False, 
             entropy_construction_process = False, 
             etftrick_construction_process = False, 
-            sampling_features_process = True, 
-            triple_barrier_computation_process = True, 
-            sample_weight_computation_process = True,
-            features_bar_computation_process = True,
+            sampling_features_process = False, 
+            triple_barrier_computation_process = False, 
+            sample_weight_computation_process = False,
+            features_bar_computation_process = False,
             features_stacking = True,
 	    )
 

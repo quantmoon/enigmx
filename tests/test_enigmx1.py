@@ -59,16 +59,17 @@ dict_models = {
 ##############################################################################
 
 main_path = '/var/data/data/'
-code = input('Ingresa el n° de serie de este intento: ')
+#code = input('Ingresa el n° de serie de este intento: ')
+code = '_estacionario_08'
 #variables = input('Por favor ingresa las variables con las que se va a construir el modelo (solo separados por comas): ')
 variables = "feature_technical_EMA_10_signal, feature_technical_sar_signal, feature_technical_bollinger_band_integer, feature_technical_bollinger_volatility_compression"
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
-                  method = 'MDA', 
+                  method = 'MDI', 
                   base_path = main_path,
                   cloud_framework = True,
-                  server_name = "34.71.58.11",
-                  stationary_stacked = False,
+                  server_name = "34.71.157.141",
+                  stationary_stacked = True,
                   features_database = "BARS_FEATURES",
                   uid = "sqlserver",
                   pwd = 'quantmoon21',
@@ -82,7 +83,7 @@ instance.get_feature_importance(
                       list_stocks = stocks,
                       #list_stocks = ['INFN','KRA','LCII','LUNA'],
                       score_constraint = 0.3, #activar 
-                      server_name = "34.71.58.11",
+                      server_name = "34.71.157.141",
                       database = "BARS_FEATURES",
                       uid = ['sqlserver'],
                       pwd = ['quantmoon2021'],
@@ -91,7 +92,7 @@ instance.get_feature_importance(
                       pval_kendall = 0.1,
                       k_min = 10,
                       n_samples = 15,
-                      cutpoint = 0.65
+                      cutpoint = 0.8
                       )
    
 

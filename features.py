@@ -770,27 +770,27 @@ class FeaturesClass():
         # definimos diccionario general de técnicos (no inc. las medias móviles)
         self.dictTechnicals = (
         	{
-			#'ema':ema,
+			'ema':ema,
 			#'hilbert_trend':trend_hilbert,
 			#'kama':kama,
 			#'midpoint':midpoint,
-			'sar_signal':sarSignal,
+			##'sar_signal':sarSignal,
 			#'trima':trima,
-            'bollinger_band_integer': bollingerBand, # lógica técnica discr.
-            'bollinger_volatility_compression': compresionVolatilidad, # lógica técnico. cont.
-            'mesa_signal': mesaSignal, #lógica técnico de valores continuos
-			'adx': adx,
+            ##'bollinger_band_integer': bollingerBand, # lógica técnica discr.
+            ##'bollinger_volatility_compression': compresionVolatilidad, # lógica técnico. cont.
+            ##'mesa_signal': mesaSignal, #lógica técnico de valores continuos
+			##'adx': adx,
 			'aroonosc':aroonosc,
 			'bop' : bop,
-			'cci': cci,
+			##'cci': cci,
 			'mfi':mfi,
 			'rsi':rsi,
 			'ultosk':ultosk,
 			'willr':willr,
             'slow_stochastic': slowStochastic, # lógica técnico. cont.
-            'fast_stochastic': fastStochastic, # lógica técnico. cont.
-			'adline':ad,
-			'obv':obv,
+            ##'fast_stochastic': fastStochastic, # lógica técnico. cont.
+			##'adline':ad,
+			##'obv':obv,
 			'atr':atr,
 			#'weighted_close_price':wcp,
 			#'hilbert_trans':simple_hilbert,
@@ -802,40 +802,40 @@ class FeaturesClass():
 			#'taws_integer_integer':taws,
 			#'ababy_integer':ababy,
 			#'ablock_integer':ablock,
-			'belthold_integer':belthold,
+			##'belthold_integer':belthold,
 			#'breakaway_integer':breakaway,
 			#'baby_swallow_integer':baby_swallow,
 			#'counterattack_integer': counterattack,	
 			#'darkcloud_integer':darkcloud,
-			'doji_integer':doji,
-			'eng_integer':eng,
+			#'doji_integer':doji,
+			##'eng_integer':eng,
 			#'evening_star_integer':evening_star,
 			#'up_down_gap_integer':up_down_gap,
-			'hammer_integer':hammer,
+			##'hammer_integer':hammer,
 			#'hanging_integer':hanging,
-			'harami_integer':harami,
-			'hw_candle_integer':hw_candle,
-			'hikkake_integer':hikkake,
+			##'harami_integer':harami,
+			##'hw_candle_integer':hw_candle,
+			##'hikkake_integer':hikkake,
 			#'pigeon_integer':pigeon,
 			#'neck_integer':neck,
 			#'kicking_integer':kicking,
 			#'ladder_integer':ladder,
-			'marubozu_integer':marubozu,
-			'matchinglow_integer':matchinglow,
+			##'marubozu_integer':marubozu,
+			##'matchinglow_integer':matchinglow,
 			#'mathold_integer':mathold,
 			#'morning_star_integer':morning_star,
 			#'piercing_integer':piercing,
-			'rickshaw_integer':rickshaw,
+			##'rickshaw_integer':rickshaw,
         	#'shooting_star_integer':shooting_star,
         	#'stick_sandwich_integer':stick_sandwich,
         	#'tasuki_gap_integer':tasuki,
         	#'river_integer':river,
-        	'beta_tech':beta_feature,
+        	##'beta_tech':beta_feature,
         	#'tforecast':tforecast,		
         	'disparity':disparity,
         	'choppiness' : choppiness,
-        	'fisher' : fisher,
-        	'countdown_ind' : countdown_ind
+        	##'fisher' : fisher,
+        	##'countdown_ind' : countdown_ind
         		}
         )
         
@@ -895,9 +895,12 @@ class FeaturesClass():
         # construye el df con los features de microestructura         
         self.dfmicrostructural = pd.DataFrame(
             {
-                'roll' : roll,'corwinschultz' : corSchultz[0],
-                'kyle' : kyle, 'amihud' : amihud,
-                'hasbrouck' : hasb, 'vpin' : vpin}
+                'roll' : roll,
+                'corwinschultz' : corSchultz[0],
+                'kyle' : kyle, 
+                'amihud' : amihud,
+                'hasbrouck' : hasb, 
+                'vpin' : vpin}
             )
         
         # general microstructural dataframe 
@@ -969,8 +972,8 @@ class FeaturesClass():
             [
                 self.df,
                 technicals,
-                tsfresh,
-                others,
+                #tsfresh,
+                #others,
                 microstructural,
 
             ], axis=1

@@ -1,0 +1,107 @@
+2021-12-06 18:19:11.736035: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2021-12-06 18:19:11.736108: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+      ::::: >>>> MultiProcess for CPKF as Backtesting started...
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m  
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m Accessing SQL Info --->>>
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m |----- Cloud Process Detected -----|
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m loggin2: Driver={ODBC DRIVER 17 for SQL Server};Server=34.71.157.141;Database=TSQL;Uid=sqlserver;Pwd=quantmoon2021;
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m access2: Driver={ODBC DRIVER 17 for SQL Server};Server=34.71.157.141;Database=BARS_STACKED;Uid=sqlserver;Pwd=quantmoon2021;
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m :::::::::>> SQL Connection Path...
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m Driver={ODBC DRIVER 17 for SQL Server};Server=34.71.157.141;Database=BARS_STACKED;Uid=sqlserver;Pwd=quantmoon2021;
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m  
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m variables ['feature_alpha53', 'feature_alpha41', 'feature_alpha46', 'feature_technical_slow_stochastic', 'feature_technical_choppiness', 'feature_microstructural_vpin', 'feature_microstructural_amihud', 'feature_microstructural_roll', 'feature_technical_atr']
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m ::::: >> Sklearn Model Detected...
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m 
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m ::::: >> No KerasClassifier Object Created...
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m 
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m ---Process Finished! 'randomForest_exo_model' file was saved in '/var/data/data/'.
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m 
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m  
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m Accessing SQL Info --->>>
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m |----- Cloud Process Detected -----|
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m loggin2: Driver={ODBC DRIVER 17 for SQL Server};Server=34.71.157.141;Database=TSQL;Uid=sqlserver;Pwd=quantmoon2021;
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m access2: Driver={ODBC DRIVER 17 for SQL Server};Server=34.71.157.141;Database=BARS_STACKED;Uid=sqlserver;Pwd=quantmoon2021;
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m :::::::::>> SQL Connection Path...
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m Driver={ODBC DRIVER 17 for SQL Server};Server=34.71.157.141;Database=BARS_STACKED;Uid=sqlserver;Pwd=quantmoon2021;
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m  
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m variables ['feature_alpha53', 'feature_alpha41', 'feature_alpha46', 'feature_technical_slow_stochastic', 'feature_technical_choppiness', 'feature_microstructural_vpin', 'feature_microstructural_amihud', 'feature_microstructural_roll', 'feature_technical_atr']
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m ::>> BetSize computation... 
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m Fitting 3 folds for each of 50 candidates, totalling 150 fits
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=  59.1s
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=17.2min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=  59.3s
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=18.4min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=100; total time=  59.9s
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=18.8min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=18.4min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 9.2min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=True, max_depth=20, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 6.3min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=4, min_samples_split=10, n_estimators=1100; total time=17.4min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=30, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=1200; total time=19.2min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=18.0min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=40, max_features=sqrt, min_samples_leaf=4, min_samples_split=5, n_estimators=1500; total time=23.6min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=None, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=300; total time= 4.9min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=True, max_depth=50, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=600; total time= 6.3min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=True, max_depth=30, max_features=auto, min_samples_leaf=1, min_samples_split=10, n_estimators=1000; total time=10.9min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=True, max_depth=50, max_features=sqrt, min_samples_leaf=2, min_samples_split=2, n_estimators=600; total time= 6.3min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=80, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=1000; total time=16.7min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=90, max_features=auto, min_samples_leaf=2, min_samples_split=2, n_estimators=1100; total time=18.8min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 9.7min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 6.3min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=40, max_features=auto, min_samples_leaf=4, min_samples_split=10, n_estimators=1900; total time=30.8min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=30, max_features=sqrt, min_samples_leaf=2, min_samples_split=5, n_estimators=1200; total time=20.0min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=60, max_features=auto, min_samples_leaf=4, min_samples_split=5, n_estimators=600; total time= 9.8min
+[2m[36m(__combinedGeneralMultiModel__ pid=52793)[0m [CV] END bootstrap=False, max_depth=10, max_features=auto, min_samples_leaf=2, min_samples_split=10, n_estimators=700; total time= 6.3min
+[2m[36m(pid=52793)[0m 2021-12-06 18:19:33.489356: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+[2m[36m(pid=52793)[0m 2021-12-06 18:19:33.489430: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+2021-12-06 21:22:00,739	WARNING worker.py:1228 -- The node with node id: 51c61a209e773f60772643efaa3f58b6bcd9f95b373710faae270ff7 and ip: 10.128.0.2 has been marked dead because the detector has missed too many heartbeats from it. This can happen when a raylet crashes unexpectedly or has lagging heartbeats.
+[2m[33m(raylet)[0m [2021-12-06 21:21:59,157 C 52728 52728] node_manager.cc:168: This node has beem marked as dead.
+[2m[33m(raylet)[0m *** StackTrace Information ***
+[2m[33m(raylet)[0m     ray::SpdLogMessage::Flush()
+[2m[33m(raylet)[0m     ray::RayLog::~RayLog()
+[2m[33m(raylet)[0m     std::_Function_handler<>::_M_invoke()
+[2m[33m(raylet)[0m     std::_Function_handler<>::_M_invoke()
+[2m[33m(raylet)[0m     std::_Function_handler<>::_M_invoke()
+[2m[33m(raylet)[0m     ray::rpc::ClientCallImpl<>::OnReplyReceived()
+[2m[33m(raylet)[0m     std::_Function_handler<>::_M_invoke()
+[2m[33m(raylet)[0m     boost::asio::detail::completion_handler<>::do_complete()
+[2m[33m(raylet)[0m     boost::asio::detail::scheduler::do_run_one()
+[2m[33m(raylet)[0m     boost::asio::detail::scheduler::run()
+[2m[33m(raylet)[0m     boost::asio::io_context::run()
+[2m[33m(raylet)[0m     main
+[2m[33m(raylet)[0m     __libc_start_main
+[2m[33m(raylet)[0m 
+2021-12-06 21:22:00,774	WARNING worker.py:1228 -- The autoscaler failed with the following error:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/ray/autoscaler/_private/monitor.py", line 423, in run
+    self._run()
+  File "/usr/local/lib/python3.8/dist-packages/ray/autoscaler/_private/monitor.py", line 311, in _run
+    self.update_load_metrics()
+  File "/usr/local/lib/python3.8/dist-packages/ray/autoscaler/_private/monitor.py", line 231, in update_load_metrics
+    response = self.gcs_node_resources_stub.GetAllResourceUsage(
+  File "/usr/local/lib/python3.8/dist-packages/grpc/_channel.py", line 946, in __call__
+    return _end_unary_response_blocking(state, call, False, None)
+  File "/usr/local/lib/python3.8/dist-packages/grpc/_channel.py", line 849, in _end_unary_response_blocking
+    raise _InactiveRpcError(state)
+grpc._channel._InactiveRpcError: <_InactiveRpcError of RPC that terminated with:
+	status = StatusCode.DEADLINE_EXCEEDED
+	details = "Deadline Exceeded"
+	debug_error_string = "{"created":"@1638825717.864941268","description":"Error received from peer ipv4:10.128.0.2:46627","file":"src/core/lib/surface/call.cc","file_line":1063,"grpc_message":"Deadline Exceeded","grpc_status":4}"
+>
+
+[2021-12-06 21:22:00,740 E 52713 52820] direct_task_transport.cc:588: The worker failed to receive a response from the local raylet. This is most likely because the local raylet has crashed.
+[2021-12-06 21:22:02,123 C 52713 52820] direct_task_transport.cc:591: IOError: 14: Socket closed
+*** StackTrace Information ***
+    ray::SpdLogMessage::Flush()
+    ray::RayLog::~RayLog()
+    ray::core::CoreWorkerDirectTaskSubmitter::RequestNewWorkerIfNeeded()::{lambda()#1}::operator()()
+    ray::rpc::ClientCallImpl<>::OnReplyReceived()
+    std::_Function_handler<>::_M_invoke()
+    boost::asio::detail::completion_handler<>::do_complete()
+    boost::asio::detail::scheduler::do_run_one()
+    boost::asio::detail::scheduler::run()
+    boost::asio::io_context::run()
+    ray::core::CoreWorker::RunIOService()
+    execute_native_thread_routine
+

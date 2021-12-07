@@ -59,6 +59,8 @@ def clusterKMeansBase(corr0,maxNumClusters=None,n_init=10,val_abs=False):
     clstrs={i:corr0.columns[np.where(
         kmeans.labels_==i)[0]].tolist() for i in np.unique(kmeans.labels_)
         } # cluster members
+    print("Clstrs")
+    print(clstrs)
     silh=pd.Series(silh,index=dist.index)
     return corr1,clstrs,silh
 
@@ -93,10 +95,7 @@ def featImpMDA_Clustered(clf,X,y,clstrs,params_dict):
     for i,(train,test) in enumerate(cvGen.split(X=X)):
         X0,y0=X.iloc[train,:],y.iloc[train]
         X1,y1=X.iloc[test,:],y.iloc[test]
-        t = time()
-        print('MDA clusterizado')
         fit=clf.fit(X=X0,y=y0)
-        print(time()- t)
         prob=fit.predict_proba(X1)
         scr0.loc[i]=-log_loss(y1,prob,labels=clf.classes_)
         for j in scr1.columns:
@@ -193,12 +192,12 @@ class ClusteredFeatureImportance(object):
         # verificación de congruencia del modelo para el FeatImp | caso: 'MDA'
         if self.method == 'MDA':
             # verificación de modelo utilizado
-            if type(self.model).__name__=='RandomForestClassifier':
-                raise ValueError(
-                    "{} model is not allowed to implement 'MDA'".format(
-                        'RandomForestClassifier'
-                        )
-                    )
+            # if type(self.model).__name__=='RandomForestClassifier':
+               # raise ValueError(
+               #     "{} model is not allowed to implement 'MDA'".format(
+               #         'RandomForestClassifier'
+               #         )
+               #     )
             # elije el método de feature importance
             methodFunction = featImpMDA_Clustered
 
@@ -207,7 +206,7 @@ class ClusteredFeatureImportance(object):
         
         # computando clusterización base de los features con base a su corr.
         self.__baseClusterization__()
-         
+
         #Para el feature importances se añaden los features discretos, si hubieren
         if self.additional_features is not None:
             self.clstrs[len(self.clstrs.keys())] = self.additional_features
@@ -220,7 +219,6 @@ class ClusteredFeatureImportance(object):
                     self.clstrs,
                     params_dict
                 )
-        
         
         # retorna el sorted featImportance por cluster, y los clusters
         return featureImportance, self.clstrs

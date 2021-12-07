@@ -1422,11 +1422,11 @@ def dataPreparation_forTuning(driver,
             cursor_= cursor,
             dataframe=True
             )
+ 
     
-    
-    print("ORIGINAL DF STACKED COLUMNS")
-    print(dfStacked.columns)
-    print(" ")
+   # print("ORIGINAL DF STACKED COLUMNS")
+   # print(dfStacked.columns)
+   # print(" ")
     
     y = SQLFRAME.read_table_info(
             statement = f"SELECT * FROM [BARS_STACKED].[dbo].LABELS_{step}",
@@ -1434,22 +1434,27 @@ def dataPreparation_forTuning(driver,
             cursor_= cursor,
             dataframe=True
             )
+
+    #dfStacked = dfStacked.iloc[:1000]
+    #y = y.iloc[:1000]
+
+    
     #Asignación de índice del stacked
     dfStacked.index = dfStacked[timeIndexName]
     dfStacked.drop(timeIndexName,axis = 1,inplace = True)
     y.index = y[timeIndexName]
     y.drop(timeIndexName,axis = 1,inplace = True)
     y = y['labels']
-
     # array conteniendo los nombres de features ingresados
     variables = [variable.strip() for variable in variables.split(',')]
-    
+    print("variables",variables)
     # Para calcular la purga y embargo
 #    if step == 'BACKTEST':
 #        variables.extend(['horizon'])
 
     # selección únicamente de features
-    X = dfStacked[variables]
+    X = dfStacked.copy()
+    X = X[variables]
     
 #    # selección únicamente de label
 #    y = dfStacked[label_name]
@@ -1458,13 +1463,18 @@ def dataPreparation_forTuning(driver,
     X = X.sort_index()
     y = y.sort_index()
 
+    dfStacked = dfStacked.sort_index()
+
     # Para calcular purga y embargo
     if step == 'BACKTEST':
-        X['horizon'] = dfStacked['horizon'].astype('datetime64[ns]')
+        X['horizon'] = dfStacked['horizon']
+        X['horizon'] = X['horizon'].astype('datetime64[ns]')
         X['barrierTime'] = dfStacked['barrierTime'].astype('datetime64[ns]')
         X['close_price'] = dfStacked['close_price']
         X['barrierPrice'] = dfStacked['barrierPrice']
         X['bidask_spread'] = dfStacked['bidask_spread']
+
+    
 
     # obtención de vector de timeIndex
     t1 = pd.Series(data=y.index, index=y.index)

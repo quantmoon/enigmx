@@ -218,8 +218,8 @@ class BetSize(object):
     # Number of trees in random forest
     n_estimators = [int(x) for x in np.linspace(
         start = 100, 
-        stop = 2000, 
-        num = 20) 
+        stop = 500, 
+        num = 5) 
         ]
 
     # Number of features to consider at every split

@@ -4,7 +4,7 @@ webpage: https://www.quantmoon.tech//
 """
 
 import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True), num_cpus=1)
+ray.init(include_dashboard=(False),ignore_reinit_error=(True), num_cpus=3)
 
 from enigmx.classEnigmx import EnigmX
 import numpy as np
@@ -49,44 +49,10 @@ def kerasModel(num_features):
     return model
 # dict with models, and params
 dict_models = {
-#    'randomForest' :(
-#        RandomForestClassifier(),
-#        {'max_leaf_nodes': list(range(2, 20)), 
-#         'min_samples_split': [2, 3, 4],
-#         'max_features' : [1],
-#         'max_samples': [20],
-#         'n_estimators' : [10,50,100],
-#         'ccp_alpha': [.01,.02,.03]} 
-#        ),
-#    'stochasticGradient' : 
-#        (SGDClassifier(), 
-#         {'loss':['log', 'modified_huber'],
-#          'penalty':['l2', 'l1', 'elasticnet'],
-#          'max_iter':list(range(1,10))}
-#         ),
-#     'adaboost' :
-#	(AdaBoostClassifier(),
-#	 {'n_estimators':[10,50,100]}
-#        ),
-#     'mlperceptron' :
-#	(MLPClassifier(),
-#	 {'activation':['logistic','tanh','relu'],
-#         'solver':['lbfgs','sgd','adam']}
-#        ),
-#     'logisticregression':
-#	(LogisticRegression(),
-#	  { 'multi_class':['multinomial'],
-#	   #'penalty':['elasticnet'],
-#	   'solver' :['newton-cg','lbfgs','sag','saga'],
-#	   'C':[.6,.8,1]}
-#       ),
-    'keras':
-	(kerasModel,
-        dict(
-            batch_size = [10, 20, 40, 60, 80, 100], 
-            epochs = [10, 50, 100]
-            ) 
-        )
+     'svm' :
+	(SVC(), 
+	 {'C' : [.8,1],
+	  'kernel' : ['poly','rbf','sigmoid']})
      }
     
 
@@ -132,7 +98,7 @@ instance = EnigmX(bartype = 'VOLUME',
 
 # get multi process for tunning and backtest
 instance.get_multi_process(
-     code_backtest = 1, 
+     code_backtest = 2, 
      dict_exo_models = dict_models,
      endogenous_model_sufix= 'rf',    
      trials = 20, 

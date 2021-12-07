@@ -65,7 +65,7 @@ code = '_no_estacionario_08'
 variables = "feature_technical_EMA_10_signal, feature_technical_sar_signal, feature_technical_bollinger_band_integer, feature_technical_bollinger_volatility_compression"
 # EnigmX instance definition
 instance = EnigmX(bartype = 'VOLUME', 
-                  method = 'MDA', 
+                  method = 'MDI', 
                   base_path = main_path,
                   cloud_framework = True,
                   server_name = "34.71.157.141",

@@ -323,7 +323,7 @@ class EnigmX:
             datetimeAsIndex = self.datetimeAsIndex,
             exo_openning_method_as_h5 =  self.exo_openning_method_as_h5,
             heuristic_model = self.heuristic_model,
-            driver = "{SQL Server}",
+            driver = self.driver,
             uid = self.uid,
             pwd = self.pwd,
             server_name = self.server_name,
@@ -644,8 +644,8 @@ class EnigmX:
             backtescode = code_backtest, 
             server_name = self.server_name, 
             database = 'BACKTESTS', 
-            uid = self.uid, 
-            pwd = self.pwd
+            uid = self.uid[0], 
+            pwd = self.pwd[0]
             )
         
         print('\n         ::::: >>>> CPKF has been successfully saved in SQL...')

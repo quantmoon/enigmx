@@ -338,6 +338,8 @@ class featureImportance(object):
 
         print(featStandarizedMatrix)
         print(labelsDataframe)
+#        featStandarizedMatrix = featStandarizedMatrix.iloc[:1000]
+#        labelsDataframe = labelsDataframe.iloc[:1000]
 
         # si se utiliza el clustering featImp 
         if self.clustered_features: 
@@ -358,7 +360,8 @@ class featureImportance(object):
                                         # parámetros optativos (valores predef.)
                                         max_number_clusters = None,
                                         number_initial_iterations = 10,
-                                        additional_features = discrete_feat,
+                                        additional_features = None,
+                                        #additional_features = discrete_feat,
                                         numerical_features = numerical_feat,
                                         simple_correlation = self.simple_correlation
                                     )
@@ -395,7 +398,7 @@ class featureImportance(object):
             
             # lista de lista con los features de c/ cluster
             clusters_values = list(clusters.values())
-            clusters_values.append(discrete_feat)
+#            clusters_values.append(discrete_feat)
             
             
             # si se selecciona la transformación por residuos
@@ -510,6 +513,9 @@ class featureImportance(object):
  
                 #Iteración por grupo de features de cada cluster:
                 for idxClust, clusterFeatures in enumerate(clusters_values):
+
+                    #############CORRECION#############
+                    print(clusterFeatures)
 
 
                     #matriz temporal de features
