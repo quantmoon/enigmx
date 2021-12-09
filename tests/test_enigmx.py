@@ -31,55 +31,61 @@ from enigmx.utils import EquitiesEnigmxUniverse
 def kerasModel(num_features):
     # def. sequential model
     model = Sequential()
-    # first embedding
-    model.add(Dense(8, input_length=num_features, activation='relu'))
-    # cetnral layer arch.
+
+    # first embedding    
+    model.add(
+        Dense(8, input_dim = num_features, activation='relu') 
+    )
+    
+    # central layer arch.
     model.add(Dense(16, activation='sigmoid'))
     model.add(Dense(16, activation='sigmoid'))
     model.add(Dense(16, activation='sigmoid'))
+
     # exit layer
-    model.add(Dense(8, input_dim = num_features, activation='relu'))
-    # final exit 
-    model.add(Dense(3, activation='softmax'))
+    model.add(Dense(3, activation='softmax'))     
     
     # Compile model
-    model.compile(loss='categorical_crossentropy', 
-                  optimizer='adam', 
-                  metrics=['accuracy'])
+    model.compile(
+            loss='categorical_crossentropy', 
+            optimizer='adam', 
+            metrics=['accuracy']
+        )
     return model
+
 # dict with models, and params
 dict_models = {
-#    'randomForest' :(
-#        RandomForestClassifier(),
-#        {'max_leaf_nodes': list(range(2, 20)), 
-#         'min_samples_split': [2, 3, 4],
-#         'max_features' : [1],
-#         'max_samples': [20],
-#         'n_estimators' : [10,50,100],
-#         'ccp_alpha': [.01,.02,.03]} 
-#        ),
-#    'stochasticGradient' : 
-#        (SGDClassifier(), 
-#         {'loss':['log', 'modified_huber'],
-#          'penalty':['l2', 'l1', 'elasticnet'],
-#          'max_iter':list(range(1,10))}
-#         ),
-#     'adaboost' :
-#	(AdaBoostClassifier(),
-#	 {'n_estimators':[10,50,100]}
-#        ),
-#     'mlperceptron' :
-#	(MLPClassifier(),
-#	 {'activation':['logistic','tanh','relu'],
-#         'solver':['lbfgs','sgd','adam']}
-#        ),
-#     'logisticregression':
-#	(LogisticRegression(),
-#	  { 'multi_class':['multinomial'],
-#	   #'penalty':['elasticnet'],
-#	   'solver' :['newton-cg','lbfgs','sag','saga'],
-#	   'C':[.6,.8,1]}
-#       ),
+    'randomForest' :(
+        RandomForestClassifier(),
+        {'max_leaf_nodes': list(range(2, 20)), 
+         'min_samples_split': [2, 3, 4],
+         'max_features' : [1],
+         'max_samples': [20],
+         'n_estimators' : [10,50,100],
+         'ccp_alpha': [.01,.02,.03]} 
+        ),
+    'stochasticGradient' : 
+        (SGDClassifier(), 
+         {'loss':['log', 'modified_huber'],
+          'penalty':['l2', 'l1', 'elasticnet'],
+          'max_iter':list(range(1,10))}
+         ),
+     'adaboost' :
+	(AdaBoostClassifier(),
+	 {'n_estimators':[10,50,100]}
+        ),
+     'mlperceptron' :
+	(MLPClassifier(),
+	 {'activation':['logistic','tanh','relu'],
+         'solver':['lbfgs','sgd','adam']}
+        ),
+     'logisticregression':
+	(LogisticRegression(),
+	  { 'multi_class':['multinomial'],
+	   #'penalty':['elasticnet'],
+	   'solver' :['newton-cg','lbfgs','sag','saga'],
+	   'C':[.6,.8,1]}
+       ),
     'keras':
 	(kerasModel,
         dict(
