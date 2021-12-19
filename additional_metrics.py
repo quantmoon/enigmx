@@ -2,7 +2,7 @@
 @author: Quantmoon Technologies
 webpage: https://www.quantmoon.tech//
 """
-
+from numba import njit
 import sys
 import numpy as np
 import pandas as pd 
@@ -322,39 +322,70 @@ def moneyEVA(binaryDF, initial_cap = 5000, cashF = 1):
   if cashF > 1 or cashF <= 0:
     sys.exit("Warning! 'cashF' value should belong to the set [0;1] only...")
 
-  # def. de cash como capital inicial entre factor de cash (%)
-  cash = [initial_cap/cashF]
-  # AUM como lst con 0 inicial (ningún activo previo en hold para el trial)
-  aum = [0]
-  # capital inicial bruto general 
-  cap = [initial_cap]
-  # lista vacía de fechas almacenables para la construcción del df. final
-  dates = [0]
-  # temporal iterativo generla
-  temp = 0
-  # suma de cash acumulable (temporal)
-  sum_cash = 0
-  # suma de capital acumulable (temporal)
-  sum_cap = 0
-  # valor restante del AUM (temporal)
-  minus_aum = 0
-  # Eventos no tomados en cuenta dado el limitante del capital 
-  no_van = []
+  #Se extraen las fechas que luego se unirán con los índices 
+  dates = binaryDF['close_date']
 
-  # iteración general por el total de eventos 
-  for i in range(binaryDF.shape[0]):
-    # si el evento representa LA ÚLTIMA salida de cash (1)...
-    if i == binaryDF.query("is_close == 1").index[-1]:
-      # evalúa si el evento no se encuentra en la lista de eventos que no van
-      last_rows=binaryDF.loc[~binaryDF.close_price_index.isin(no_van)].loc[i+1:]
-      # utiliza el neto de beneficio/pérdida para inicializar cap, cash y aum
-      sum_cap = sum_cap + last_rows.net.sum()
-      minus_aum = minus_aum + last_rows.invest_price.sum()
-      sum_cash = sum_cash + last_rows.invest_price.sum()
+  #Se construye una matriz de numpy, para utilizarla con numba, cambiando las fechas, por 
+  # una columna de índices
+  reemplazo = np.array(list(range(len(binaryDF))))
+  binary_matrix = binaryDF.to_numpy()
+  binary_matrix[:,0] = reemplazo
+
+  #Transformación de la matriz para que sea legible
+  binary_matrix = np.array(binary_matrix, dtype = np.float32)
+
+  #Se corre la función  
+  aum,cash,cap,dates_index= backtest(binary_matrix, initial_cap, cashF)
+
+  # pandas vacío para almacenamiento de info final
+  assetum = pd.DataFrame()
+  # añadidura de fecha de evento 
+  assetum["close_date"] = dates[dates_index[1:]] # 'close_date' como nombre para post. merge
+  # añadidura de AUM
+  assetum["aum"] = aum[1:]
+  # añadidura de CASH
+  assetum["cash"] = cash[1:]
+  # añadidura de CAP
+  assetum["cap"] = cap[1:]
+  return assetum
+
+
+@njit
+def backtest(binaryDF, initial_cap, cashF):
     
-    ##########################################################################
-    ################### CONDICIONALES DE CASH, CAPITAL Y AUM #################
-    ##########################################################################
+  # def. de cash como capital inicial entre factor de cash (%)
+    cash = [initial_cap/cashF]
+  # AUM como lst con 0 inicial (ningún activo previo en hold para el trial)
+    aum = [0]
+  # capital inicial bruto general 
+    cap = [initial_cap]
+  # lista vacía de fechas almacenables para la construcción del df. final
+    dates = [0]
+  # temporal iterativo generla
+    temp = 0
+  # suma de cash acumulable (temporal)
+    sum_cash = 0
+  # suma de capital acumulable (temporal)
+    sum_cap = 0
+  # valor restante del AUM (temporal)
+    minus_aum = 0
+  # Eventos no tomados en cuenta dado el limitante del capital 
+    no_van = [0]
+    
+  # iteración general por el total de eventos 
+    for i in range(binaryDF.shape[0]):
+        
+    # si el evento representa LA ÚLTIMA salida de cash (1)...
+        if i == np.where(binaryDF[:,4] == 1)[-1][-1]:
+            
+      # evalúa si el evento no se encuentra en la lista de eventos que no van
+            last_rows = binaryDF[np.array([idx for idx,x in enumerate(binaryDF[:,2]) if x not in no_van[1:]])]
+            last_rows = last_rows[last_rows[:,0]>i]
+                
+      # utiliza el neto de beneficio/pérdida para inicializar cap, cash y aum
+            sum_cap = sum_cap + np.sum(last_rows[:,3])
+            minus_aum = minus_aum + np.sum(last_rows[:,1])
+            sum_cash = sum_cash + np.sum(last_rows[:,1])
 
     #Para todo condicional existen dos casos principales, si el is_close es 0
     #O si el is_close es 1
@@ -364,92 +395,81 @@ def moneyEVA(binaryDF, initial_cap = 5000, cashF = 1):
     #Flujo de Efectivo (CASH)
     
     #Si nos encontramos en una liquidación de la operación
-    if binaryDF["is_close"].iloc[i] == 0:
-      #Y esta operación si fue aperturada (no está en no_van)
-      if binaryDF["close_price_index"].iloc[i] not in no_van:
-        #suma las liquidaciones para añadirlas en el próximo is_close=1
-        sum_cash = sum_cash + binaryDF["invest_price"].iloc[i]
-      else:
-        #si la operación no fue aperturada, no sumar esa operación
-        sum_cash = sum_cash
-    #Si, en cambio, se encuentra en la apertura del trade
-    elif binaryDF["is_close"].iloc[i] == 1:
-      dates.append(binaryDF["close_date"].iloc[i])
-      if sum_cash == 0:
-        if (cash[temp] - binaryDF["invest_price"].iloc[i]) >= 0:
-            cash.append(cash[temp] - binaryDF["invest_price"].iloc[i])
-            temp = temp + 1
+        if binaryDF[i,4] == 0:
+          #Y esta operación si fue aperturada (no está en no_van)
+            if binaryDF[i,2] not in no_van:
+            #suma las liquidaciones para añadirlas en el próximo is_close=1
+                sum_cash = sum_cash + binaryDF[i,1]
+            else:
+            #si la operación no fue aperturada, no sumar esa operación
+                sum_cash = sum_cash
+        #Si, en cambio, se encuentra en la apertura del trade
+        elif binaryDF[i,4] == 1:
+            dates.append(binaryDF[i,0])
+            if sum_cash == 0:
+                if (cash[temp] - binaryDF[i,1]) >= 0:
+                    cash.append(cash[temp] - binaryDF[i,1])
+                    temp = temp + 1
+                else:
+                    cash.append(cash[temp])
+                    no_van.append(binaryDF[i,2])
+                    temp = temp + 1
+            if sum_cash !=0 :
+                if (cash[temp] + sum_cash - binaryDF[i,1]) >= 0:
+                    cash.append(cash[temp] + sum_cash - binaryDF[i,1])
+                    temp = temp + 1
+                else:
+                    cash.append(cash[temp] + sum_cash)
+                    no_van.append(binaryDF[i,2])
+                    temp = temp + 1
+                sum_cash = 0
+
+        #Asset Under Management (AUM)
+        if binaryDF[i,4] == 0:
+            if binaryDF[i,2] not in no_van:
+                minus_aum = minus_aum + binaryDF[i,1]
+            else:
+                minus_aum = minus_aum
+        elif binaryDF[i,4] == 1:
+            if minus_aum == 0:
+                if binaryDF[i,2] not in no_van:
+                    aum.append(aum[temp-1] + binaryDF[i,1])
+                else:
+                    aum.append(aum[temp-1])
+            elif minus_aum != 0:
+                if binaryDF[i,2] not in no_van:
+                    if (aum[temp-1] + binaryDF[i,1] - minus_aum) <= 0:
+                        aum.append(0)
+                    else:
+                        aum.append(
+                            aum[temp-1] + binaryDF[i,1] - minus_aum
+                            )
+                else:
+                    if (aum[temp-1] - minus_aum) <= 0 :
+                        aum.append(0)
+                    else:
+                        aum.append(aum[temp-1] - minus_aum)
+                minus_aum = 0
+
+        #Evolución de la Capitalización (CAP)
+        if binaryDF[i,4] == 0:
+            if binaryDF[i,2] not in no_van:
+                sum_cap += binaryDF[i,3]
+            else:
+                sum_cap = sum_cap
+        elif binaryDF[i,4] == 1:
+            if sum_cap != 0:
+                cap.append(cap[temp - 1] + sum_cap)
+                sum_cap = 0
+            elif sum_cap == 0:
+                cap.append(cap[temp-1])
         else:
-          cash.append(cash[temp])
-          no_van.append(binaryDF["close_price_index"].iloc[i])
-          temp = temp + 1
-      if sum_cash !=0 :
-        if (cash[temp] + sum_cash - binaryDF["invest_price"].iloc[i]) >= 0:
-          cash.append(cash[temp] + sum_cash - binaryDF["invest_price"].iloc[i])
-          temp = temp + 1
-        else:
-          cash.append(cash[temp] + sum_cash)
-          no_van.append(binaryDF["close_price_index"].iloc[i])
-          temp = temp + 1
-        sum_cash = 0
+            continue
+            
+        # si se topa con la última salida de cash...
+        if i == np.where(binaryDF[:,4] == 1)[-1][-1]:
+          # rompe el loop
+            break
 
-    #Asset Under Management (AUM)
-    if binaryDF["is_close"].iloc[i] == 0:
-      if binaryDF["close_price_index"].iloc[i] not in no_van:
-        minus_aum = minus_aum + binaryDF["invest_price"].iloc[i]
-      else:
-        minus_aum = minus_aum
-    elif binaryDF["is_close"].iloc[i] == 1:
-      if minus_aum == 0:
-        if binaryDF["close_price_index"].iloc[i] not in no_van:
-          aum.append(aum[temp-1] + binaryDF["invest_price"].iloc[i])
-        else:
-          aum.append(aum[temp-1])
-      elif minus_aum != 0:
-        if binaryDF["close_price_index"].iloc[i] not in no_van:
-          if (aum[temp-1] + binaryDF["invest_price"].iloc[i] - minus_aum) <= 0:
-            aum.append(0)
-          else:
-            aum.append(
-                aum[temp-1] + binaryDF["invest_price"].iloc[i] - minus_aum
-                )
-        else:
-          if (aum[temp-1] - minus_aum) <= 0 :
-            aum.append(0)
-          else:
-            aum.append(aum[temp-1] - minus_aum)
-        minus_aum = 0
-
-    #Evolución de la Capitalización (CAP)
-    if binaryDF["is_close"].iloc[i] == 0:
-      if binaryDF["close_price_index"].iloc[i] not in no_van:
-        sum_cap += binaryDF["net"].iloc[i]
-      else:
-        sum_cap = sum_cap
-    elif binaryDF["is_close"].iloc[i] == 1:
-      if sum_cap != 0:
-        cap.append(cap[temp - 1] + sum_cap)
-        sum_cap = 0
-      elif sum_cap == 0:
-        cap.append(cap[temp-1])
-    else:
-      continue
-
-    # si se topa con la última salida de cash...
-    if i == binaryDF.query("is_close == 1").index[-1]:
-      # rompe el loop
-      break
-
-  # pandas vacío para almacenamiento de info final
-  assetum = pd.DataFrame()
-  # añadidura de fecha de evento 
-  assetum["close_date"] = dates[1:] # 'close_date' como nombre para post. merge
-  # añadidura de AUM
-  assetum["aum"] = aum[1:]
-  # añadidura de CASH
-  assetum["cash"] = cash[1:]
-  # añadidura de CAP
-  assetum["cap"] = cap[1:]
-
-  return assetum
-
+    
+    return aum,cash,cap, dates

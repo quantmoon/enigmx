@@ -13,7 +13,7 @@ from enigmx.tests.stocks import stocks
 
 
 
-server_name = "34.71.157.141" 
+server_name = "34.122.49.78" 
 referential_base_database = 'TSQL'
 pathzarr = '/var/data/data/'
 list_stocks = stocks
@@ -55,8 +55,8 @@ enigmxsql.create_table_database(
      bars_barrier = False,
      bars_weights = False,
      bars_features = False,
-     backtest_database = False,
-     bars_stacked = True,
+     backtest_database = True,
+     bars_stacked = False,
      creation_database = True
      )
 
@@ -70,7 +70,7 @@ enigmxsql.compute_info_to_sql(
             triple_barrier_computation_process = False, 
             sample_weight_computation_process = False,
             features_bar_computation_process = False,
-            features_stacking = True,
+            features_stacking = False,
 	    )
 
 

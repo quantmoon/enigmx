@@ -4,7 +4,7 @@ webpage: https://www.quantmoon.tech//
 """
 
 import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True), num_cpus=1)
+ray.init(include_dashboard=(False),ignore_reinit_error=(True), num_cpus=2)
 
 from enigmx.classEnigmx import EnigmX
 import numpy as np
@@ -86,13 +86,13 @@ dict_models = {
 	   'solver' :['newton-cg','lbfgs','sag','saga'],
 	   'C':[.6,.8,1]}
        ),
-    'keras':
-	(kerasModel,
-        dict(
-            batch_size = [10, 20, 40, 60, 80, 100], 
-            epochs = [10, 50, 100]
-            ) 
-        )
+#    'keras':
+#	(kerasModel,
+#        dict(
+#            batch_size = [10, 20, 40, 60, 80, 100], 
+#            epochs = [10, 50, 100]
+#            ) 
+#        )
      }
     
 
@@ -108,7 +108,7 @@ instance = EnigmX(bartype = 'VOLUME',
                   method = 'MDA', 
                   base_path = main_path,
                   cloud_framework = True,
-                  server_name = "34.71.157.141",
+                  server_name = "34.122.49.78",
                   stationary_stacked = True,
                   features_database = "BARS_FEATURES",
                   uid = ['sqlserver'],
@@ -137,16 +137,16 @@ instance = EnigmX(bartype = 'VOLUME',
    
 
 # get multi process for tunning and backtest
-instance.get_multi_process(
-     code_backtest = 1, 
-     dict_exo_models = dict_models,
-     endogenous_model_sufix= 'rf',    
-     trials = 20, 
-     partitions = 2, 
-     cloud_instance = True,
-     variables = variables
-     )
+#instance.get_multi_process(
+#     code_backtest = 1, 
+#     dict_exo_models = dict_models,
+#     endogenous_model_sufix= 'rf',    
+#     trials = 20, 
+#     partitions = 2, 
+#     cloud_instance = True,
+#     variables = variables
+#     )
  # extraemos las métricas del combinatorial
-#instance.get_metrics(
-#    code_backtest = '100'
-#    )
+instance.get_metrics(
+    code_backtest = '1'
+    )

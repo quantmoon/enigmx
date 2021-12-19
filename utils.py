@@ -1424,9 +1424,6 @@ def dataPreparation_forTuning(driver,
             )
  
     
-   # print("ORIGINAL DF STACKED COLUMNS")
-   # print(dfStacked.columns)
-   # print(" ")
     
     y = SQLFRAME.read_table_info(
             statement = f"SELECT * FROM [BARS_STACKED].[dbo].LABELS_{step}",
@@ -1445,14 +1442,10 @@ def dataPreparation_forTuning(driver,
     y.index = y[timeIndexName]
     y.drop(timeIndexName,axis = 1,inplace = True)
     y = y['labels']
+
     # array conteniendo los nombres de features ingresados
     variables = [variable.strip() for variable in variables.split(',')]
-    print("variables",variables)
-    # Para calcular la purga y embargo
-#    if step == 'BACKTEST':
-#        variables.extend(['horizon'])
 
-    # selección únicamente de features
     X = dfStacked.copy()
     X = X[variables]
     

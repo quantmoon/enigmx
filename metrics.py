@@ -374,6 +374,8 @@ class EnigmxMetrics(object):
         self.fixed_comission = fixed_comission
         # benchmark de 0 a 1 para el probabilistic sharpe ratio
         self.psp_benchmark = psp_benchmark 
+
+        print("Computando las métricas de un trial",flush = True)
         
     def generate(self):
         

@@ -653,7 +653,7 @@ class EnigmX:
     
     def get_metrics(self, code_backtest, database = 'BACKTESTS'):
         
-        
+                
         #abrir la instancia sql base, la conexión y el cursor
         SQLFRAME, dbconn, cursor = databundle_instance(
                     #nombre del servidor SQL Local
@@ -671,7 +671,9 @@ class EnigmX:
                     #referential database for SQL initial Loc
                     referential_base_database = self.features_database
                     )                    
-        
+        print("LEYENDO TABLA")        
+
+
         # extraemos el df de trials segun codigo de backtest
         df_trials = SQLFRAME.read_table_info(
             "SELECT * FROM [BACKTESTS].[dbo].BACKTEST_TRIAL_{}".format(
@@ -682,7 +684,7 @@ class EnigmX:
             dataframe = True
             )
         
-        print("<<<<< :::::::::::::: Metrics Computation Initialization...")
+        print("<<<<< :::::::::::::: Metrics Computation Initialization...", flush = True)
 
         #df_trials['barrierTime']= pd.to_datetime(df_trials['barrierTime'])
 
