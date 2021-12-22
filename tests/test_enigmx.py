@@ -4,7 +4,7 @@ webpage: https://www.quantmoon.tech//
 """
 
 import ray
-ray.init(include_dashboard=(False),ignore_reinit_error=(True), num_cpus=2)
+ray.init(include_dashboard=(False),ignore_reinit_error=(True), num_cpus=1)
 
 from enigmx.classEnigmx import EnigmX
 import numpy as np
@@ -74,18 +74,18 @@ dict_models = {
 	(AdaBoostClassifier(),
 	 {'n_estimators':[10,50,100]}
         ),
-     'mlperceptron' :
-	(MLPClassifier(),
-	 {'activation':['logistic','tanh','relu'],
-         'solver':['lbfgs','sgd','adam']}
-        ),
-     'logisticregression':
-	(LogisticRegression(),
-	  { 'multi_class':['multinomial'],
-	   #'penalty':['elasticnet'],
-	   'solver' :['newton-cg','lbfgs','sag','saga'],
-	   'C':[.6,.8,1]}
-       ),
+#     'mlperceptron' :
+#	(MLPClassifier(),
+#	 {'activation':['logistic','tanh','relu'],
+#         'solver':['lbfgs','sgd','adam']}
+#        ),
+#     'logisticregression':
+#	(LogisticRegression(),
+#	  { 'multi_class':['multinomial'],
+#	   #'penalty':['elasticnet'],
+#	   'solver' :['newton-cg','lbfgs','sag','saga'],
+#	   'C':[.6,.8,1]}
+#      ),
 #    'keras':
 #	(kerasModel,
 #        dict(
@@ -137,16 +137,16 @@ instance = EnigmX(bartype = 'VOLUME',
    
 
 # get multi process for tunning and backtest
-#instance.get_multi_process(
-#     code_backtest = 1, 
-#     dict_exo_models = dict_models,
-#     endogenous_model_sufix= 'rf',    
-#     trials = 20, 
-#     partitions = 2, 
-#     cloud_instance = True,
-#     variables = variables
-#     )
+instance.get_multi_process(
+     code_backtest = 2, 
+     dict_exo_models = dict_models,
+     endogenous_model_sufix= 'rf',    
+     trials = 20, 
+     partitions = 2, 
+     cloud_instance = True,
+     variables = variables
+     )
  # extraemos las métricas del combinatorial
-instance.get_metrics(
-    code_backtest = '1'
-    )
+#instance.get_metrics(
+#    code_backtest = '2'
+#    )

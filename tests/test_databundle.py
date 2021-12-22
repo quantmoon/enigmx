@@ -56,7 +56,7 @@ enigmxsql.create_table_database(
      bars_weights = False,
      bars_features = False,
      backtest_database = True,
-     bars_stacked = False,
+     bars_stacked = True,
      creation_database = True
      )
 
@@ -70,7 +70,7 @@ enigmxsql.compute_info_to_sql(
             triple_barrier_computation_process = False, 
             sample_weight_computation_process = False,
             features_bar_computation_process = False,
-            features_stacking = False,
+            features_stacking = True,
 	    )
 
 
