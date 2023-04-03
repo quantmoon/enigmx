@@ -11,6 +11,6 @@ Authors:
 
 Important: the last updated version of Enigmx belongs to the branch *"cloud_test"*, corresponding to this section.
 
-Please, see the [Project Article](https://enigmx.com/the-project/) or the [Project Whitepaper](https://www.docdroid.net/txvET7H/enigmx-whitepaper-en-pdf) to see further details.
+Please, see the [Project Article](https://enigmx.com/the-project/) or the [Project Whitepaper](https://www.docdroid.net/txvET7H/enigmx-whitepaper-en-pdf) for further details.
 
 Any inquiries, please send us a email at contacto@quantmoon.com. 
