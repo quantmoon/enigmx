@@ -15,4 +15,4 @@ Please, see the [Project Article](https://enigmx.com/the-project/) or the [Proje
 
 Any inquiries, please send us a email at contacto@quantmoon.com. 
 
-**Disclaimer:** _The material embodied in this software is provided to you "as-is" and without warranty of any kind, express, implied or otherwise, including without limitation, any warranty of fitness for a particular purpose. The author WILL NOT take any responsability of potential errors in the uses of this software. 
+**Disclaimer:** _The material embodied in this software is provided to you "as-is" and without warranty of any kind, express, implied or otherwise, including without limitation, any warranty of fitness for a particular purpose. The author WILL NOT take any responsability of potential errors in the uses of this software._
