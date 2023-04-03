@@ -9,6 +9,8 @@ Authors:
 - [Abraham Soldevilla](https://www.linkedin.com/in/abraham-soldevilla-cqf-bb5a85170/)
 - [William Vásquez](https://www.linkedin.com/in/vasquezwilliam/)
 
+Important: the last updated version of Enigmx belongs to the branch *cloud_test*
+
 Please, see the [Project Article](https://enigmx.com/the-project/) or the [Project Whitepaper](https://www.docdroid.net/txvET7H/enigmx-whitepaper-en-pdf) to see further details.
 
 Any inqueries, please send us a email at contacto@quantmoon.com. 
