@@ -1,3 +1,3 @@
-EnigmX - The investment strategies factory
+# EnigmX - The investment strategies factory
 
 *****
