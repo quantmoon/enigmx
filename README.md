@@ -4,10 +4,10 @@
 
 Authors:
 
-- [Helí Gonzales Pérez](https://www.linkedin.com/in/heli-gonzales/).
-- [Frank Salvador Ygnacio Rosas](https://www.linkedin.com/in/fsyrosas/).
-- [Abraham Soldevilla](https://www.linkedin.com/in/abraham-soldevilla-cqf-bb5a85170/).
-- [William Vásquez](https://www.linkedin.com/in/vasquezwilliam/).
+- [Helí Gonzales Pérez](https://www.linkedin.com/in/heli-gonzales/)
+- [Frank Salvador Ygnacio Rosas](https://www.linkedin.com/in/fsyrosas/)
+- [Abraham Soldevilla](https://www.linkedin.com/in/abraham-soldevilla-cqf-bb5a85170/)
+- [William Vásquez](https://www.linkedin.com/in/vasquezwilliam/)
 
 Important: the last updated version of Enigmx belongs to the branch *"cloud_test"*, corresponding to this section.
 
